@@ -375,6 +375,45 @@
             theme: { mode: 'dark' }
         });
         categoryChart.render();
+        fetch()const sheetCsvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRKgVp3AKe0ohg0mAmXllwD_LfCBq_m_5WeXuBd8jNnsD6SR9eU9lFD82f3itnQun4RzTfi9ShM1L0i/pub?output=csv';
+
+async function loadPpuData() {
+    try {
+        const response = await fetch(sheetCsvUrl);
+        const dataText = await response.text();
+        
+        // Memecah baris CSV menjadi array
+        const rows = dataText.split('\n').slice(1); // Potong baris header
+        
+        const tableBody = document.querySelector('tbody');
+        tableBody.innerHTML = ''; // Bersihkan data sampel/dummy
+
+        rows.forEach(row => {
+            const cols = row.split(',');
+            if (cols.length >= 8) {
+                // Menata baris tabel secara dinamis dari data spreadsheet
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-slate-800/40';
+                tr.innerHTML = `
+                    <td class="p-3 font-bold text-white">${cols[0]}</td>
+                    <td class="p-3">${cols[1]}</td>
+                    <td class="p-3">${cols[2]} HM</td>
+                    <td class="p-3 text-rose-400 font-semibold">${cols[3]}%</td>
+                    <td class="p-3 text-amber-400 font-semibold">${cols[4]}%</td>
+                    <td class="p-3 text-emerald-400 font-semibold">${cols[5]}%</td>
+                    <td class="p-3">${cols[6]}</td>
+                    <td class="p-3 text-slate-300">${cols[7]}</td>
+                `;
+                tableBody.appendChild(tr);
+            }
+        });
+    } catch (error) {
+        console.error('Gagal mengambil data dari Google Sheets:', error);
+    }
+}
+
+// Jalankan fungsi saat halaman selesai dimuat
+loadPpuData();
     </script>
 </body>
 </html>
