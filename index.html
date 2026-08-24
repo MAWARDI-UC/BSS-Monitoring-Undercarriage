@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BSS UCR MONITORING - System Management</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- ApexCharts CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0f172a;
+            color: #f8fafc;
+        }
+    </style>
+</head>
+<body class="min-h-screen pb-12">
+
+    <!-- Top Navbar -->
+    <header class="bg-slate-900 border-b border-slate-800 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <!-- Brand / Logo -->
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-500 font-bold">
+                        <i data-lucide="shield-alert" class="w-6 h-6 text-amber-500"></i>
+                    </div>
+                    <div>
+                        <h1 class="font-bold text-lg leading-none text-white tracking-wide">BSS UCR MONITORING</h1>
+                        <span class="text-xs text-amber-400 font-medium">Program Pemeriksaan Undercarriage (PPU)</span>
+                    </div>
+                </div>
+
+                <!-- Right Side Profile & Actions -->
+                <div class="flex items-center space-x-4">
+                    <div class="flex items-center space-x-3 bg-slate-800/80 px-3 py-1.5 rounded-lg border border-slate-700">
+                        <div class="w-8 h-8 rounded-full bg-amber-500/20 border border-amber-400 flex items-center justify-center text-amber-400 font-bold text-sm">
+                            <i data-lucide="user" class="w-4 h-4"></i>
+                        </div>
+                        <div class="text-xs">
+                            <p class="font-semibold text-slate-200">Administrator System</p>
+                            <p class="text-slate-400 text-[10px]">Role: <span class="text-amber-400 font-semibold">Plant / Technical</span></p>
+                        </div>
+                    </div>
+                    <button class="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 text-xs transition">
+                        <i data-lucide="log-out" class="w-4 h-4"></i>
+                        <span>Logout</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Navigation Tabs -->
+            <nav class="flex space-x-2 border-t border-slate-800/60 py-2">
+                <a href="#" class="px-3 py-1.5 rounded-md text-xs font-semibold bg-amber-500 text-slate-950 flex items-center space-x-1.5 shadow-md shadow-amber-500/20">
+                    <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
+                    <span>Dashboard PPU</span>
+                </a>
+                <a href="#" class="px-3 py-1.5 rounded-md text-xs font-medium text-slate-400 hover:text-slate-200 hover:bg-slate-800 flex items-center space-x-1.5 transition">
+                    <i data-lucide="clipboard-check" class="w-4 h-4"></i>
+                    <span>Input Hasil Pengukuran</span>
+                </a>
+                <a href="#" class="px-3 py-1.5 rounded-md text-xs font-medium text-slate-400 hover:text-slate-200 hover:bg-slate-800 flex items-center space-x-1.5 transition">
+                    <i data-lucide="layers" class="w-4 h-4"></i>
+                    <span>Klasifikasi Unit (A/B/C)</span>
+                </a>
+                <a href="#" class="px-3 py-1.5 rounded-md text-xs font-medium text-slate-400 hover:text-slate-200 hover:bg-slate-800 flex items-center space-x-1.5 transition">
+                    <i data-lucide="wrench" class="w-4 h-4"></i>
+                    <span>Plan Replacement</span>
+                </a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 space-y-6">
+
+        <!-- Welcome Banner -->
+        <div class="relative overflow-hidden rounded-2xl bg-gradient-to-r from-slate-900 via-slate-800 to-amber-950/40 p-6 border border-slate-800 shadow-xl">
+            <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                    <div class="flex items-center space-x-2 mb-2">
+                        <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold tracking-wide uppercase bg-amber-500 text-slate-950">PLANT & ENGINEERING</span>
+                        <span class="text-xs text-emerald-400 font-medium flex items-center space-x-1">
+                            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                            <span>Monitoring PPU Active</span>
+                        </span>
+                    </div>
+                    <h2 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">Undercarriage Wear & Status Dashboard</h2>
+                    <p class="text-xs text-amber-400 font-semibold tracking-wider uppercase mt-1">PROGRAM PEMERIKSAAN UNDERCARRIAGE (PPU)</p>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <button class="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-semibold text-xs flex items-center space-x-1.5 transition shadow-lg shadow-amber-500/20">
+                        <i data-lucide="plus-circle" class="w-4 h-4"></i>
+                        <span>+ Input Pengukuran PPU</span>
+                    </button>
+                    <button class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 font-semibold text-xs flex items-center space-x-1.5 transition">
+                        <i data-lucide="file-text" class="w-4 h-4"></i>
+                        <span>Export Report</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filter Bar -->
+        <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-5 shadow-lg space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <div class="flex items-center space-x-2 text-amber-400 font-bold text-sm">
+                    <i data-lucide="filter" class="w-4 h-4"></i>
+                    <span class="text-slate-100">Filter Unit & Site Monitoring</span>
+                </div>
+                <button class="text-xs text-slate-400 hover:text-amber-400 flex items-center space-x-1 transition">
+                    <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
+                    <span>Reset Filter</span>
+                </button>
+            </div>
+
+            <!-- Filter Controls Grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4">
+                <div>
+                    <label class="block text-[11px] font-medium text-slate-400 mb-1">Site Operational</label>
+                    <select class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-amber-500">
+                        <option value="ALL">Semua Site</option>
+                        <option value="MBL">Site MBL</option>
+                        <option value="MHU">Site MHU</option>
+                        <option value="BAYAN">Site BAYAN</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-[11px] font-medium text-slate-400 mb-1">Model Unit</label>
+                    <select class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-amber-500">
+                        <option value="ALL">Semua Model</option>
+                        <option value="D85ESS">Bulldozer D85ESS</option>
+                        <option value="D375A">Bulldozer D375A</option>
+                        <option value="PC2000">Excavator PC2000</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-[11px] font-medium text-slate-400 mb-1">Komponen Undercarriage</label>
+                    <select class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-amber-500">
+                        <option value="ALL">Semua Komponen</option>
+                        <option value="Track Link">Track Link</option>
+                        <option value="Track Roller">Track Roller</option>
+                        <option value="Carrier Roller">Carrier Roller</option>
+                        <option value="Sprocket">Sprocket</option>
+                        <option value="Idler">Idler</option>
+                        <option value="Track Shoe">Track Shoe</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-[11px] font-medium text-slate-400 mb-1">Klasifikasi Condition</label>
+                    <select class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-amber-500">
+                        <option value="ALL">Semua Kategori</option>
+                        <option value="A">Kategori A (&lt;70% Wear)</option>
+                        <option value="B">Kategori B (70-85% Wear)</option>
+                        <option value="C">Kategori C (&gt;85% Critical)</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-[11px] font-medium text-slate-400 mb-1">Vendor Support</label>
+                    <select class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-amber-500">
+                        <option value="ALL">Semua Vendor</option>
+                        <option value="UT">PT. United Tractors</option>
+                        <option value="PFI">PT. Pacific Firstrack Indonesia</option>
+                        <option value="KMT">PT. Kaltim Multi Traktor</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- KPI Summary Cards -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+
+            <!-- Card 1: Total Unit Monitored -->
+            <div class="bg-slate-900/90 border border-slate-800 p-5 rounded-2xl flex items-center justify-between shadow-md">
+                <div>
+                    <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Total Unit Monitored</p>
+                    <h3 class="text-2xl font-black text-white mt-1">42 Unit</h3>
+                    <p class="text-[10px] text-slate-500 mt-1">HM Calculate Basis</p>
+                </div>
+                <div class="w-12 h-12 rounded-2xl bg-blue-500/10 border border-blue-500/30 flex items-center justify-center text-blue-400">
+                    <i data-lucide="truck" class="w-6 h-6"></i>
+                </div>
+            </div>
+
+            <!-- Card 2: Wear Level Alert > 80% -->
+            <div class="bg-slate-900/90 border border-slate-800 p-5 rounded-2xl flex items-center justify-between shadow-md">
+                <div>
+                    <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Critical Wear (&gt;80%)</p>
+                    <h3 class="text-2xl font-black text-amber-400 mt-1">8 Unit</h3>
+                    <p class="text-[10px] text-amber-500 mt-1 font-semibold">Perlu Schedule Replace</p>
+                </div>
+                <div class="w-12 h-12 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-500">
+                    <i data-lucide="alert-triangle" class="w-6 h-6"></i>
+                </div>
+            </div>
+
+            <!-- Card 3: Dominan Replacement Need -->
+            <div class="bg-slate-900/90 border border-slate-800 p-5 rounded-2xl flex items-center justify-between shadow-md">
+                <div>
+                    <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Komponen Kritis</p>
+                    <h3 class="text-2xl font-black text-white mt-1">Track Link</h3>
+                    <p class="text-[10px] text-rose-400 mt-1 font-semibold">Rata-rata Wear 84%</p>
+                </div>
+                <div class="w-12 h-12 rounded-2xl bg-rose-500/10 border border-rose-500/30 flex items-center justify-center text-rose-400">
+                    <i data-lucide="disc" class="w-6 h-6"></i>
+                </div>
+            </div>
+
+            <!-- Card 4: Achievement PPU -->
+            <div class="bg-slate-900/90 border border-slate-800 p-5 rounded-2xl flex items-center justify-between shadow-md">
+                <div>
+                    <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">PPU Achievement</p>
+                    <h3 class="text-2xl font-black text-white mt-1">94.2%</h3>
+                    <p class="text-[10px] text-emerald-400 mt-1 font-semibold">Inspeksi On-Schedule</p>
+                </div>
+                <div class="w-12 h-12 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
+                    <i data-lucide="check-circle-2" class="w-6 h-6"></i>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Charts Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+            <!-- Wear Level Distribution per Component -->
+            <div class="lg:col-span-7 bg-slate-900/90 border border-slate-800 p-5 rounded-2xl shadow-lg flex flex-col justify-between">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="flex items-center space-x-2">
+                        <i data-lucide="bar-chart-3" class="w-4 h-4 text-amber-400"></i>
+                        <h3 class="font-bold text-sm text-slate-100">Tingkat Keausan Rata-rata Komponen (%)</h3>
+                    </div>
+                    <span class="text-[10px] font-semibold bg-slate-800 text-slate-400 px-2.5 py-1 rounded-md border border-slate-700">Persentase Wear</span>
+                </div>
+                <div id="wearChart" class="w-full"></div>
+            </div>
+
+            <!-- Distribution Klasifikasi Condition (A / B / C) -->
+            <div class="lg:col-span-5 bg-slate-900/90 border border-slate-800 p-5 rounded-2xl shadow-lg flex flex-col justify-between">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="flex items-center space-x-2">
+                        <i data-lucide="pie-chart" class="w-4 h-4 text-amber-400"></i>
+                        <h3 class="font-bold text-sm text-slate-100">Klasifikasi Kondisi Undercarriage</h3>
+                    </div>
+                    <span class="text-[10px] font-semibold bg-slate-800 text-slate-400 px-2.5 py-1 rounded-md border border-slate-700">Kategori A/B/C</span>
+                </div>
+                <div id="categoryChart" class="w-full flex items-center justify-center my-auto"></div>
+            </div>
+
+        </div>
+
+        <!-- Table Monitoring Unit Wear Status -->
+        <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-5 shadow-lg space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <div class="flex items-center space-x-2">
+                    <i data-lucide="table" class="w-4 h-4 text-amber-400"></i>
+                    <h3 class="font-bold text-sm text-slate-100">Status Keausan Unit (PPU Real-time Monitoring)</h3>
+                </div>
+                <span class="text-xs text-slate-400">HM Calculate Monitoring</span>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs text-slate-300">
+                    <thead class="bg-slate-800/80 uppercase text-[10px] text-slate-400 border-b border-slate-700">
+                        <tr>
+                            <th class="p-3">Code Unit</th>
+                            <th class="p-3">Site</th>
+                            <th class="p-3">HM Calculate</th>
+                            <th class="p-3">Track Link Wear</th>
+                            <th class="p-3">Track Roller Wear</th>
+                            <th class="p-3">Sprocket Wear</th>
+                            <th class="p-3">Klasifikasi</th>
+                            <th class="p-3">Rekomendasi Action</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-800">
+                        <tr class="hover:bg-slate-800/40">
+                            <td class="p-3 font-bold text-white">DZ-102</td>
+                            <td class="p-3">MBL</td>
+                            <td class="p-3">12,450 HM</td>
+                            <td class="p-3 text-rose-400 font-semibold">88%</td>
+                            <td class="p-3 text-amber-400 font-semibold">78%</td>
+                            <td class="p-3 text-emerald-400 font-semibold">62%</td>
+                            <td class="p-3"><span class="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-500/20 text-rose-400 border border-rose-500/30">Kategori C</span></td>
+                            <td class="p-3 text-slate-300">Schedule Replace Track Link & Bushing</td>
+                        </tr>
+                        <tr class="hover:bg-slate-800/40">
+                            <td class="p-3 font-bold text-white">EX-205</td>
+                            <td class="p-3">MHU</td>
+                            <td class="p-3">8,320 HM</td>
+                            <td class="p-3 text-amber-400 font-semibold">76%</td>
+                            <td class="p-3 text-amber-400 font-semibold">81%</td>
+                            <td class="p-3 text-emerald-400 font-semibold">55%</td>
+                            <td class="p-3"><span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-400 border border-amber-500/30">Kategori B</span></td>
+                            <td class="p-3 text-slate-300">Monitoring PPU Ketat & Servis Roller</td>
+                        </tr>
+                        <tr class="hover:bg-slate-800/40">
+                            <td class="p-3 font-bold text-white">DZ-88</td>
+                            <td class="p-3">BAYAN</td>
+                            <td class="p-3">4,110 HM</td>
+                            <td class="p-3 text-emerald-400 font-semibold">42%</td>
+                            <td class="p-3 text-emerald-400 font-semibold">38%</td>
+                            <td class="p-3 text-emerald-400 font-semibold">30%</td>
+                            <td class="p-3"><span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Kategori A</span></td>
+                            <td class="p-3 text-slate-300">Penataan Staffing Terrain Standar</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Script Chart Undercarriage -->
+    <script>
+        lucide.createIcons();
+
+        // 1. Bar Chart: Wear Level per Component
+        const wearChart = new ApexCharts(document.querySelector("#wearChart"), {
+            series: [{
+                name: 'Wear %',
+                data: [84, 76, 71, 65, 58, 62]
+            }],
+            chart: { type: 'bar', height: 280, toolbar: { show: false }, background: 'transparent' },
+            colors: ['#f59e0b'],
+            plotOptions: {
+                bar: { borderRadius: 6, columnWidth: '45%', distributed: true }
+            },
+            theme: { mode: 'dark' },
+            colors: ['#ef4444', '#f59e0b', '#f59e0b', '#10b981', '#10b981', '#10b981'],
+            legend: { show: false },
+            xaxis: {
+                categories: ['Track Link', 'Track Roller', 'Carrier Roller', 'Sprocket', 'Idler', 'Track Shoe'],
+                labels: { style: { colors: '#94a3b8', fontSize: '10px' } }
+            },
+            yaxis: {
+                max: 100,
+                labels: { formatter: (val) => val + '%', style: { colors: '#94a3b8', fontSize: '10px' } }
+            },
+            grid: { borderColor: '#1e293b', strokeDashArray: 3 },
+            tooltip: { theme: 'dark', y: { formatter: (val) => val + '%' } }
+        });
+        wearChart.render();
+
+        // 2. Donut Chart: Klasifikasi A / B / C
+        const categoryChart = new ApexCharts(document.querySelector("#categoryChart"), {
+            series: [22, 12, 8],
+            labels: ['Kategori A (<70% Wear)', 'Kategori B (70-85% Wear)', 'Kategori C (>85% Critical)'],
+            chart: { type: 'donut', height: 290, background: 'transparent' },
+            colors: ['#10b981', '#f59e0b', '#ef4444'],
+            stroke: { colors: ['#0f172a'] },
+            legend: { position: 'bottom', fontSize: '11px', labels: { colors: '#cbd5e1' } },
+            dataLabels: { enabled: false },
+            plotOptions: {
+                pie: {
+                    donut: {
+                        size: '70%',
+                        labels: {
+                            show: true,
+                            total: { show: true, label: 'Total Unit', color: '#94a3b8', fontSize: '11px', formatter: () => '42 Unit' },
+                            value: { color: '#ffffff', fontSize: '18px', fontWeight: '800' }
+                        }
+                    }
+                }
+            },
+            theme: { mode: 'dark' }
+        });
+        categoryChart.render();
+    </script>
+</body>
+</html>
