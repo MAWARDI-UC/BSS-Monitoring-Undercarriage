@@ -113,90 +113,42 @@
                     <i data-lucide="filter" class="w-4 h-4"></i>
                     <span class="text-slate-100">Filter Unit & Site Monitoring</span>
                 </div>
-                <button class="text-xs text-slate-400 hover:text-amber-400 flex items-center space-x-1 transition">
+                <button id="resetFilterBtn" class="text-xs text-slate-400 hover:text-amber-400 flex items-center space-x-1 transition">
                     <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
                     <span>Reset Filter</span>
                 </button>
             </div>
 
             <!-- Filter Controls Grid -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
                 <div>
                     <label class="block text-[11px] font-medium text-slate-400 mb-1">SITE</label>
-                    <select class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-amber-500">
+                    <select id="siteFilter" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-amber-500">
                         <option value="ALL">Semua Site</option>
-                        <option value="MBL">Site MBLM</option>
-                        <option value="MHU">Site MHU</option>
-                        <option value="BAYAN">Site BAYAN</option>
-                        <option value="CDI">Site CDI</option>
                     </select>
                 </div>
 
                 <div>
                     <label class="block text-[11px] font-medium text-slate-400 mb-1">TYPE</label>
-                    <select class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-amber-500">
+                    <select id="typeFilter" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-amber-500">
                         <option value="ALL">Semua TYPE</option>
-                        <option value="BULLDOZER">BULLDOZER</option>
-                        <option value="EXCAVATOR">EXCAVATOR</option>
-                        <option value="DRILLING">DRILLING</option>
                     </select>
                 </div>
 
                 <div>
                     <label class="block text-[11px] font-medium text-slate-400 mb-1">MODEL</label>
-                    <select class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-amber-500">
+                    <select id="modelFilter" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-amber-500">
                         <option value="ALL">Semua Model</option>
-                        <option value="D155A-6R">D155A-6R</option>
-                        <option value="D245S">D245S</option>
-                        <option value="D375A-5">D375A-5</option>
-                        <option value="D375A-6R">D375A-6R</option>
-                        <option value="D50KS">D50KS</option>
-                        <option value="D85E-SS-2">D85E-SS-2</option>
-                        <option value="DH24-B2">DH24-B2</option>
-                        <option value="DH24-C3">DH24-C3</option>
-                        <option value="E6210F">E6210F</option>
-                        <option value="E6215H">E6215H</option>
-                        <option value="E6350H">E6350H</option>
-                        <option value="E6360F">E6360F</option>
-                        <option value="E6500F">E6500F</option>
-                        <option value="E6550F">E6550F</option>
-                        <option value="E6650F">E6650F</option>
-                        <option value="E6780H">E6780H</option>
-                        <option value="E680F">E680F</option>
-                        <option value="E6920H">E6920H</option>
-                        <option value="ME105">ME105</option>
-                        <option value="ME109">ME109</option>
-                        <option value="PC1250SP-11R">PC1250SP-11R</option>
-                        <option value="PC1250SP-8R">PC1250SP-8R</option>
-                        <option value="PC2000-11R">PC2000-11R</option>
-                        <option value="PC2000-8">PC2000-8</option>
-                        <option value="PC500LC-10R">PC500LC-10R</option>
-                        <option value="PC850-SE">PC850-SE</option>
-                        <option value="R850LC-9">R850LC-9</option>
-                        <option value="SD26-C3 XL">SD26-C3 XL</option>
-                        <option value="SD32W">SD32W</option>
-                        <option value="SD34-C3 XL">SD34-C3 XL</option>
-                        <option value="SD60-C5">SD60-C5</option>
-                        <option value="SE980LCW">SE980LCW</option>
-                        <option value="XE1250">XE1250</option>
-                        <option value="XE2000">XE2000</option>
-                        <option value="XE900D">XE900D</option>
-                        <option value="ZX200-5G">ZX200-5G</option>
-                        <option value="ZX210F-5G">ZX210F-5G</option>
-                        <option value="ZX350H-5G">ZX350H-5G</option>
-                        <option value="ZX470H-5G">ZX470H-5G</option>
-                        <option value="ZX470LC-5G">ZX470LC-5G</option>
-                        <option value="ZX870H-5G">ZX870H-5G</option>
-                        <option value="ZX870LCH-5G">ZX870LCH-5G</option>
                     </select>
                 </div>
 
                 <div>
                     <label class="block text-[11px] font-medium text-slate-400 mb-1">ALARM PPU</label>
-                    <select class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-amber-500">
+                    <select id="alarmFilter" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-amber-500">
                         <option value="ALL">Semua Kategori</option>
-                        <option value="MENDEKATI PLAN PPU">MENDEKATI PLAN PPU</option>
                         <option value="OVER">OVER</option>
+                        <option value="MENDEKATI PLAN PPU">MENDEKATI PLAN PPU</option>
+                        <option value="ON SCHEDULE">ON SCHEDULE</option>
                     </select>
                 </div>
             </div>
@@ -204,24 +156,21 @@
 
         <!-- KPI Summary Cards -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-
-            <!-- Card 1: Total Unit Monitored -->
             <div class="bg-slate-900/90 border border-slate-800 p-5 rounded-2xl flex items-center justify-between shadow-md">
                 <div>
                     <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Total Unit Track Monitored</p>
-                    <h3 class="text-2xl font-black text-white mt-1">42 Unit</h3>
-                    <p class="text-[10px] text-slate-500 mt-1">Dalam monitorinh UCR Site</p>
+                    <h3 id="cardTotalUnit" class="text-2xl font-black text-white mt-1">0 Unit</h3>
+                    <p class="text-[10px] text-slate-500 mt-1">Dalam monitoring UCR Site</p>
                 </div>
                 <div class="w-12 h-12 rounded-2xl bg-blue-500/10 border border-blue-500/30 flex items-center justify-center text-blue-400">
                     <i data-lucide="truck" class="w-6 h-6"></i>
                 </div>
             </div>
 
-            <!-- Card 2: Wear Level Alert > 80% -->
             <div class="bg-slate-900/90 border border-slate-800 p-5 rounded-2xl flex items-center justify-between shadow-md">
                 <div>
                     <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">OVER Interval PPU</p>
-                    <h3 class="text-2xl font-black text-amber-400 mt-1">8 Unit</h3>
+                    <h3 id="cardOverUnit" class="text-2xl font-black text-amber-400 mt-1">0 Unit</h3>
                     <p class="text-[10px] text-amber-500 mt-1 font-semibold">Perlu Dilakukan PPU</p>
                 </div>
                 <div class="w-12 h-12 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-500">
@@ -229,11 +178,10 @@
                 </div>
             </div>
 
-            <!-- Card 3: Dominan Replacement Need -->
             <div class="bg-slate-900/90 border border-slate-800 p-5 rounded-2xl flex items-center justify-between shadow-md">
                 <div>
                     <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">MENDEKATI PLAN PPU</p>
-                    <h3 class="text-2xl font-black text-white mt-1">14 Unit</h3>
+                    <h3 id="cardMendekatiUnit" class="text-2xl font-black text-white mt-1">0 Unit</h3>
                     <p class="text-[10px] text-rose-400 mt-1 font-semibold">Perlu Schedule PPU</p>
                 </div>
                 <div class="w-12 h-12 rounded-2xl bg-rose-500/10 border border-rose-500/30 flex items-center justify-center text-rose-400">
@@ -241,7 +189,6 @@
                 </div>
             </div>
 
-            <!-- Card 4: Achievement PPU -->
             <div class="bg-slate-900/90 border border-slate-800 p-5 rounded-2xl flex items-center justify-between shadow-md">
                 <div>
                     <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">PPU Achievement</p>
@@ -252,13 +199,10 @@
                     <i data-lucide="check-circle-2" class="w-6 h-6"></i>
                 </div>
             </div>
-
         </div>
 
         <!-- Charts Grid -->
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-
-            <!-- Wear Level Distribution per Component -->
             <div class="lg:col-span-7 bg-slate-900/90 border border-slate-800 p-5 rounded-2xl shadow-lg flex flex-col justify-between">
                 <div class="flex items-center justify-between mb-4">
                     <div class="flex items-center space-x-2">
@@ -270,7 +214,6 @@
                 <div id="wearChart" class="w-full"></div>
             </div>
 
-            <!-- Distribution Klasifikasi Condition (A / B / C) -->
             <div class="lg:col-span-5 bg-slate-900/90 border border-slate-800 p-5 rounded-2xl shadow-lg flex flex-col justify-between">
                 <div class="flex items-center justify-between mb-4">
                     <div class="flex items-center space-x-2">
@@ -299,45 +242,14 @@
                         <tr>
                             <th class="p-3">Code Unit</th>
                             <th class="p-3">Site</th>
+                            <th class="p-3">Type</th>
+                            <th class="p-3">Model Unit</th>
                             <th class="p-3">HM Calculate</th>
-                            <th class="p-3">Track Link Wear</th>
-                            <th class="p-3">Track Roller Wear</th>
-                            <th class="p-3">Sprocket Wear</th>
-                            <th class="p-3">Klasifikasi</th>
-                            <th class="p-3">Rekomendasi Action</th>
+                            <th class="p-3">Alarm PPU Status</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-slate-800">
-                        <tr class="hover:bg-slate-800/40">
-                            <td class="p-3 font-bold text-white">DZ-102</td>
-                            <td class="p-3">MBL</td>
-                            <td class="p-3">12,450 HM</td>
-                            <td class="p-3 text-rose-400 font-semibold">88%</td>
-                            <td class="p-3 text-amber-400 font-semibold">78%</td>
-                            <td class="p-3 text-emerald-400 font-semibold">62%</td>
-                            <td class="p-3"><span class="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-500/20 text-rose-400 border border-rose-500/30">Kategori C</span></td>
-                            <td class="p-3 text-slate-300">Schedule Replace Track Link & Bushing</td>
-                        </tr>
-                        <tr class="hover:bg-slate-800/40">
-                            <td class="p-3 font-bold text-white">EX-205</td>
-                            <td class="p-3">MHU</td>
-                            <td class="p-3">8,320 HM</td>
-                            <td class="p-3 text-amber-400 font-semibold">76%</td>
-                            <td class="p-3 text-amber-400 font-semibold">81%</td>
-                            <td class="p-3 text-emerald-400 font-semibold">55%</td>
-                            <td class="p-3"><span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-400 border border-amber-500/30">Kategori B</span></td>
-                            <td class="p-3 text-slate-300">Monitoring PPU Ketat & Servis Roller</td>
-                        </tr>
-                        <tr class="hover:bg-slate-800/40">
-                            <td class="p-3 font-bold text-white">DZ-88</td>
-                            <td class="p-3">BAYAN</td>
-                            <td class="p-3">4,110 HM</td>
-                            <td class="p-3 text-emerald-400 font-semibold">42%</td>
-                            <td class="p-3 text-emerald-400 font-semibold">38%</td>
-                            <td class="p-3 text-emerald-400 font-semibold">30%</td>
-                            <td class="p-3"><span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Kategori A</span></td>
-                            <td class="p-3 text-slate-300">Penataan Staffing Terrain Standar</td>
-                        </tr>
+                    <tbody id="ppuTableBody" class="divide-y divide-slate-800">
+                        <!-- Content Rendered by JS -->
                     </tbody>
                 </table>
             </div>
@@ -345,21 +257,14 @@
 
     </main>
 
-    <!-- Script Chart Undercarriage -->
     <script>
         lucide.createIcons();
 
-        // 1. Bar Chart: Wear Level per Component
+        // ApexCharts Render
         const wearChart = new ApexCharts(document.querySelector("#wearChart"), {
-            series: [{
-                name: 'Wear %',
-                data: [84, 76, 71, 65, 58, 62]
-            }],
+            series: [{ name: 'Wear %', data: [84, 76, 71, 65, 58, 62] }],
             chart: { type: 'bar', height: 280, toolbar: { show: false }, background: 'transparent' },
-            colors: ['#f59e0b'],
-            plotOptions: {
-                bar: { borderRadius: 6, columnWidth: '45%', distributed: true }
-            },
+            plotOptions: { bar: { borderRadius: 6, columnWidth: '45%', distributed: true } },
             theme: { mode: 'dark' },
             colors: ['#ef4444', '#f59e0b', '#f59e0b', '#10b981', '#10b981', '#10b981'],
             legend: { show: false },
@@ -376,7 +281,6 @@
         });
         wearChart.render();
 
-        // 2. Donut Chart: Klasifikasi A / B / C
         const categoryChart = new ApexCharts(document.querySelector("#categoryChart"), {
             series: [22, 12, 8],
             labels: ['Kategori A (<70% Wear)', 'Kategori B (70-85% Wear)', 'Kategori C (>85% Critical)'],
@@ -391,7 +295,16 @@
                         size: '70%',
                         labels: {
                             show: true,
-                            total: { show: true, label: 'Total Unit', color: '#94a3b8', fontSize: '11px', formatter: () => '42 Unit' },
+                            total: { 
+                                show: true, 
+                                label: 'Total Unit', 
+                                color: '#94a3b8', 
+                                fontSize: '11px', 
+                                formatter: (w) => {
+                                    const total = w.globals.seriesTotals.reduce((a, b) => a + b, 0);
+                                    return total + ' Unit';
+                                }
+                            },
                             value: { color: '#ffffff', fontSize: '18px', fontWeight: '800' }
                         }
                     }
@@ -400,45 +313,119 @@
             theme: { mode: 'dark' }
         });
         categoryChart.render();
-        fetch()const sheetCsvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRKgVp3AKe0ohg0mAmXllwD_LfCBq_m_5WeXuBd8jNnsD6SR9eU9lFD82f3itnQun4RzTfi9ShM1L0i/pub?output=csv';
 
-async function loadPpuData() {
-    try {
-        const response = await fetch(sheetCsvUrl);
-        const dataText = await response.text();
-        
-        // Memecah baris CSV menjadi array
-        const rows = dataText.split('\n').slice(1); // Potong baris header
-        
-        const tableBody = document.querySelector('tbody');
-        tableBody.innerHTML = ''; // Bersihkan data sampel/dummy
+        // Target URL Google Sheets CSV Terbaru
+        const sheetCsvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSMyvNRqkn65gL_4tIjZKJeKRIQG9ODScl-6uIst7HobQXwRsP4J2BdI1NsA81_pHqxrH2t_sF75_Ch/pub?output=csv';
+        let globalPpuData = [];
 
-        rows.forEach(row => {
-            const cols = row.split(',');
-            if (cols.length >= 8) {
-                // Menata baris tabel secara dinamis dari data spreadsheet
+        async function loadPpuData() {
+            try {
+                const response = await fetch(sheetCsvUrl);
+                const dataText = await response.text();
+                
+                const rows = dataText.split('\n').filter(r => r.trim() !== '').slice(1);
+                
+                globalPpuData = rows.map(row => {
+                    const cols = row.split(',').map(c => c.trim().replace(/^"(.*)"$/, '$1'));
+                    return {
+                        site: cols[1] || '',      // Kolom B: SITE
+                        type: cols[2] || '',      // Kolom C: TYPE
+                        codeUnit: cols[3] || '',  // Kolom D: CODE UNIT
+                        model: cols[4] || '',     // Kolom E: MODEL UNIT
+                        hm: cols[6] || '0',       // Kolom G: HM CALCULATE
+                        alarm: cols[13] || ''     // Kolom N: ALARM PPU
+                    };
+                });
+
+                populateDropdowns(globalPpuData);
+                renderDashboard(globalPpuData);
+                
+            } catch (error) {
+                console.error('Gagal mengambil data dari Google Sheets:', error);
+            }
+        }
+
+        function populateDropdowns(data) {
+            const sites = [...new Set(data.map(d => d.site).filter(Boolean))].sort();
+            const types = [...new Set(data.map(d => d.type).filter(Boolean))].sort();
+            const models = [...new Set(data.map(d => d.model).filter(Boolean))].sort();
+
+            fillSelectOptions('siteFilter', sites, 'Semua Site');
+            fillSelectOptions('typeFilter', types, 'Semua TYPE');
+            fillSelectOptions('modelFilter', models, 'Semua Model');
+        }
+
+        function fillSelectOptions(elementId, items, defaultText) {
+            const select = document.getElementById(elementId);
+            select.innerHTML = `<option value="ALL">${defaultText}</option>`;
+            items.forEach(item => {
+                select.innerHTML += `<option value="${item}">${item}</option>`;
+            });
+        }
+
+        function renderDashboard(data) {
+            const tableBody = document.getElementById('ppuTableBody');
+            tableBody.innerHTML = '';
+
+            data.forEach(item => {
                 const tr = document.createElement('tr');
-                tr.className = 'hover:bg-slate-800/40';
+                tr.className = 'hover:bg-slate-800/40 border-b border-slate-800';
+                
+                let alarmStyle = 'text-emerald-400 font-semibold';
+                if (item.alarm.toUpperCase().includes('OVER')) {
+                    alarmStyle = 'text-rose-400 font-bold bg-rose-500/10 px-2 py-0.5 rounded border border-rose-500/20';
+                } else if (item.alarm.toUpperCase().includes('MENDEKATI')) {
+                    alarmStyle = 'text-amber-400 font-bold bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20';
+                }
+
                 tr.innerHTML = `
-                    <td class="p-3 font-bold text-white">${cols[0]}</td>
-                    <td class="p-3">${cols[1]}</td>
-                    <td class="p-3">${cols[2]} HM</td>
-                    <td class="p-3 text-rose-400 font-semibold">${cols[3]}%</td>
-                    <td class="p-3 text-amber-400 font-semibold">${cols[4]}%</td>
-                    <td class="p-3 text-emerald-400 font-semibold">${cols[5]}%</td>
-                    <td class="p-3">${cols[6]}</td>
-                    <td class="p-3 text-slate-300">${cols[7]}</td>
+                    <td class="p-3 font-bold text-white">${item.codeUnit}</td>
+                    <td class="p-3 text-slate-300">${item.site}</td>
+                    <td class="p-3 text-slate-300">${item.type}</td>
+                    <td class="p-3 text-slate-300">${item.model}</td>
+                    <td class="p-3 text-slate-300">${item.hm} HM</td>
+                    <td class="p-3"><span class="${alarmStyle}">${item.alarm || '-'}</span></td>
                 `;
                 tableBody.appendChild(tr);
-            }
-        });
-    } catch (error) {
-        console.error('Gagal mengambil data dari Google Sheets:', error);
-    }
-}
+            });
 
-// Jalankan fungsi saat halaman selesai dimuat
-loadPpuData();
+            // Refresh KPI Summary Card Numbers
+            document.getElementById('cardTotalUnit').innerText = `${data.length} Unit`;
+            document.getElementById('cardOverUnit').innerText = `${data.filter(d => d.alarm.toUpperCase().includes('OVER')).length} Unit`;
+            document.getElementById('cardMendekatiUnit').innerText = `${data.filter(d => d.alarm.toUpperCase().includes('MENDEKATI')).length} Unit`;
+        }
+
+        function applyFilters() {
+            const siteVal = document.getElementById('siteFilter').value;
+            const typeVal = document.getElementById('typeFilter').value;
+            const modelVal = document.getElementById('modelFilter').value;
+            const alarmVal = document.getElementById('alarmFilter').value;
+
+            const filteredData = globalPpuData.filter(item => {
+                const matchSite = (siteVal === 'ALL' || item.site === siteVal);
+                const matchType = (typeVal === 'ALL' || item.type === typeVal);
+                const matchModel = (modelVal === 'ALL' || item.model === modelVal);
+                const matchAlarm = (alarmVal === 'ALL' || item.alarm.toUpperCase().includes(alarmVal.toUpperCase()));
+                
+                return matchSite && matchType && matchModel && matchAlarm;
+            });
+
+            renderDashboard(filteredData);
+        }
+
+        ['siteFilter', 'typeFilter', 'modelFilter', 'alarmFilter'].forEach(id => {
+            document.getElementById(id).addEventListener('change', applyFilters);
+        });
+
+        document.getElementById('resetFilterBtn').addEventListener('click', () => {
+            document.getElementById('siteFilter').value = 'ALL';
+            document.getElementById('typeFilter').value = 'ALL';
+            document.getElementById('modelFilter').value = 'ALL';
+            document.getElementById('alarmFilter').value = 'ALL';
+            renderDashboard(globalPpuData);
+        });
+
+        loadPpuData();
     </script>
 </body>
 </html>
