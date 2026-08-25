@@ -377,12 +377,10 @@
                 globalPpuData = rows.map(row => {
                     const cols = row.split(',').map(c => c.trim().replace(/^"(.*)"$/, '$1'));
                     return {
-                        site: cols[1] || '',      // Kolom B: SITE
-                        type: cols[2] || '',      // Kolom C: TYPE
-                        codeUnit: cols[3] || '',  // Kolom D: CODE UNIT
-                        model: cols[4] || '',     // Kolom E: MODEL UNIT
-                        hm: cols[6] || '0',       // Kolom G: HM CALCULATE
-                        alarm: cols[13] || ''     // Kolom N: ALARM PPU
+                        site: cols[1] || '',      // Kolom A: SITE
+                        type: cols[2] || '',      // Kolom B: TYPE
+                        model: cols[4] || '',     // Kolom D: MODEL UNIT
+                        alarm: cols[12] || ''     // Kolom L: ALARM PPU
                     };
                 });
 
