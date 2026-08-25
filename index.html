@@ -125,10 +125,6 @@
                     <label class="block text-[11px] font-medium text-slate-400 mb-1">SITE</label>
                     <select id="siteFilter" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-amber-500">
                         <option value="ALL">Semua Site</option>
-                        <option value="MBL">Site MBLM</option>
-                        <option value="MHU">Site MHU</option>
-                        <option value="BAYAN">Site BAYAN</option>
-                        <option value="CDI">Site CDI</option>
                     </select>
                 </div>
 
@@ -136,9 +132,6 @@
                     <label class="block text-[11px] font-medium text-slate-400 mb-1">TYPE</label>
                     <select id="typeFilter" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-amber-500">
                         <option value="ALL">Semua TYPE</option>
-                        <option value="BULLDOZER">BULLDOZER</option>
-                        <option value="EXCAVATOR">EXCAVATOR</option>
-                        <option value="DRILLING">DRILLING</option>
                     </select>
                 </div>
 
@@ -146,48 +139,6 @@
                     <label class="block text-[11px] font-medium text-slate-400 mb-1">MODEL</label>
                     <select id="modelFilter" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-amber-500">
                         <option value="ALL">Semua Model</option>
-                        <option value="D155A-6R">D155A-6R</option>
-                        <option value="D245S">D245S</option>
-                        <option value="D375A-5">D375A-5</option>
-                        <option value="D375A-6R">D375A-6R</option>
-                        <option value="D50KS">D50KS</option>
-                        <option value="D85E-SS-2">D85E-SS-2</option>
-                        <option value="DH24-B2">DH24-B2</option>
-                        <option value="DH24-C3">DH24-C3</option>
-                        <option value="E6210F">E6210F</option>
-                        <option value="E6215H">E6215H</option>
-                        <option value="E6350H">E6350H</option>
-                        <option value="E6360F">E6360F</option>
-                        <option value="E6500F">E6500F</option>
-                        <option value="E6550F">E6550F</option>
-                        <option value="E6650F">E6650F</option>
-                        <option value="E6780H">E6780H</option>
-                        <option value="E680F">E680F</option>
-                        <option value="E6920H">E6920H</option>
-                        <option value="ME105">ME105</option>
-                        <option value="ME109">ME109</option>
-                        <option value="PC1250SP-11R">PC1250SP-11R</option>
-                        <option value="PC1250SP-8R">PC1250SP-8R</option>
-                        <option value="PC2000-11R">PC2000-11R</option>
-                        <option value="PC2000-8">PC2000-8</option>
-                        <option value="PC500LC-10R">PC500LC-10R</option>
-                        <option value="PC850-SE">PC850-SE</option>
-                        <option value="R850LC-9">R850LC-9</option>
-                        <option value="SD26-C3 XL">SD26-C3 XL</option>
-                        <option value="SD32W">SD32W</option>
-                        <option value="SD34-C3 XL">SD34-C3 XL</option>
-                        <option value="SD60-C5">SD60-C5</option>
-                        <option value="SE980LCW">SE980LCW</option>
-                        <option value="XE1250">XE1250</option>
-                        <option value="XE2000">XE2000</option>
-                        <option value="XE900D">XE900D</option>
-                        <option value="ZX200-5G">ZX200-5G</option>
-                        <option value="ZX210F-5G">ZX210F-5G</option>
-                        <option value="ZX350H-5G">ZX350H-5G</option>
-                        <option value="ZX470H-5G">ZX470H-5G</option>
-                        <option value="ZX470LC-5G">ZX470LC-5G</option>
-                        <option value="ZX870H-5G">ZX870H-5G</option>
-                        <option value="ZX870LCH-5G">ZX870LCH-5G</option>
                     </select>
                 </div>
 
@@ -366,35 +317,34 @@
         let globalPpuData = [];
 
         async function loadPpuData() {
-    try {
-        const response = await fetch(sheetCsvUrl);
-        const dataText = await response.text();
-        
-        // Split baris dan buang baris kosong
-        const rows = dataText.split('\n').filter(r => r.trim() !== '').slice(1);
-        
-        globalPpuData = rows.map(row => {
-            // Mengatasi pembacaan CSV yang dipisahkan koma
-            const cols = row.split(',').map(c => c.trim().replace(/^"(.*)"$/, '$1'));
-            
-            return {
-                site: cols[0] || '',      // Kolom A (Indeks 0) -> SITE
-                type: cols[1] || '',      // Kolom B (Indeks 1) -> TYPE
-                codeUnit: cols[2] || '',  // Kolom C (Indeks 2) -> CODE UNIT
-                model: cols[3] || '',     // Kolom D (Indeks 3) -> MODEL UNIT
-                hm: cols[5] || '0',       // Kolom F (Indeks 5) -> HM
-                alarm: cols[11] || ''     // Kolom L (Indeks 11) -> ALARM PPU
-            };
-        });
+            try {
+                const response = await fetch(sheetCsvUrl);
+                const dataText = await response.text();
+                
+                // Split baris dan buang baris kosong
+                const rows = dataText.split('\n').filter(r => r.trim() !== '').slice(1);
+                
+                globalPpuData = rows.map(row => {
+                    const cols = row.split(',').map(c => c.trim().replace(/^"(.*)"$/, '$1'));
+                    
+                    return {
+                        site: cols[0] || '',      // Kolom A -> SITE
+                        type: cols[1] || '',      // Kolom B -> TYPE
+                        codeUnit: cols[2] || '',  // Kolom C -> CODE UNIT
+                        model: cols[3] || '',     // Kolom D -> MODEL UNIT
+                        hm: cols[5] || '0',       // Kolom F -> HM
+                        alarm: cols[11] || ''     // Kolom L -> ALARM PPU
+                    };
+                });
 
-        // Update dropdown & tabel
-        populateDropdowns(globalPpuData);
-        renderDashboard(globalPpuData);
-        
-    } catch (error) {
-        console.error('Gagal mengambil data dari Google Sheets:', error);
-    }
-}
+                // Update dropdown & tabel
+                populateDropdowns(globalPpuData);
+                renderDashboard(globalPpuData);
+                
+            } catch (error) {
+                console.error('Gagal mengambil data dari Google Sheets:', error);
+            }
+        }
 
         function populateDropdowns(data) {
             const sites = [...new Set(data.map(d => d.site).filter(Boolean))].sort();
@@ -429,12 +379,11 @@
                     alarmStyle = 'text-amber-400 font-bold bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20';
                 }
 
+                // Disesuaikan persis 4 kolom: SITE | TYPE | MODEL UNIT | ALARM PPU STATUS
                 tr.innerHTML = `
-                    <td class="p-3 font-bold text-white">${item.codeUnit}</td>
-                    <td class="p-3 text-slate-300">${item.site}</td>
+                    <td class="p-3 font-bold text-white">${item.site}</td>
                     <td class="p-3 text-slate-300">${item.type}</td>
                     <td class="p-3 text-slate-300">${item.model}</td>
-                    <td class="p-3 text-slate-300">${item.hm} HM</td>
                     <td class="p-3"><span class="${alarmStyle}">${item.alarm || '-'}</span></td>
                 `;
                 tableBody.appendChild(tr);
