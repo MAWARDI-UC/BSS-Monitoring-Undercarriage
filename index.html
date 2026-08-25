@@ -260,17 +260,16 @@
     <script>
     lucide.createIcons();
 
-    // 1. Inisialisasi Grafik Kiri: PPU Achievement Masing-Masing Site
+    // Target URL Google Sheets CSV
+    const sheetCsvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSMyvNRqkn65gL_4tIjZKJeKRIQG9ODScl-6uIst7HobQXwRsP4J2BdI1NsA81_pHqxrH2t_sF75_Ch/pub?output=csv';
+    let globalPpuData = [];
+
+    // Inisialisasi ApexCharts
     const achievementChart = new ApexCharts(document.querySelector("#wearChart"), {
         series: [{ name: 'Achievement (%)', data: [] }],
         chart: { type: 'bar', height: 280, toolbar: { show: false }, background: 'transparent' },
         plotOptions: { 
-            bar: { 
-                borderRadius: 6, 
-                columnWidth: '45%', 
-                distributed: true,
-                dataLabels: { position: 'top' }
-            } 
+            bar: { borderRadius: 6, columnWidth: '45%', distributed: true, dataLabels: { position: 'top' } } 
         },
         dataLabels: {
             enabled: true,
@@ -281,20 +280,12 @@
         theme: { mode: 'dark' },
         colors: ['#3b82f6', '#10b981', '#f59e0b', '#ec4899', '#8b5cf6', '#06b6d4'],
         legend: { show: false },
-        xaxis: {
-            categories: [],
-            labels: { style: { colors: '#94a3b8', fontSize: '11px', fontWeight: 'bold' } }
-        },
-        yaxis: {
-            max: 100,
-            labels: { formatter: (val) => val + '%', style: { colors: '#94a3b8', fontSize: '10px' } }
-        },
-        grid: { borderColor: '#1e293b', strokeDashArray: 3 },
-        tooltip: { theme: 'dark', y: { formatter: (val) => val + '%' } }
+        xaxis: { categories: [], labels: { style: { colors: '#94a3b8', fontSize: '11px', fontWeight: 'bold' } } },
+        yaxis: { max: 100, labels: { formatter: (val) => val + '%', style: { colors: '#94a3b8', fontSize: '10px' } } },
+        grid: { borderColor: '#1e293b', strokeDashArray: 3 }
     });
     achievementChart.render();
 
-    // 2. Inisialisasi Grafik Kanan: OVER Interval PPU Masing-Masing Site
     const overChart = new ApexCharts(document.querySelector("#categoryChart"), {
         series: [],
         labels: [],
@@ -328,10 +319,6 @@
     });
     overChart.render();
 
-    // Target URL Google Sheets CSV
-    const sheetCsvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSMyvNRqkn65gL_4tIjZKJeKRIQG9ODScl-6uIst7HobQXwRsP4J2BdI1NsA81_pHqxrH2t_sF75_Ch/pub?output=csv';
-    let globalPpuData = [];
-
     async function loadPpuData() {
         try {
             const response = await fetch(sheetCsvUrl);
@@ -340,13 +327,14 @@
             
             globalPpuData = rows.map(row => {
                 const cols = row.split(',').map(c => c.trim().replace(/^"(.*)"$/, '$1'));
+                
                 return {
-                    site: cols[0] || '',
-                    type: cols[1] || '',
-                    codeUnit: cols[2] || '',
-                    model: cols[3] || '',
-                    hm: cols[5] || '0',
-                    alarm: cols[11] || ''
+                    site: cols[0] || '',        // Kolom A
+                    type: cols[1] || '',        // Kolom B
+                    noUnit: cols[2] || '',      // Kolom C
+                    modelUnit: cols[3] || '',   // Kolom D
+                    alarmStatus: cols[11] || '',// Kolom L
+                    durasiOver: cols[12] || '-'  // Kolom M
                 };
             });
 
@@ -361,7 +349,7 @@
     function populateDropdowns(data) {
         const sites = [...new Set(data.map(d => d.site).filter(Boolean))].sort();
         const types = [...new Set(data.map(d => d.type).filter(Boolean))].sort();
-        const models = [...new Set(data.map(d => d.model).filter(Boolean))].sort();
+        const models = [...new Set(data.map(d => d.modelUnit).filter(Boolean))].sort();
 
         fillSelectOptions('siteFilter', sites, 'Semua Site');
         fillSelectOptions('typeFilter', types, 'Semua TYPE');
@@ -377,35 +365,44 @@
     }
 
     function renderDashboard(data) {
-        // Render Tabel
+        // 1. Filter Tabel: Hanya "MENDEKATI PLAN PPU" dan "OVER"
         const tableBody = document.getElementById('ppuTableBody');
         tableBody.innerHTML = '';
 
-        data.forEach(item => {
+        const tableFilteredData = data.filter(item => {
+            const status = (item.alarmStatus || '').toUpperCase();
+            return status.includes('OVER') || status.includes('MENDEKATI');
+        });
+
+        tableFilteredData.forEach(item => {
             const tr = document.createElement('tr');
             tr.className = 'hover:bg-slate-800/40 border-b border-slate-800';
             
-            let alarmStyle = 'text-emerald-400 font-semibold';
-            if (item.alarm.toUpperCase().includes('OVER')) {
-                alarmStyle = 'text-rose-400 font-bold bg-rose-500/10 px-2 py-0.5 rounded border border-rose-500/20';
-            } else if (item.alarm.toUpperCase().includes('MENDEKATI')) {
-                alarmStyle = 'text-amber-400 font-bold bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20';
+            let alarmBadge = '';
+            const statusUpper = item.alarmStatus.toUpperCase();
+            
+            if (statusUpper.includes('OVER')) {
+                alarmBadge = `<span class="px-2.5 py-1 rounded text-xs font-bold bg-rose-500/10 text-rose-400 border border-rose-500/20">OVER</span>`;
+            } else if (statusUpper.includes('MENDEKATI')) {
+                alarmBadge = `<span class="px-2.5 py-1 rounded text-xs font-bold bg-amber-500/10 text-amber-400 border border-amber-500/20">MENDEKATI PLAN PPU</span>`;
             }
 
             tr.innerHTML = `
                 <td class="p-3 font-bold text-white">${item.site}</td>
                 <td class="p-3 text-slate-300">${item.type}</td>
-                <td class="p-3 text-slate-300">${item.model}</td>
-                <td class="p-3"><span class="${alarmStyle}">${item.alarm || '-'}</span></td>
+                <td class="p-3 text-slate-300">${item.modelUnit}</td>
+                <td class="p-3 font-semibold text-white">${item.noUnit}</td>
+                <td class="p-3">${alarmBadge}</td>
+                <td class="p-3 text-slate-300 font-semibold">${item.durasiOver}</td>
             `;
             tableBody.appendChild(tr);
         });
 
-        // Hitung Variabel KPI Cards
+        // 2. Hitung Variabel KPI Cards (Berdasarkan Populasi Filter Aktif)
         const totalUnit = data.length;
-        const overUnit = data.filter(d => d.alarm.toUpperCase().includes('OVER')).length;
-        const mendekatiUnit = data.filter(d => d.alarm.toUpperCase().includes('MENDEKATI')).length;
-
+        const overUnit = data.filter(d => d.alarmStatus.toUpperCase().includes('OVER')).length;
+        const mendekatiUnit = data.filter(d => d.alarmStatus.toUpperCase().includes('MENDEKATI')).length;
+        
         const totalAman = totalUnit - overUnit;
         const achievementPct = totalUnit > 0 ? ((totalAman / totalUnit) * 100).toFixed(1) : 0;
 
@@ -418,7 +415,7 @@
             cardAchievement.innerText = `${achievementPct}%`;
         }
 
-        // Kalkulasi Data Grafik Berdasarkan Site
+        // 3. Update Visual Grafik Berdasarkan Site
         const sites = [...new Set(data.map(d => d.site).filter(Boolean))].sort();
         
         const siteAchievementData = [];
@@ -428,27 +425,23 @@
         sites.forEach(siteName => {
             const siteUnits = data.filter(d => d.site === siteName);
             const totalSiteUnits = siteUnits.length;
-            const overSiteUnits = siteUnits.filter(d => d.alarm.toUpperCase().includes('OVER')).length;
+            const overSiteUnits = siteUnits.filter(d => d.alarmStatus.toUpperCase().includes('OVER')).length;
             const amanSiteUnits = totalSiteUnits - overSiteUnits;
             
-            // Persentase Achievement Site
             const siteAch = totalSiteUnits > 0 ? parseFloat(((amanSiteUnits / totalSiteUnits) * 100).toFixed(1)) : 0;
             siteAchievementData.push(siteAch);
 
-            // Data Over Unit per Site
             if (overSiteUnits > 0) {
                 siteOverSeries.push(overSiteUnits);
                 siteOverLabels.push(`${siteName} - ${overSiteUnits} Unit`);
             }
         });
 
-        // Update Bar Chart (Achievement per Site)
         achievementChart.updateOptions({
             xaxis: { categories: sites },
             series: [{ name: 'Achievement (%)', data: siteAchievementData }]
         });
 
-        // Update Donut Chart (Over Unit per Site)
         overChart.updateOptions({
             labels: siteOverLabels,
             series: siteOverSeries
@@ -464,8 +457,8 @@
         const filteredData = globalPpuData.filter(item => {
             const matchSite = (siteVal === 'ALL' || item.site === siteVal);
             const matchType = (typeVal === 'ALL' || item.type === typeVal);
-            const matchModel = (modelVal === 'ALL' || item.model === modelVal);
-            const matchAlarm = (alarmVal === 'ALL' || item.alarm.toUpperCase().includes(alarmVal.toUpperCase()));
+            const matchModel = (modelVal === 'ALL' || item.modelUnit === modelVal);
+            const matchAlarm = (alarmVal === 'ALL' || item.alarmStatus.toUpperCase().includes(alarmVal.toUpperCase()));
             
             return matchSite && matchType && matchModel && matchAlarm;
         });
