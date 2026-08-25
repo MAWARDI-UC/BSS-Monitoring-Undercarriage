@@ -350,6 +350,9 @@
             
             console.log(`📊 Total rows dari CSV: ${rows.length}`);
             
+            // Store raw data untuk analisis
+            const rawDataForAnalysis = [];
+            
             globalPpuData = rows.map((row, idx) => {
                 const cols = row.split(',').map(c => c.trim().replace(/^"(.*)"$/, '$1'));
                 
@@ -359,23 +362,57 @@
                     noUnit: cols[2] || '',      // Kolom C
                     modelUnit: cols[3] || '',   // Kolom D
                     alarmStatus: cols[11] || '',// Kolom L (Alarm PPU Status)
-                    durasiOver: cols[12] || '-' // Kolom M (Durasi Over)
+                    durasiOver: cols[12] || '-', // Kolom M (Durasi Over)
+                    rawAlarmAllCols: cols.slice(10, 15) // Debug: store kolom 10-15
                 };
                 
-                // Debug: log setiap item dengan OVER
-                if (item.alarmStatus && item.alarmStatus.toUpperCase().includes('OVER')) {
-                    console.log(`Row ${idx + 2}: ${item.noUnit} - Status: "${item.alarmStatus}"`);
-                }
+                rawDataForAnalysis.push({
+                    rowNum: idx + 2,
+                    noUnit: item.noUnit,
+                    colL: cols[11] || '[EMPTY]',
+                    allCols: cols
+                });
                 
                 return item;
             });
             
-            // Debug: Hitung OVER secara terpisah
-            const overCount = globalPpuData.filter(d => 
+            // Debug: Hitung OVER dengan berbagai metode
+            const overCount1 = globalPpuData.filter(d => 
                 (d.alarmStatus || '').toString().trim().toUpperCase().includes('OVER')
             ).length;
-            console.log(`✅ Total OVER terdeteksi: ${overCount} unit`);
+            
+            // Coba search di semua kolom
+            const overCount2 = globalPpuData.filter(d => {
+                const allStr = Object.values(d).join(' ').toUpperCase();
+                return allStr.includes('OVER');
+            }).length;
+            
+            console.log(`✅ OVER di kolom L: ${overCount1} unit`);
+            console.log(`✅ OVER di semua kolom: ${overCount2} unit`);
             console.log(`📋 Total unit di dashboard: ${globalPpuData.length}`);
+            
+            // Log data yang TIDAK terbaca sebagai OVER (sample 10 pertama)
+            console.log(`\n🔍 Sample data TIDAK OVER di kolom L (10 pertama):`);
+            const notOverSample = rawDataForAnalysis.filter((r, i) => 
+                !r.colL.toUpperCase().includes('OVER') && i < 15
+            ).slice(0, 10);
+            
+            notOverSample.forEach(d => {
+                console.log(`Row ${d.rowNum}: ${d.noUnit} - ColL: "${d.colL}"`);
+            });
+            
+            // Log SEMUA yang OVER untuk verifikasi
+            console.log(`\n🔍 Data dengan "OVER" di kolom L (all):`);
+            const allOverRows = rawDataForAnalysis.filter(r => r.colL.toUpperCase().includes('OVER'));
+            console.log(`Total: ${allOverRows.length}`);
+            
+            // Cek juga di kolom lain (col 13, 14 dst)
+            console.log(`\n🔍 Checking kolom M (index 12) untuk OVER:`);
+            const overInColM = rawDataForAnalysis.filter((r, i) => {
+                const col12 = globalPpuData[i].durasiOver;
+                return col12 && col12.toUpperCase().includes('OVER');
+            }).length;
+            console.log(`Found in kolom M: ${overInColM}`);
 
             populateDropdowns(globalPpuData);
             renderDashboard(globalPpuData);
@@ -407,11 +444,18 @@
         // Helper: Normalisasi & parsing status
         const getStatus = (item) => (item.alarmStatus || '').toString().trim().toUpperCase();
         
-        // Helper: Cek status OVER
-        const isStatusOver = (st) => st === 'OVER' || st.startsWith('OVER');
+        // Helper: Cek status OVER - tangkap semua variasi
+        const isStatusOver = (st) => {
+            return st && (
+                st === 'OVER' || 
+                st.startsWith('OVER') || 
+                st.endsWith('OVER') ||
+                st.includes('OVER')
+            );
+        };
         
         // Helper: Cek status MENDEKATI
-        const isStatusMendekati = (st) => st.includes('MENDEKATI');
+        const isStatusMendekati = (st) => st && st.includes('MENDEKATI');
 
         // 1. Hitung KPI Cards
         const totalUnit = data.length;
