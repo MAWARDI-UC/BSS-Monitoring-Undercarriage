@@ -256,176 +256,188 @@
     </main>
 
     <script>
-        lucide.createIcons();
+    lucide.createIcons();
 
-        // ApexCharts Render
-        const wearChart = new ApexCharts(document.querySelector("#wearChart"), {
-            series: [{ name: 'Wear %', data: [84, 76, 71, 65, 58, 62] }],
-            chart: { type: 'bar', height: 280, toolbar: { show: false }, background: 'transparent' },
-            plotOptions: { bar: { borderRadius: 6, columnWidth: '45%', distributed: true } },
-            theme: { mode: 'dark' },
-            colors: ['#ef4444', '#f59e0b', '#f59e0b', '#10b981', '#10b981', '#10b981'],
-            legend: { show: false },
-            xaxis: {
-                categories: ['Track Link', 'Track Roller', 'Carrier Roller', 'Sprocket', 'Idler', 'Track Shoe'],
-                labels: { style: { colors: '#94a3b8', fontSize: '10px' } }
-            },
-            yaxis: {
-                max: 100,
-                labels: { formatter: (val) => val + '%', style: { colors: '#94a3b8', fontSize: '10px' } }
-            },
-            grid: { borderColor: '#1e293b', strokeDashArray: 3 },
-            tooltip: { theme: 'dark', y: { formatter: (val) => val + '%' } }
-        });
-        wearChart.render();
+    // ApexCharts Render
+    const wearChart = new ApexCharts(document.querySelector("#wearChart"), {
+        series: [{ name: 'Wear %', data: [84, 76, 71, 65, 58, 62] }],
+        chart: { type: 'bar', height: 280, toolbar: { show: false }, background: 'transparent' },
+        plotOptions: { bar: { borderRadius: 6, columnWidth: '45%', distributed: true } },
+        theme: { mode: 'dark' },
+        colors: ['#ef4444', '#f59e0b', '#f59e0b', '#10b981', '#10b981', '#10b981'],
+        legend: { show: false },
+        xaxis: {
+            categories: ['Track Link', 'Track Roller', 'Carrier Roller', 'Sprocket', 'Idler', 'Track Shoe'],
+            labels: { style: { colors: '#94a3b8', fontSize: '10px' } }
+        },
+        yaxis: {
+            max: 100,
+            labels: { formatter: (val) => val + '%', style: { colors: '#94a3b8', fontSize: '10px' } }
+        },
+        grid: { borderColor: '#1e293b', strokeDashArray: 3 },
+        tooltip: { theme: 'dark', y: { formatter: (val) => val + '%' } }
+    });
+    wearChart.render();
 
-        const categoryChart = new ApexCharts(document.querySelector("#categoryChart"), {
-            series: [22, 12, 8],
-            labels: ['Kategori A (<70% Wear)', 'Kategori B (70-85% Wear)', 'Kategori C (>85% Critical)'],
-            chart: { type: 'donut', height: 290, background: 'transparent' },
-            colors: ['#10b981', '#f59e0b', '#ef4444'],
-            stroke: { colors: ['#0f172a'] },
-            legend: { position: 'bottom', fontSize: '11px', labels: { colors: '#cbd5e1' } },
-            dataLabels: { enabled: false },
-            plotOptions: {
-                pie: {
-                    donut: {
-                        size: '70%',
-                        labels: {
-                            show: true,
-                            total: { 
-                                show: true, 
-                                label: 'Total Unit', 
-                                color: '#94a3b8', 
-                                fontSize: '11px', 
-                                formatter: (w) => {
-                                    const total = w.globals.seriesTotals.reduce((a, b) => a + b, 0);
-                                    return total + ' Unit';
-                                }
-                            },
-                            value: { color: '#ffffff', fontSize: '18px', fontWeight: '800' }
-                        }
+    const categoryChart = new ApexCharts(document.querySelector("#categoryChart"), {
+        series: [22, 12, 8],
+        labels: ['Kategori A (<70% Wear)', 'Kategori B (70-85% Wear)', 'Kategori C (>85% Critical)'],
+        chart: { type: 'donut', height: 290, background: 'transparent' },
+        colors: ['#10b981', '#f59e0b', '#ef4444'],
+        stroke: { colors: ['#0f172a'] },
+        legend: { position: 'bottom', fontSize: '11px', labels: { colors: '#cbd5e1' } },
+        dataLabels: { enabled: false },
+        plotOptions: {
+            pie: {
+                donut: {
+                    size: '70%',
+                    labels: {
+                        show: true,
+                        total: { 
+                            show: true, 
+                            label: 'Total Unit', 
+                            color: '#94a3b8', 
+                            fontSize: '11px', 
+                            formatter: (w) => {
+                                const total = w.globals.seriesTotals.reduce((a, b) => a + b, 0);
+                                return total + ' Unit';
+                            }
+                        },
+                        value: { color: '#ffffff', fontSize: '18px', fontWeight: '800' }
                     }
                 }
-            },
-            theme: { mode: 'dark' }
-        });
-        categoryChart.render();
-
-        // Target URL Google Sheets CSV Terbaru
-        const sheetCsvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSMyvNRqkn65gL_4tIjZKJeKRIQG9ODScl-6uIst7HobQXwRsP4J2BdI1NsA81_pHqxrH2t_sF75_Ch/pub?output=csv';
-        let globalPpuData = [];
-
-        async function loadPpuData() {
-            try {
-                const response = await fetch(sheetCsvUrl);
-                const dataText = await response.text();
-                
-                // Split baris dan buang baris kosong
-                const rows = dataText.split('\n').filter(r => r.trim() !== '').slice(1);
-                
-                globalPpuData = rows.map(row => {
-                    const cols = row.split(',').map(c => c.trim().replace(/^"(.*)"$/, '$1'));
-                    
-                    return {
-                        site: cols[0] || '',      // Kolom A -> SITE
-                        type: cols[1] || '',      // Kolom B -> TYPE
-                        codeUnit: cols[2] || '',  // Kolom C -> CODE UNIT
-                        model: cols[3] || '',     // Kolom D -> MODEL UNIT
-                        hm: cols[5] || '0',       // Kolom F -> HM
-                        alarm: cols[11] || ''     // Kolom L -> ALARM PPU
-                    };
-                });
-
-                // Update dropdown & tabel
-                populateDropdowns(globalPpuData);
-                renderDashboard(globalPpuData);
-                
-            } catch (error) {
-                console.error('Gagal mengambil data dari Google Sheets:', error);
             }
-        }
+        },
+        theme: { mode: 'dark' }
+    });
+    categoryChart.render();
 
-        function populateDropdowns(data) {
-            const sites = [...new Set(data.map(d => d.site).filter(Boolean))].sort();
-            const types = [...new Set(data.map(d => d.type).filter(Boolean))].sort();
-            const models = [...new Set(data.map(d => d.model).filter(Boolean))].sort();
+    // Target URL Google Sheets CSV
+    const sheetCsvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSMyvNRqkn65gL_4tIjZKJeKRIQG9ODScl-6uIst7HobQXwRsP4J2BdI1NsA81_pHqxrH2t_sF75_Ch/pub?output=csv';
+    let globalPpuData = [];
 
-            fillSelectOptions('siteFilter', sites, 'Semua Site');
-            fillSelectOptions('typeFilter', types, 'Semua TYPE');
-            fillSelectOptions('modelFilter', models, 'Semua Model');
-        }
-
-        function fillSelectOptions(elementId, items, defaultText) {
-            const select = document.getElementById(elementId);
-            select.innerHTML = `<option value="ALL">${defaultText}</option>`;
-            items.forEach(item => {
-                select.innerHTML += `<option value="${item}">${item}</option>`;
-            });
-        }
-
-        function renderDashboard(data) {
-            const tableBody = document.getElementById('ppuTableBody');
-            tableBody.innerHTML = '';
-
-            data.forEach(item => {
-                const tr = document.createElement('tr');
-                tr.className = 'hover:bg-slate-800/40 border-b border-slate-800';
+    async function loadPpuData() {
+        try {
+            const response = await fetch(sheetCsvUrl);
+            const dataText = await response.text();
+            
+            const rows = dataText.split('\n').filter(r => r.trim() !== '').slice(1);
+            
+            globalPpuData = rows.map(row => {
+                const cols = row.split(',').map(c => c.trim().replace(/^"(.*)"$/, '$1'));
                 
-                let alarmStyle = 'text-emerald-400 font-semibold';
-                if (item.alarm.toUpperCase().includes('OVER')) {
-                    alarmStyle = 'text-rose-400 font-bold bg-rose-500/10 px-2 py-0.5 rounded border border-rose-500/20';
-                } else if (item.alarm.toUpperCase().includes('MENDEKATI')) {
-                    alarmStyle = 'text-amber-400 font-bold bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20';
-                }
-
-                // Disesuaikan persis 4 kolom: SITE | TYPE | MODEL UNIT | ALARM PPU STATUS
-                tr.innerHTML = `
-                    <td class="p-3 font-bold text-white">${item.site}</td>
-                    <td class="p-3 text-slate-300">${item.type}</td>
-                    <td class="p-3 text-slate-300">${item.model}</td>
-                    <td class="p-3"><span class="${alarmStyle}">${item.alarm || '-'}</span></td>
-                `;
-                tableBody.appendChild(tr);
+                return {
+                    site: cols[0] || '',
+                    type: cols[1] || '',
+                    codeUnit: cols[2] || '',
+                    model: cols[3] || '',
+                    hm: cols[5] || '0',
+                    alarm: cols[11] || ''
+                };
             });
 
-            // Refresh KPI Summary Card Numbers
-            document.getElementById('cardTotalUnit').innerText = `${data.length} Unit`;
-            document.getElementById('cardOverUnit').innerText = `${data.filter(d => d.alarm.toUpperCase().includes('OVER')).length} Unit`;
-            document.getElementById('cardMendekatiUnit').innerText = `${data.filter(d => d.alarm.toUpperCase().includes('MENDEKATI')).length} Unit`;
-        }
-
-        function applyFilters() {
-            const siteVal = document.getElementById('siteFilter').value;
-            const typeVal = document.getElementById('typeFilter').value;
-            const modelVal = document.getElementById('modelFilter').value;
-            const alarmVal = document.getElementById('alarmFilter').value;
-
-            const filteredData = globalPpuData.filter(item => {
-                const matchSite = (siteVal === 'ALL' || item.site === siteVal);
-                const matchType = (typeVal === 'ALL' || item.type === typeVal);
-                const matchModel = (modelVal === 'ALL' || item.model === modelVal);
-                const matchAlarm = (alarmVal === 'ALL' || item.alarm.toUpperCase().includes(alarmVal.toUpperCase()));
-                
-                return matchSite && matchType && matchModel && matchAlarm;
-            });
-
-            renderDashboard(filteredData);
-        }
-
-        ['siteFilter', 'typeFilter', 'modelFilter', 'alarmFilter'].forEach(id => {
-            document.getElementById(id).addEventListener('change', applyFilters);
-        });
-
-        document.getElementById('resetFilterBtn').addEventListener('click', () => {
-            document.getElementById('siteFilter').value = 'ALL';
-            document.getElementById('typeFilter').value = 'ALL';
-            document.getElementById('modelFilter').value = 'ALL';
-            document.getElementById('alarmFilter').value = 'ALL';
+            populateDropdowns(globalPpuData);
             renderDashboard(globalPpuData);
+            
+        } catch (error) {
+            console.error('Gagal mengambil data dari Google Sheets:', error);
+        }
+    }
+
+    function populateDropdowns(data) {
+        const sites = [...new Set(data.map(d => d.site).filter(Boolean))].sort();
+        const types = [...new Set(data.map(d => d.type).filter(Boolean))].sort();
+        const models = [...new Set(data.map(d => d.model).filter(Boolean))].sort();
+
+        fillSelectOptions('siteFilter', sites, 'Semua Site');
+        fillSelectOptions('typeFilter', types, 'Semua TYPE');
+        fillSelectOptions('modelFilter', models, 'Semua Model');
+    }
+
+    function fillSelectOptions(elementId, items, defaultText) {
+        const select = document.getElementById(elementId);
+        select.innerHTML = `<option value="ALL">${defaultText}</option>`;
+        items.forEach(item => {
+            select.innerHTML += `<option value="${item}">${item}</option>`;
+        });
+    }
+
+    function renderDashboard(data) {
+        const tableBody = document.getElementById('ppuTableBody');
+        tableBody.innerHTML = '';
+
+        data.forEach(item => {
+            const tr = document.createElement('tr');
+            tr.className = 'hover:bg-slate-800/40 border-b border-slate-800';
+            
+            let alarmStyle = 'text-emerald-400 font-semibold';
+            if (item.alarm.toUpperCase().includes('OVER')) {
+                alarmStyle = 'text-rose-400 font-bold bg-rose-500/10 px-2 py-0.5 rounded border border-rose-500/20';
+            } else if (item.alarm.toUpperCase().includes('MENDEKATI')) {
+                alarmStyle = 'text-amber-400 font-bold bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20';
+            }
+
+            tr.innerHTML = `
+                <td class="p-3 font-bold text-white">${item.site}</td>
+                <td class="p-3 text-slate-300">${item.type}</td>
+                <td class="p-3 text-slate-300">${item.model}</td>
+                <td class="p-3"><span class="${alarmStyle}">${item.alarm || '-'}</span></td>
+            `;
+            tableBody.appendChild(tr);
         });
 
-        loadPpuData();
-    </script>
+        // 1. Hitung variabel KPI secara dinamis berdasarkan hasil filter
+        const totalUnit = data.length;
+        const overUnit = data.filter(d => d.alarm.toUpperCase().includes('OVER')).length;
+        const mendekatiUnit = data.filter(d => d.alarm.toUpperCase().includes('MENDEKATI')).length;
+
+        // 2. Kalkulasi Total Aman & Achievement (%)
+        const totalAman = totalUnit - overUnit;
+        const achievementPct = totalUnit > 0 ? ((totalAman / totalUnit) * 100).toFixed(1) : 0;
+
+        // 3. Update Tampilan KPI Cards
+        document.getElementById('cardTotalUnit').innerText = `${totalUnit} Unit`;
+        document.getElementById('cardOverUnit').innerText = `${overUnit} Unit`;
+        document.getElementById('cardMendekatiUnit').innerText = `${mendekatiUnit} Unit`;
+        
+        // Element KPI Card Achievement
+        const cardAchievement = document.querySelector('.grid-cols-1.sm\\:grid-cols-2.lg\\:grid-cols-4 > div:nth-child(4) h3');
+        if (cardAchievement) {
+            cardAchievement.innerText = `${achievementPct}%`;
+        }
+    }
+
+    function applyFilters() {
+        const siteVal = document.getElementById('siteFilter').value;
+        const typeVal = document.getElementById('typeFilter').value;
+        const modelVal = document.getElementById('modelFilter').value;
+        const alarmVal = document.getElementById('alarmFilter').value;
+
+        const filteredData = globalPpuData.filter(item => {
+            const matchSite = (siteVal === 'ALL' || item.site === siteVal);
+            const matchType = (typeVal === 'ALL' || item.type === typeVal);
+            const matchModel = (modelVal === 'ALL' || item.model === modelVal);
+            const matchAlarm = (alarmVal === 'ALL' || item.alarm.toUpperCase().includes(alarmVal.toUpperCase()));
+            
+            return matchSite && matchType && matchModel && matchAlarm;
+        });
+
+        renderDashboard(filteredData);
+    }
+
+    ['siteFilter', 'typeFilter', 'modelFilter', 'alarmFilter'].forEach(id => {
+        document.getElementById(id).addEventListener('change', applyFilters);
+    });
+
+    document.getElementById('resetFilterBtn').addEventListener('click', () => {
+        document.getElementById('siteFilter').value = 'ALL';
+        document.getElementById('typeFilter').value = 'ALL';
+        document.getElementById('modelFilter').value = 'ALL';
+        document.getElementById('alarmFilter').value = 'ALL';
+        renderDashboard(globalPpuData);
+    });
+
+    loadPpuData();
+</script>
 </body>
 </html>
