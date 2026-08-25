@@ -366,29 +366,35 @@
         let globalPpuData = [];
 
         async function loadPpuData() {
-            try {
-                const response = await fetch(sheetCsvUrl);
-                const dataText = await response.text();
-                
-                const rows = dataText.split('\n').filter(r => r.trim() !== '').slice(1);
-                
-                globalPpuData = rows.map(row => {
-                    const cols = row.split(',').map(c => c.trim().replace(/^"(.*)"$/, '$1'));
-                    return {
-                        site: cols[1] || '',      // Kolom A: SITE
-                        type: cols[2] || '',      // Kolom B: TYPE
-                        model: cols[4] || '',     // Kolom D: MODEL UNIT
-                        alarm: cols[12] || ''     // Kolom L: ALARM PPU
-                    };
-                });
+    try {
+        const response = await fetch(sheetCsvUrl);
+        const dataText = await response.text();
+        
+        // Split baris dan buang baris kosong
+        const rows = dataText.split('\n').filter(r => r.trim() !== '').slice(1);
+        
+        globalPpuData = rows.map(row => {
+            // Mengatasi pembacaan CSV yang dipisahkan koma
+            const cols = row.split(',').map(c => c.trim().replace(/^"(.*)"$/, '$1'));
+            
+            return {
+                site: cols[0] || '',      // Kolom A (Indeks 0) -> SITE
+                type: cols[1] || '',      // Kolom B (Indeks 1) -> TYPE
+                codeUnit: cols[2] || '',  // Kolom C (Indeks 2) -> CODE UNIT
+                model: cols[3] || '',     // Kolom D (Indeks 3) -> MODEL UNIT
+                hm: cols[5] || '0',       // Kolom F (Indeks 5) -> HM
+                alarm: cols[11] || ''     // Kolom L (Indeks 11) -> ALARM PPU
+            };
+        });
 
-                populateDropdowns(globalPpuData);
-                renderDashboard(globalPpuData);
-                
-            } catch (error) {
-                console.error('Gagal mengambil data dari Google Sheets:', error);
-            }
-        }
+        // Update dropdown & tabel
+        populateDropdowns(globalPpuData);
+        renderDashboard(globalPpuData);
+        
+    } catch (error) {
+        console.error('Gagal mengambil data dari Google Sheets:', error);
+    }
+}
 
         function populateDropdowns(data) {
             const sites = [...new Set(data.map(d => d.site).filter(Boolean))].sort();
