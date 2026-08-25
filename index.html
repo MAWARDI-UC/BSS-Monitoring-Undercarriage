@@ -348,24 +348,40 @@
             const dataText = await response.text();
             const rows = dataText.split('\n').filter(r => r.trim() !== '').slice(1);
             
-            globalPpuData = rows.map(row => {
+            console.log(`📊 Total rows dari CSV: ${rows.length}`);
+            
+            globalPpuData = rows.map((row, idx) => {
                 const cols = row.split(',').map(c => c.trim().replace(/^"(.*)"$/, '$1'));
                 
-                return {
+                const item = {
                     site: cols[0] || '',        // Kolom A
                     type: cols[1] || '',        // Kolom B
                     noUnit: cols[2] || '',      // Kolom C
                     modelUnit: cols[3] || '',   // Kolom D
-                    alarmStatus: cols[11] || '',// Kolom L
-                    durasiOver: cols[12] || '-'  // Kolom M
+                    alarmStatus: cols[11] || '',// Kolom L (Alarm PPU Status)
+                    durasiOver: cols[12] || '-' // Kolom M (Durasi Over)
                 };
+                
+                // Debug: log setiap item dengan OVER
+                if (item.alarmStatus && item.alarmStatus.toUpperCase().includes('OVER')) {
+                    console.log(`Row ${idx + 2}: ${item.noUnit} - Status: "${item.alarmStatus}"`);
+                }
+                
+                return item;
             });
+            
+            // Debug: Hitung OVER secara terpisah
+            const overCount = globalPpuData.filter(d => 
+                (d.alarmStatus || '').toString().trim().toUpperCase().includes('OVER')
+            ).length;
+            console.log(`✅ Total OVER terdeteksi: ${overCount} unit`);
+            console.log(`📋 Total unit di dashboard: ${globalPpuData.length}`);
 
             populateDropdowns(globalPpuData);
             renderDashboard(globalPpuData);
             
         } catch (error) {
-            console.error('Gagal mengambil data dari Google Sheets:', error);
+            console.error('❌ Gagal mengambil data dari Google Sheets:', error);
         }
     }
 
