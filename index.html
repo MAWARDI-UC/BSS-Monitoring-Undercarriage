@@ -258,17 +258,30 @@
     <script>
     lucide.createIcons();
 
-    // ApexCharts Render
-    const wearChart = new ApexCharts(document.querySelector("#wearChart"), {
-        series: [{ name: 'Wear %', data: [84, 76, 71, 65, 58, 62] }],
+    // 1. Inisialisasi Grafik Kiri: PPU Achievement Masing-Masing Site
+    const achievementChart = new ApexCharts(document.querySelector("#wearChart"), {
+        series: [{ name: 'Achievement (%)', data: [] }],
         chart: { type: 'bar', height: 280, toolbar: { show: false }, background: 'transparent' },
-        plotOptions: { bar: { borderRadius: 6, columnWidth: '45%', distributed: true } },
+        plotOptions: { 
+            bar: { 
+                borderRadius: 6, 
+                columnWidth: '45%', 
+                distributed: true,
+                dataLabels: { position: 'top' }
+            } 
+        },
+        dataLabels: {
+            enabled: true,
+            formatter: (val) => val + '%',
+            offsetY: -20,
+            style: { colors: ['#f8fafc'], fontSize: '11px', fontWeight: 'bold' }
+        },
         theme: { mode: 'dark' },
-        colors: ['#ef4444', '#f59e0b', '#f59e0b', '#10b981', '#10b981', '#10b981'],
+        colors: ['#3b82f6', '#10b981', '#f59e0b', '#ec4899', '#8b5cf6', '#06b6d4'],
         legend: { show: false },
         xaxis: {
-            categories: ['Track Link', 'Track Roller', 'Carrier Roller', 'Sprocket', 'Idler', 'Track Shoe'],
-            labels: { style: { colors: '#94a3b8', fontSize: '10px' } }
+            categories: [],
+            labels: { style: { colors: '#94a3b8', fontSize: '11px', fontWeight: 'bold' } }
         },
         yaxis: {
             max: 100,
@@ -277,16 +290,17 @@
         grid: { borderColor: '#1e293b', strokeDashArray: 3 },
         tooltip: { theme: 'dark', y: { formatter: (val) => val + '%' } }
     });
-    wearChart.render();
+    achievementChart.render();
 
-    const categoryChart = new ApexCharts(document.querySelector("#categoryChart"), {
-        series: [22, 12, 8],
-        labels: ['Kategori A (<70% Wear)', 'Kategori B (70-85% Wear)', 'Kategori C (>85% Critical)'],
+    // 2. Inisialisasi Grafik Kanan: OVER Interval PPU Masing-Masing Site
+    const overChart = new ApexCharts(document.querySelector("#categoryChart"), {
+        series: [],
+        labels: [],
         chart: { type: 'donut', height: 290, background: 'transparent' },
-        colors: ['#10b981', '#f59e0b', '#ef4444'],
+        colors: ['#ef4444', '#f97316', '#f59e0b', '#eab308', '#84cc16', '#06b6d4'],
         stroke: { colors: ['#0f172a'] },
         legend: { position: 'bottom', fontSize: '11px', labels: { colors: '#cbd5e1' } },
-        dataLabels: { enabled: false },
+        dataLabels: { enabled: true },
         plotOptions: {
             pie: {
                 donut: {
@@ -295,7 +309,7 @@
                         show: true,
                         total: { 
                             show: true, 
-                            label: 'Total Unit', 
+                            label: 'Total Over PPU', 
                             color: '#94a3b8', 
                             fontSize: '11px', 
                             formatter: (w) => {
@@ -303,14 +317,14 @@
                                 return total + ' Unit';
                             }
                         },
-                        value: { color: '#ffffff', fontSize: '18px', fontWeight: '800' }
+                        value: { color: '#ef4444', fontSize: '18px', fontWeight: '800' }
                     }
                 }
             }
         },
         theme: { mode: 'dark' }
     });
-    categoryChart.render();
+    overChart.render();
 
     // Target URL Google Sheets CSV
     const sheetCsvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSMyvNRqkn65gL_4tIjZKJeKRIQG9ODScl-6uIst7HobQXwRsP4J2BdI1NsA81_pHqxrH2t_sF75_Ch/pub?output=csv';
@@ -320,12 +334,10 @@
         try {
             const response = await fetch(sheetCsvUrl);
             const dataText = await response.text();
-            
             const rows = dataText.split('\n').filter(r => r.trim() !== '').slice(1);
             
             globalPpuData = rows.map(row => {
                 const cols = row.split(',').map(c => c.trim().replace(/^"(.*)"$/, '$1'));
-                
                 return {
                     site: cols[0] || '',
                     type: cols[1] || '',
@@ -363,6 +375,7 @@
     }
 
     function renderDashboard(data) {
+        // Render Tabel
         const tableBody = document.getElementById('ppuTableBody');
         tableBody.innerHTML = '';
 
@@ -386,25 +399,58 @@
             tableBody.appendChild(tr);
         });
 
-        // 1. Hitung variabel KPI secara dinamis berdasarkan hasil filter
+        // Hitung Variabel KPI Cards
         const totalUnit = data.length;
         const overUnit = data.filter(d => d.alarm.toUpperCase().includes('OVER')).length;
         const mendekatiUnit = data.filter(d => d.alarm.toUpperCase().includes('MENDEKATI')).length;
 
-        // 2. Kalkulasi Total Aman & Achievement (%)
         const totalAman = totalUnit - overUnit;
         const achievementPct = totalUnit > 0 ? ((totalAman / totalUnit) * 100).toFixed(1) : 0;
 
-        // 3. Update Tampilan KPI Cards
         document.getElementById('cardTotalUnit').innerText = `${totalUnit} Unit`;
         document.getElementById('cardOverUnit').innerText = `${overUnit} Unit`;
         document.getElementById('cardMendekatiUnit').innerText = `${mendekatiUnit} Unit`;
         
-        // Element KPI Card Achievement
         const cardAchievement = document.querySelector('.grid-cols-1.sm\\:grid-cols-2.lg\\:grid-cols-4 > div:nth-child(4) h3');
         if (cardAchievement) {
             cardAchievement.innerText = `${achievementPct}%`;
         }
+
+        // Kalkulasi Data Grafik Berdasarkan Site
+        const sites = [...new Set(data.map(d => d.site).filter(Boolean))].sort();
+        
+        const siteAchievementData = [];
+        const siteOverSeries = [];
+        const siteOverLabels = [];
+
+        sites.forEach(siteName => {
+            const siteUnits = data.filter(d => d.site === siteName);
+            const totalSiteUnits = siteUnits.length;
+            const overSiteUnits = siteUnits.filter(d => d.alarm.toUpperCase().includes('OVER')).length;
+            const amanSiteUnits = totalSiteUnits - overSiteUnits;
+            
+            // Persentase Achievement Site
+            const siteAch = totalSiteUnits > 0 ? parseFloat(((amanSiteUnits / totalSiteUnits) * 100).toFixed(1)) : 0;
+            siteAchievementData.push(siteAch);
+
+            // Data Over Unit per Site
+            if (overSiteUnits > 0) {
+                siteOverSeries.push(overSiteUnits);
+                siteOverLabels.push(`${siteName} - ${overSiteUnits} Unit`);
+            }
+        });
+
+        // Update Bar Chart (Achievement per Site)
+        achievementChart.updateOptions({
+            xaxis: { categories: sites },
+            series: [{ name: 'Achievement (%)', data: siteAchievementData }]
+        });
+
+        // Update Donut Chart (Over Unit per Site)
+        overChart.updateOptions({
+            labels: siteOverLabels,
+            series: siteOverSeries
+        });
     }
 
     function applyFilters() {
