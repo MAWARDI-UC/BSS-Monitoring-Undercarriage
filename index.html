@@ -192,7 +192,7 @@
             <div class="bg-slate-900/90 border border-slate-800 p-5 rounded-2xl flex items-center justify-between shadow-md">
                 <div>
                     <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">PPU Achievement</p>
-                    <h3 class="text-2xl font-black text-white mt-1">94.2%</h3>
+                    <h3 id="cardAchievementPercent" class="text-2xl font-black text-white mt-1">94.2%</h3>
                     <p class="text-[10px] text-emerald-400 mt-1 font-semibold">Inspeksi On-Schedule</p>
                 </div>
                 <div class="w-12 h-12 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
@@ -388,13 +388,36 @@
     }
 
     function renderDashboard(data) {
-        // 1. Filter Tabel: Hanya "MENDEKATI PLAN PPU" dan "OVER"
+        // Helper: Normalisasi & parsing status
+        const getStatus = (item) => (item.alarmStatus || '').toString().trim().toUpperCase();
+        
+        // Helper: Cek status OVER
+        const isStatusOver = (st) => st === 'OVER' || st.startsWith('OVER');
+        
+        // Helper: Cek status MENDEKATI
+        const isStatusMendekati = (st) => st.includes('MENDEKATI');
+
+        // 1. Hitung KPI Cards
+        const totalUnit = data.length;
+        const overUnit = data.filter(d => isStatusOver(getStatus(d))).length;
+        const mendekatiUnit = data.filter(d => isStatusMendekati(getStatus(d))).length;
+        
+        const totalAman = totalUnit - overUnit;
+        const achievementPct = totalUnit > 0 ? ((totalAman / totalUnit) * 100).toFixed(1) : 0;
+
+        // Update KPI Cards
+        document.getElementById('cardTotalUnit').innerText = `${totalUnit} Unit`;
+        document.getElementById('cardOverUnit').innerText = `${overUnit} Unit`;
+        document.getElementById('cardMendekatiUnit').innerText = `${mendekatiUnit} Unit`;
+        document.getElementById('cardAchievementPercent').innerText = `${achievementPct}%`;
+
+        // 2. Render Tabel
         const tableBody = document.getElementById('ppuTableBody');
         tableBody.innerHTML = '';
 
         const tableFilteredData = data.filter(item => {
-            const status = (item.alarmStatus || '').toUpperCase();
-            return status.includes('OVER') || status.includes('MENDEKATI');
+            const st = getStatus(item);
+            return isStatusOver(st) || isStatusMendekati(st);
         });
 
         tableFilteredData.forEach(item => {
@@ -402,11 +425,11 @@
             tr.className = 'hover:bg-slate-800/40 border-b border-slate-800';
             
             let alarmBadge = '';
-            const statusUpper = item.alarmStatus.toUpperCase();
+            const st = getStatus(item);
             
-            if (statusUpper.includes('OVER')) {
+            if (isStatusOver(st)) {
                 alarmBadge = `<span class="px-2.5 py-1 rounded text-xs font-bold bg-rose-500/10 text-rose-400 border border-rose-500/20">OVER</span>`;
-            } else if (statusUpper.includes('MENDEKATI')) {
+            } else if (isStatusMendekati(st)) {
                 alarmBadge = `<span class="px-2.5 py-1 rounded text-xs font-bold bg-amber-500/10 text-amber-400 border border-amber-500/20">MENDEKATI PLAN PPU</span>`;
             }
 
@@ -421,24 +444,7 @@
             tableBody.appendChild(tr);
         });
 
-        // 2. Hitung Variabel KPI Cards (Berdasarkan Populasi Filter Aktif)
-        const totalUnit = data.length;
-        const overUnit = data.filter(d => (d.alarmStatus || '').toUpperCase().includes('OVER')).length;
-        const mendekatiUnit = data.filter(d => (d.alarmStatus || '').toUpperCase().includes('MENDEKATI')).length;
-        
-        const totalAman = totalUnit - overUnit;
-        const achievementPct = totalUnit > 0 ? ((totalAman / totalUnit) * 100).toFixed(1) : 0;
-
-        document.getElementById('cardTotalUnit').innerText = `${totalUnit} Unit`;
-        document.getElementById('cardOverUnit').innerText = `${overUnit} Unit`;
-        document.getElementById('cardMendekatiUnit').innerText = `${mendekatiUnit} Unit`;
-        
-        const cardAchievement = document.querySelector('.grid-cols-1.sm\\:grid-cols-2.lg\\:grid-cols-4 > div:nth-child(4) h3');
-        if (cardAchievement) {
-            cardAchievement.innerText = `${achievementPct}%`;
-        }
-
-        // 3. Update Visual Grafik Berdasarkan Site
+        // 3. Update Charts
         const sites = [...new Set(data.map(d => d.site).filter(Boolean))].sort();
         
         const siteAchievementData = [];
@@ -448,8 +454,7 @@
         sites.forEach(siteName => {
             const siteUnits = data.filter(d => d.site === siteName);
             const totalSiteUnits = siteUnits.length;
-            // cek baik alarmStatus atau properti alarm (jika ada)
-            const overSiteUnits = siteUnits.filter(d => ((d.alarmStatus || d.alarm) || '').toUpperCase().includes('OVER')).length;
+            const overSiteUnits = siteUnits.filter(d => isStatusOver(getStatus(d))).length;
             const amanSiteUnits = totalSiteUnits - overSiteUnits;
             
             const siteAch = totalSiteUnits > 0 ? parseFloat(((amanSiteUnits / totalSiteUnits) * 100).toFixed(1)) : 0;
@@ -457,7 +462,6 @@
 
             if (overSiteUnits > 0) {
                 siteOverSeries.push(overSiteUnits);
-                // Legend hanya menampilkan nama site (tanpa jumlah), tooltip/dataLabels akan menampilkan angka
                 siteOverLabels.push(siteName);
             }
         });
