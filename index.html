@@ -55,23 +55,23 @@
             </div>
 
             <!-- Navigation Tabs -->
-            <nav class="flex space-x-2 border-t border-slate-800/60 py-2">
-                <a href="#" class="px-3 py-1.5 rounded-md text-xs font-semibold bg-amber-500 text-slate-950 flex items-center space-x-1.5 shadow-md shadow-amber-500/20">
+            <nav class="flex space-x-2 border-t border-slate-800/60 py-2 overflow-x-auto">
+                <button data-tab="ppu" class="tab-btn px-3 py-1.5 rounded-md text-xs font-semibold bg-amber-500 text-slate-950 flex items-center space-x-1.5 shadow-md shadow-amber-500/20 whitespace-nowrap">
                     <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
                     <span>PPU</span>
-                </a>
-                <a href="#" class="px-3 py-1.5 rounded-md text-xs font-medium text-slate-400 hover:text-slate-200 hover:bg-slate-800 flex items-center space-x-1.5 transition">
+                </button>
+                <button data-tab="review-lifetime" class="tab-btn px-3 py-1.5 rounded-md text-xs font-medium text-slate-400 hover:text-slate-200 hover:bg-slate-800 flex items-center space-x-1.5 transition whitespace-nowrap">
                     <i data-lucide="clipboard-check" class="w-4 h-4"></i>
                     <span>Review Lifetime</span>
-                </a>
-                <a href="#" class="px-3 py-1.5 rounded-md text-xs font-medium text-slate-400 hover:text-slate-200 hover:bg-slate-800 flex items-center space-x-1.5 transition">
+                </button>
+                <button data-tab="klasifikasi" class="tab-btn px-3 py-1.5 rounded-md text-xs font-medium text-slate-400 hover:text-slate-200 hover:bg-slate-800 flex items-center space-x-1.5 transition whitespace-nowrap">
                     <i data-lucide="layers" class="w-4 h-4"></i>
                     <span>Klasifikasi Unit (A/B/C)</span>
-                </a>
-                <a href="#" class="px-3 py-1.5 rounded-md text-xs font-medium text-slate-400 hover:text-slate-200 hover:bg-slate-800 flex items-center space-x-1.5 transition">
+                </button>
+                <button data-tab="plan-replacement" class="tab-btn px-3 py-1.5 rounded-md text-xs font-medium text-slate-400 hover:text-slate-200 hover:bg-slate-800 flex items-center space-x-1.5 transition whitespace-nowrap">
                     <i data-lucide="wrench" class="w-4 h-4"></i>
                     <span>Plan Replacement</span>
-                </a>
+                </button>
             </nav>
         </div>
     </header>
@@ -79,174 +79,368 @@
     <!-- Main Container -->
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 space-y-6">
 
-        <!-- Welcome Banner -->
-        <div class="relative overflow-hidden rounded-2xl bg-gradient-to-r from-slate-900 via-slate-800 to-amber-950/40 p-6 border border-slate-800 shadow-xl">
-            <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div>
-                    <div class="flex items-center space-x-2 mb-2">
-                        <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold tracking-wide uppercase bg-amber-500 text-slate-950">PLANT</span>
-                        <span class="text-xs text-emerald-400 font-medium flex items-center space-x-1">
-                            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                            <span>Monitoring PPU Active</span>
-                        </span>
+        <!-- ==================== PPU DASHBOARD ==================== -->
+        <div id="ppu-content" class="dashboard-content space-y-6">
+            <!-- Welcome Banner -->
+            <div class="relative overflow-hidden rounded-2xl bg-gradient-to-r from-slate-900 via-slate-800 to-amber-950/40 p-6 border border-slate-800 shadow-xl">
+                <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div>
+                        <div class="flex items-center space-x-2 mb-2">
+                            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold tracking-wide uppercase bg-amber-500 text-slate-950">PLANT</span>
+                            <span class="text-xs text-emerald-400 font-medium flex items-center space-x-1">
+                                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                                <span>Monitoring PPU Active</span>
+                            </span>
+                        </div>
+                        <h2 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">Alarm & Achivement PPU</h2>
+                        <p class="text-xs text-amber-400 font-semibold tracking-wider uppercase mt-1">PROGRAM PEMERIKSAAN UNDERCARRIAGE (PPU)</p>
                     </div>
-                    <h2 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">Alarm & Achivement PPU</h2>
-                    <p class="text-xs text-amber-400 font-semibold tracking-wider uppercase mt-1">PROGRAM PEMERIKSAAN UNDERCARRIAGE (PPU)</p>
+                    <div class="flex items-center space-x-3">
+                        <button class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 font-semibold text-xs flex items-center space-x-1.5 transition">
+                            <i data-lucide="file-text" class="w-4 h-4"></i>
+                            <span>Export Report</span>
+                        </button>
+                    </div>
                 </div>
-                <div class="flex items-center space-x-3">
-                    <button class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 font-semibold text-xs flex items-center space-x-1.5 transition">
-                        <i data-lucide="file-text" class="w-4 h-4"></i>
-                        <span>Export Report</span>
+            </div>
+
+            <!-- Filter Bar -->
+            <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-5 shadow-lg space-y-4">
+                <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                    <div class="flex items-center space-x-2 text-amber-400 font-bold text-sm">
+                        <i data-lucide="filter" class="w-4 h-4"></i>
+                        <span class="text-slate-100">Filter Unit & Site Monitoring</span>
+                    </div>
+                    <button id="resetFilterBtn" class="text-xs text-slate-400 hover:text-amber-400 flex items-center space-x-1 transition">
+                        <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
+                        <span>Reset Filter</span>
                     </button>
                 </div>
-            </div>
-        </div>
 
-        <!-- Filter Bar -->
-        <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-5 shadow-lg space-y-4">
-            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-                <div class="flex items-center space-x-2 text-amber-400 font-bold text-sm">
-                    <i data-lucide="filter" class="w-4 h-4"></i>
-                    <span class="text-slate-100">Filter Unit & Site Monitoring</span>
-                </div>
-                <button id="resetFilterBtn" class="text-xs text-slate-400 hover:text-amber-400 flex items-center space-x-1 transition">
-                    <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
-                    <span>Reset Filter</span>
-                </button>
-            </div>
-
-            <!-- Filter Controls Grid -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-                <div>
-                    <label class="block text-[11px] font-medium text-slate-400 mb-1">SITE</label>
-                    <select id="siteFilter" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-amber-500">
-                        <option value="ALL">Semua Site</option>
-                    </select>
-                </div>
-
-                <div>
-                    <label class="block text-[11px] font-medium text-slate-400 mb-1">TYPE</label>
-                    <select id="typeFilter" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-amber-500">
-                        <option value="ALL">Semua TYPE</option>
-                    </select>
-                </div>
-
-                <div>
-                    <label class="block text-[11px] font-medium text-slate-400 mb-1">MODEL</label>
-                    <select id="modelFilter" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-amber-500">
-                        <option value="ALL">Semua Model</option>
-                    </select>
-                </div>
-
-                <div>
-                    <label class="block text-[11px] font-medium text-slate-400 mb-1">ALARM PPU</label>
-                    <select id="alarmFilter" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-amber-500">
-                        <option value="ALL">Semua Kategori</option>
-                        <option value="OVER">OVER</option>
-                        <option value="MENDEKATI PLAN PPU">MENDEKATI PLAN PPU</option>
-                    </select>
-                </div>
-            </div>
-        </div>
-
-        <!-- KPI Summary Cards -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div class="bg-slate-900/90 border border-slate-800 p-5 rounded-2xl flex items-center justify-between shadow-md">
-                <div>
-                    <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Total Unit Track Monitored</p>
-                    <h3 id="cardTotalUnit" class="text-2xl font-black text-white mt-1">0 Unit</h3>
-                    <p class="text-[10px] text-slate-500 mt-1">Dalam monitoring UCR Site</p>
-                </div>
-                <div class="w-12 h-12 rounded-2xl bg-blue-500/10 border border-blue-500/30 flex items-center justify-center text-blue-400">
-                    <i data-lucide="truck" class="w-6 h-6"></i>
-                </div>
-            </div>
-
-            <div class="bg-slate-900/90 border border-slate-800 p-5 rounded-2xl flex items-center justify-between shadow-md">
-                <div>
-                    <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">OVER Interval PPU</p>
-                    <h3 id="cardOverUnit" class="text-2xl font-black text-amber-400 mt-1">0 Unit</h3>
-                    <p class="text-[10px] text-amber-500 mt-1 font-semibold">Perlu Dilakukan PPU</p>
-                </div>
-                <div class="w-12 h-12 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-500">
-                    <i data-lucide="alert-triangle" class="w-6 h-6"></i>
-                </div>
-            </div>
-
-            <div class="bg-slate-900/90 border border-slate-800 p-5 rounded-2xl flex items-center justify-between shadow-md">
-                <div>
-                    <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">MENDEKATI PLAN PPU</p>
-                    <h3 id="cardMendekatiUnit" class="text-2xl font-black text-white mt-1">0 Unit</h3>
-                    <p class="text-[10px] text-rose-400 mt-1 font-semibold">Perlu Schedule PPU</p>
-                </div>
-                <div class="w-12 h-12 rounded-2xl bg-rose-500/10 border border-rose-500/30 flex items-center justify-center text-rose-400">
-                    <i data-lucide="disc" class="w-6 h-6"></i>
-                </div>
-            </div>
-
-            <div class="bg-slate-900/90 border border-slate-800 p-5 rounded-2xl flex items-center justify-between shadow-md">
-                <div>
-                    <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">PPU Achievement</p>
-                    <h3 id="cardAchievementPercent" class="text-2xl font-black text-white mt-1">94.2%</h3>
-                    <p class="text-[10px] text-emerald-400 mt-1 font-semibold">Inspeksi On-Schedule</p>
-                </div>
-                <div class="w-12 h-12 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
-                    <i data-lucide="check-circle-2" class="w-6 h-6"></i>
-                </div>
-            </div>
-        </div>
-
-        <!-- Charts Grid -->
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-            <div class="lg:col-span-7 bg-slate-900/90 border border-slate-800 p-5 rounded-2xl shadow-lg flex flex-col justify-between">
-                <div class="flex items-center justify-between mb-4">
-                    <div class="flex items-center space-x-2">
-                        <i data-lucide="bar-chart-3" class="w-4 h-4 text-amber-400"></i>
-                        <h3 class="font-bold text-sm text-slate-100">PPU Achievement Masing-masing Site (%)</h3>
+                <!-- Filter Controls Grid -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+                    <div>
+                        <label class="block text-[11px] font-medium text-slate-400 mb-1">SITE</label>
+                        <select id="siteFilter" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-amber-500">
+                            <option value="ALL">Semua Site</option>
+                        </select>
                     </div>
-                    <span class="text-[10px] font-semibold bg-slate-800 text-slate-400 px-2.5 py-1 rounded-md border border-slate-700">Presentase Unit tanpa Over</span>
+
+                    <div>
+                        <label class="block text-[11px] font-medium text-slate-400 mb-1">TYPE</label>
+                        <select id="typeFilter" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-amber-500">
+                            <option value="ALL">Semua TYPE</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-[11px] font-medium text-slate-400 mb-1">MODEL</label>
+                        <select id="modelFilter" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-amber-500">
+                            <option value="ALL">Semua Model</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-[11px] font-medium text-slate-400 mb-1">ALARM PPU</label>
+                        <select id="alarmFilter" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-amber-500">
+                            <option value="ALL">Semua Kategori</option>
+                            <option value="OVER">OVER</option>
+                            <option value="MENDEKATI PLAN PPU">MENDEKATI PLAN PPU</option>
+                        </select>
+                    </div>
                 </div>
-                <div id="wearChart" class="w-full"></div>
             </div>
 
-            <div class="lg:col-span-5 bg-slate-900/90 border border-slate-800 p-5 rounded-2xl shadow-lg flex flex-col justify-between">
-                <div class="flex items-center justify-between mb-4">
-                    <div class="flex items-center space-x-2">
-                        <i data-lucide="pie-chart" class="w-4 h-4 text-amber-400"></i>
-                        <h3 class="font-bold text-sm text-slate-100">Total OVER Interval PPU Masing-masing Site</h3>
+            <!-- KPI Summary Cards -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="bg-slate-900/90 border border-slate-800 p-5 rounded-2xl flex items-center justify-between shadow-md">
+                    <div>
+                        <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Total Unit Track Monitored</p>
+                        <h3 id="cardTotalUnit" class="text-2xl font-black text-white mt-1">0 Unit</h3>
+                        <p class="text-[10px] text-slate-500 mt-1">Dalam monitoring UCR Site</p>
                     </div>
-                    <span class="text-[10px] font-semibold bg-slate-800 text-slate-400 px-2.5 py-1 rounded-md border border-slate-700">Total/Site</span>
+                    <div class="w-12 h-12 rounded-2xl bg-blue-500/10 border border-blue-500/30 flex items-center justify-center text-blue-400">
+                        <i data-lucide="truck" class="w-6 h-6"></i>
+                    </div>
                 </div>
-                <div id="categoryChart" class="w-full flex items-center justify-center my-auto"></div>
+
+                <div class="bg-slate-900/90 border border-slate-800 p-5 rounded-2xl flex items-center justify-between shadow-md">
+                    <div>
+                        <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">OVER Interval PPU</p>
+                        <h3 id="cardOverUnit" class="text-2xl font-black text-amber-400 mt-1">0 Unit</h3>
+                        <p class="text-[10px] text-amber-500 mt-1 font-semibold">Perlu Dilakukan PPU</p>
+                    </div>
+                    <div class="w-12 h-12 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-500">
+                        <i data-lucide="alert-triangle" class="w-6 h-6"></i>
+                    </div>
+                </div>
+
+                <div class="bg-slate-900/90 border border-slate-800 p-5 rounded-2xl flex items-center justify-between shadow-md">
+                    <div>
+                        <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">MENDEKATI PLAN PPU</p>
+                        <h3 id="cardMendekatiUnit" class="text-2xl font-black text-white mt-1">0 Unit</h3>
+                        <p class="text-[10px] text-rose-400 mt-1 font-semibold">Perlu Schedule PPU</p>
+                    </div>
+                    <div class="w-12 h-12 rounded-2xl bg-rose-500/10 border border-rose-500/30 flex items-center justify-center text-rose-400">
+                        <i data-lucide="disc" class="w-6 h-6"></i>
+                    </div>
+                </div>
+
+                <div class="bg-slate-900/90 border border-slate-800 p-5 rounded-2xl flex items-center justify-between shadow-md">
+                    <div>
+                        <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">PPU Achievement</p>
+                        <h3 id="cardAchievementPercent" class="text-2xl font-black text-white mt-1">94.2%</h3>
+                        <p class="text-[10px] text-emerald-400 mt-1 font-semibold">Inspeksi On-Schedule</p>
+                    </div>
+                    <div class="w-12 h-12 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
+                        <i data-lucide="check-circle-2" class="w-6 h-6"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <div class="lg:col-span-7 bg-slate-900/90 border border-slate-800 p-5 rounded-2xl shadow-lg flex flex-col justify-between">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center space-x-2">
+                            <i data-lucide="bar-chart-3" class="w-4 h-4 text-amber-400"></i>
+                            <h3 class="font-bold text-sm text-slate-100">PPU Achievement Masing-masing Site (%)</h3>
+                        </div>
+                        <span class="text-[10px] font-semibold bg-slate-800 text-slate-400 px-2.5 py-1 rounded-md border border-slate-700">Presentase Unit tanpa Over</span>
+                    </div>
+                    <div id="wearChart" class="w-full"></div>
+                </div>
+
+                <div class="lg:col-span-5 bg-slate-900/90 border border-slate-800 p-5 rounded-2xl shadow-lg flex flex-col justify-between">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center space-x-2">
+                            <i data-lucide="pie-chart" class="w-4 h-4 text-amber-400"></i>
+                            <h3 class="font-bold text-sm text-slate-100">Total OVER Interval PPU Masing-masing Site</h3>
+                        </div>
+                        <span class="text-[10px] font-semibold bg-slate-800 text-slate-400 px-2.5 py-1 rounded-md border border-slate-700">Total/Site</span>
+                    </div>
+                    <div id="categoryChart" class="w-full flex items-center justify-center my-auto"></div>
+                </div>
+            </div>
+
+            <!-- Table Monitoring Unit Wear Status -->
+            <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-5 shadow-lg space-y-4">
+                <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                    <div class="flex items-center space-x-2">
+                        <i data-lucide="table" class="w-4 h-4 text-amber-400"></i>
+                        <h3 class="font-bold text-sm text-slate-100">Status Unit Over Interval PPU (PPU Real-time Monitoring)</h3>
+                    </div>
+                    <span class="text-xs text-slate-400">Berdasarkan Update Monitoring UCR Tiap Site</span>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs text-slate-300">
+                        <thead class="bg-slate-800/80 uppercase text-[10px] text-slate-400 border-b border-slate-700">
+                            <tr>
+                                <th class="p-3">Site</th>
+                                <th class="p-3">Type</th>
+                                <th class="p-3">Model Unit</th>
+                                <th class="p-3">No Unit</th>
+                                <th class="p-3">Alarm PPU Status</th>
+                                <th class="p-3">Durasi Over (HM)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ppuTableBody" class="divide-y divide-slate-800">
+                            <!-- Content Rendered by JS -->
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
 
-        <!-- Table Monitoring Unit Wear Status -->
-        <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-5 shadow-lg space-y-4">
-            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-                <div class="flex items-center space-x-2">
-                    <i data-lucide="table" class="w-4 h-4 text-amber-400"></i>
-                    <h3 class="font-bold text-sm text-slate-100">Status Unit Over Interval PPU (PPU Real-time Monitoring)</h3>
+        <!-- ==================== REVIEW LIFETIME DASHBOARD ==================== -->
+        <div id="review-lifetime-content" class="dashboard-content space-y-6 hidden">
+            <!-- Welcome Banner -->
+            <div class="relative overflow-hidden rounded-2xl bg-gradient-to-r from-slate-900 via-slate-800 to-cyan-950/40 p-6 border border-slate-800 shadow-xl">
+                <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div>
+                        <div class="flex items-center space-x-2 mb-2">
+                            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold tracking-wide uppercase bg-cyan-500 text-slate-950">REVIEW</span>
+                            <span class="text-xs text-emerald-400 font-medium flex items-center space-x-1">
+                                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                                <span>Monitoring Review Lifetime</span>
+                            </span>
+                        </div>
+                        <h2 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">Review Lifetime Unit</h2>
+                        <p class="text-xs text-cyan-400 font-semibold tracking-wider uppercase mt-1">MONITORING STATUS LIFETIME UNIT</p>
+                    </div>
+                    <div class="flex items-center space-x-3">
+                        <button class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 font-semibold text-xs flex items-center space-x-1.5 transition">
+                            <i data-lucide="file-text" class="w-4 h-4"></i>
+                            <span>Export Report</span>
+                        </button>
+                    </div>
                 </div>
-                <span class="text-xs text-slate-400">Berdasarkan Update Monitoring UCR Tiap Site</span>
             </div>
 
-            <div class="overflow-x-auto">
-                <table class="w-full text-left text-xs text-slate-300">
-                    <thead class="bg-slate-800/80 uppercase text-[10px] text-slate-400 border-b border-slate-700">
-                        <tr>
-                            <th class="p-3">Site</th>
-                            <th class="p-3">Type</th>
-                            <th class="p-3">Model Unit</th>
-                            <th class="p-3">No Unit</th>
-                            <th class="p-3">Alarm PPU Status</th>
-                            <th class="p-3">Durasi Over (HM)</th>
-                        </tr>
-                    </thead>
-                    <tbody id="ppuTableBody" class="divide-y divide-slate-800">
-                        <!-- Content Rendered by JS -->
-                    </tbody>
-                </table>
+            <!-- Filter Bar -->
+            <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-5 shadow-lg space-y-4">
+                <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                    <div class="flex items-center space-x-2 text-cyan-400 font-bold text-sm">
+                        <i data-lucide="filter" class="w-4 h-4"></i>
+                        <span class="text-slate-100">Filter Review Lifetime</span>
+                    </div>
+                    <button id="resetFilterBtnReview" class="text-xs text-slate-400 hover:text-cyan-400 flex items-center space-x-1 transition">
+                        <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
+                        <span>Reset Filter</span>
+                    </button>
+                </div>
+
+                <!-- Filter Controls Grid -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+                    <div>
+                        <label class="block text-[11px] font-medium text-slate-400 mb-1">SITE</label>
+                        <select id="reviewSiteFilter" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-cyan-500">
+                            <option value="ALL">Semua Site</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-[11px] font-medium text-slate-400 mb-1">STATUS</label>
+                        <select id="reviewStatusFilter" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-cyan-500">
+                            <option value="ALL">Semua Status</option>
+                            <option value="TERCAPAI">Tercapai</option>
+                            <option value="TIDAK TERCAPAI">Tidak Tercapai</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-[11px] font-medium text-slate-400 mb-1">TYPE</label>
+                        <select id="reviewTypeFilter" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-cyan-500">
+                            <option value="ALL">Semua TYPE</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-[11px] font-medium text-slate-400 mb-1">MODEL</label>
+                        <select id="reviewModelFilter" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-cyan-500">
+                            <option value="ALL">Semua Model</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- KPI Summary Cards for Review Lifetime -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="bg-slate-900/90 border border-slate-800 p-5 rounded-2xl flex items-center justify-between shadow-md">
+                    <div>
+                        <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Total Unit Review</p>
+                        <h3 id="reviewCardTotal" class="text-2xl font-black text-white mt-1">0 Unit</h3>
+                        <p class="text-[10px] text-slate-500 mt-1">Total Unit Dalam Review</p>
+                    </div>
+                    <div class="w-12 h-12 rounded-2xl bg-blue-500/10 border border-blue-500/30 flex items-center justify-center text-blue-400">
+                        <i data-lucide="truck" class="w-6 h-6"></i>
+                    </div>
+                </div>
+
+                <div class="bg-slate-900/90 border border-slate-800 p-5 rounded-2xl flex items-center justify-between shadow-md">
+                    <div>
+                        <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Status Tercapai</p>
+                        <h3 id="reviewCardTercapai" class="text-2xl font-black text-emerald-400 mt-1">0 Unit</h3>
+                        <p class="text-[10px] text-emerald-500 mt-1 font-semibold">Lifetime Tercapai</p>
+                    </div>
+                    <div class="w-12 h-12 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
+                        <i data-lucide="check-circle-2" class="w-6 h-6"></i>
+                    </div>
+                </div>
+
+                <div class="bg-slate-900/90 border border-slate-800 p-5 rounded-2xl flex items-center justify-between shadow-md">
+                    <div>
+                        <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Status Tidak Tercapai</p>
+                        <h3 id="reviewCardTidakTercapai" class="text-2xl font-black text-rose-400 mt-1">0 Unit</h3>
+                        <p class="text-[10px] text-rose-500 mt-1 font-semibold">Lifetime Tidak Tercapai</p>
+                    </div>
+                    <div class="w-12 h-12 rounded-2xl bg-rose-500/10 border border-rose-500/30 flex items-center justify-center text-rose-400">
+                        <i data-lucide="x-circle" class="w-6 h-6"></i>
+                    </div>
+                </div>
+
+                <div class="bg-slate-900/90 border border-slate-800 p-5 rounded-2xl flex items-center justify-between shadow-md">
+                    <div>
+                        <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Success Rate</p>
+                        <h3 id="reviewCardSuccessRate" class="text-2xl font-black text-white mt-1">0%</h3>
+                        <p class="text-[10px] text-cyan-400 mt-1 font-semibold">Achievement Rate</p>
+                    </div>
+                    <div class="w-12 h-12 rounded-2xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400">
+                        <i data-lucide="trending-up" class="w-6 h-6"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Table Review Lifetime -->
+            <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-5 shadow-lg space-y-4">
+                <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                    <div class="flex items-center space-x-2">
+                        <i data-lucide="table" class="w-4 h-4 text-cyan-400"></i>
+                        <h3 class="font-bold text-sm text-slate-100">Daftar Review Lifetime Unit</h3>
+                    </div>
+                    <span class="text-xs text-slate-400">Data Status Lifetime Unit</span>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs text-slate-300">
+                        <thead class="bg-slate-800/80 uppercase text-[10px] text-slate-400 border-b border-slate-700">
+                            <tr>
+                                <th class="p-3">Site</th>
+                                <th class="p-3">Type</th>
+                                <th class="p-3">Model Unit</th>
+                                <th class="p-3">No Unit</th>
+                                <th class="p-3">Lifetime Status</th>
+                                <th class="p-3">Last Update</th>
+                            </tr>
+                        </thead>
+                        <tbody id="reviewTableBody" class="divide-y divide-slate-800">
+                            <!-- Content Rendered by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== KLASIFIKASI UNIT DASHBOARD ==================== -->
+        <div id="klasifikasi-content" class="dashboard-content space-y-6 hidden">
+            <div class="relative overflow-hidden rounded-2xl bg-gradient-to-r from-slate-900 via-slate-800 to-purple-950/40 p-6 border border-slate-800 shadow-xl">
+                <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div>
+                        <div class="flex items-center space-x-2 mb-2">
+                            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold tracking-wide uppercase bg-purple-500 text-slate-950">KLASIFIKASI</span>
+                        </div>
+                        <h2 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">Klasifikasi Unit (A/B/C)</h2>
+                        <p class="text-xs text-purple-400 font-semibold tracking-wider uppercase mt-1">MONITORING KLASIFIKASI UNIT</p>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-8 shadow-lg">
+                <div class="text-center text-slate-400">
+                    <i data-lucide="construction" class="w-12 h-12 mx-auto mb-4 opacity-50"></i>
+                    <p class="text-sm">Konten Klasifikasi Unit sedang dalam tahap pengembangan...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== PLAN REPLACEMENT DASHBOARD ==================== -->
+        <div id="plan-replacement-content" class="dashboard-content space-y-6 hidden">
+            <div class="relative overflow-hidden rounded-2xl bg-gradient-to-r from-slate-900 via-slate-800 to-pink-950/40 p-6 border border-slate-800 shadow-xl">
+                <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div>
+                        <div class="flex items-center space-x-2 mb-2">
+                            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold tracking-wide uppercase bg-pink-500 text-slate-950">PLAN</span>
+                        </div>
+                        <h2 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">Plan Replacement</h2>
+                        <p class="text-xs text-pink-400 font-semibold tracking-wider uppercase mt-1">MONITORING RENCANA PENGGANTIAN UNIT</p>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-8 shadow-lg">
+                <div class="text-center text-slate-400">
+                    <i data-lucide="construction" class="w-12 h-12 mx-auto mb-4 opacity-50"></i>
+                    <p class="text-sm">Konten Plan Replacement sedang dalam tahap pengembangan...</p>
+                </div>
             </div>
         </div>
 
@@ -255,87 +449,128 @@
     <script>
     lucide.createIcons();
 
-    // Target URL Google Sheets CSV
+    // ==================== GLOBAL STATE ====================
     const sheetCsvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSMyvNRqkn65gL_4tIjZKJeKRIQG9ODScl-6uIst7HobQXwRsP4J2BdI1NsA81_pHqxrH2t_sF75_Ch/pub?output=csv';
     let globalPpuData = [];
+    let globalReviewData = []; // Data untuk Review Lifetime
 
-    // Inisialisasi ApexCharts
-    const achievementChart = new ApexCharts(document.querySelector("#wearChart"), {
-        series: [{ name: 'Achievement (%)', data: [] }],
-        chart: { type: 'bar', height: 280, toolbar: { show: false }, background: 'transparent' },
-        plotOptions: { 
-            bar: { borderRadius: 6, columnWidth: '45%', distributed: true, dataLabels: { position: 'top' } } 
-        },
-        dataLabels: {
-            enabled: true,
-            formatter: (val) => val + '%',
-            offsetY: -20,
-            style: { colors: ['#f8fafc'], fontSize: '11px', fontWeight: 'bold' }
-        },
-        theme: { mode: 'dark' },
-        colors: ['#3b82f6', '#10b981', '#f59e0b', '#ec4899', '#8b5cf6', '#06b6d4'],
-        legend: { show: false },
-        xaxis: { categories: [], labels: { style: { colors: '#94a3b8', fontSize: '11px', fontWeight: 'bold' } } },
-        yaxis: { max: 100, labels: { formatter: (val) => val + '%', style: { colors: '#94a3b8', fontSize: '10px' } } },
-        grid: { borderColor: '#1e293b', strokeDashArray: 3 }
-    });
-    achievementChart.render();
+    let achievementChart, overChart;
 
-    // 1. Inisialisasi Donut Chart dengan Formatter DataLabels & Legend
-    const overChart = new ApexCharts(document.querySelector("#categoryChart"), {
-        series: [],
-        labels: [],
-        chart: { type: 'donut', height: 290, background: 'transparent' },
-        colors: ['#ef4444', '#f97316', '#f59e0b', '#eab308', '#84cc16', '#06b6d4', '#3b82f6', '#8b5cf6'],
-        stroke: { colors: ['#0f172a'] },
-        legend: { 
-            position: 'bottom', 
-            fontSize: '11px', 
-            labels: { colors: '#cbd5e1' } 
-        },
-        dataLabels: { 
-            enabled: true,
-            // Menampilkan Angka Total Unit (bukan persen) langsung di dalam Donut
-            formatter: function (val, opts) {
-                const seriesVal = opts.w.config.series[opts.seriesIndex];
-                return seriesVal + " Unit";
+    // ==================== TAB SWITCHING ====================
+    function initTabSwitching() {
+        const tabBtns = document.querySelectorAll('.tab-btn');
+        tabBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const tabName = btn.dataset.tab;
+                switchToTab(tabName);
+            });
+        });
+    }
+
+    function switchToTab(tabName) {
+        // Hide all content
+        const allContents = document.querySelectorAll('.dashboard-content');
+        allContents.forEach(content => content.classList.add('hidden'));
+
+        // Show selected content
+        document.getElementById(tabName + '-content').classList.remove('hidden');
+
+        // Update tab buttons
+        const tabBtns = document.querySelectorAll('.tab-btn');
+        tabBtns.forEach(btn => {
+            if (btn.dataset.tab === tabName) {
+                btn.classList.remove('text-slate-400', 'hover:text-slate-200', 'hover:bg-slate-800');
+                btn.classList.add('bg-amber-500', 'text-slate-950', 'shadow-md', 'shadow-amber-500/20');
+            } else {
+                btn.classList.add('text-slate-400', 'hover:text-slate-200', 'hover:bg-slate-800');
+                btn.classList.remove('bg-amber-500', 'text-slate-950', 'shadow-md', 'shadow-amber-500/20');
+            }
+        });
+
+        // Trigger resize untuk chart agar responsive
+        setTimeout(() => {
+            if (achievementChart) achievementChart.reflow();
+            if (overChart) overChart.reflow();
+        }, 100);
+    }
+
+    // ==================== PPU DASHBOARD ====================
+    function initPpuCharts() {
+        achievementChart = new ApexCharts(document.querySelector("#wearChart"), {
+            series: [{ name: 'Achievement (%)', data: [] }],
+            chart: { type: 'bar', height: 280, toolbar: { show: false }, background: 'transparent' },
+            plotOptions: { 
+                bar: { borderRadius: 6, columnWidth: '45%', distributed: true, dataLabels: { position: 'top' } } 
             },
-            style: {
-                fontSize: '11px',
-                fontWeight: 'bold'
+            dataLabels: {
+                enabled: true,
+                formatter: (val) => val + '%',
+                offsetY: -20,
+                style: { colors: ['#f8fafc'], fontSize: '11px', fontWeight: 'bold' }
             },
-            dropShadow: { enabled: false }
-        },
-        plotOptions: {
-            pie: {
-                donut: {
-                    size: '70%',
-                    labels: {
-                        show: true,
-                        total: { 
-                            show: true, 
-                            label: 'Total Over PPU', 
-                            color: '#94a3b8', 
-                            fontSize: '11px', 
-                            formatter: (w) => {
-                                const total = w.globals.seriesTotals.reduce((a, b) => a + b, 0);
-                                return total + ' Unit';
-                            }
-                        },
-                        value: { color: '#ef4444', fontSize: '18px', fontWeight: '800' }
+            theme: { mode: 'dark' },
+            colors: ['#3b82f6', '#10b981', '#f59e0b', '#ec4899', '#8b5cf6', '#06b6d4'],
+            legend: { show: false },
+            xaxis: { categories: [], labels: { style: { colors: '#94a3b8', fontSize: '11px', fontWeight: 'bold' } } },
+            yaxis: { max: 100, labels: { formatter: (val) => val + '%', style: { colors: '#94a3b8', fontSize: '10px' } } },
+            grid: { borderColor: '#1e293b', strokeDashArray: 3 }
+        });
+        achievementChart.render();
+
+        overChart = new ApexCharts(document.querySelector("#categoryChart"), {
+            series: [],
+            labels: [],
+            chart: { type: 'donut', height: 290, background: 'transparent' },
+            colors: ['#ef4444', '#f97316', '#f59e0b', '#eab308', '#84cc16', '#06b6d4', '#3b82f6', '#8b5cf6'],
+            stroke: { colors: ['#0f172a'] },
+            legend: { 
+                position: 'bottom', 
+                fontSize: '11px', 
+                labels: { colors: '#cbd5e1' } 
+            },
+            dataLabels: { 
+                enabled: true,
+                formatter: function (val, opts) {
+                    const seriesVal = opts.w.config.series[opts.seriesIndex];
+                    return seriesVal + " Unit";
+                },
+                style: {
+                    fontSize: '11px',
+                    fontWeight: 'bold'
+                },
+                dropShadow: { enabled: false }
+            },
+            plotOptions: {
+                pie: {
+                    donut: {
+                        size: '70%',
+                        labels: {
+                            show: true,
+                            total: { 
+                                show: true, 
+                                label: 'Total Over PPU', 
+                                color: '#94a3b8', 
+                                fontSize: '11px', 
+                                formatter: (w) => {
+                                    const total = w.globals.seriesTotals.reduce((a, b) => a + b, 0);
+                                    return total + ' Unit';
+                                }
+                            },
+                            value: { color: '#ef4444', fontSize: '18px', fontWeight: '800' }
+                        }
                     }
                 }
-            }
-        },
-        tooltip: {
-            theme: 'dark',
-            y: {
-                formatter: (val) => val + ' Unit'
-            }
-        },
-        theme: { mode: 'dark' }
-    });
-    overChart.render();
+            },
+            tooltip: {
+                theme: 'dark',
+                y: {
+                    formatter: (val) => val + ' Unit'
+                }
+            },
+            theme: { mode: 'dark' }
+        });
+        overChart.render();
+    }
 
     async function loadPpuData() {
         try {
@@ -345,72 +580,24 @@
             
             console.log(`📊 Total rows dari CSV: ${rows.length}`);
             
-            // Store raw data untuk analisis
-            const rawDataForAnalysis = [];
-            
             globalPpuData = rows.map((row, idx) => {
                 const cols = row.split(',').map(c => c.trim().replace(/^"(.*)"$/, '$1'));
                 
-                const item = {
-                    site: cols[0] || '',        // Kolom A
-                    type: cols[1] || '',        // Kolom B
-                    noUnit: cols[2] || '',      // Kolom C
-                    modelUnit: cols[3] || '',   // Kolom D
-                    alarmStatus: cols[11] || '',// Kolom L (Alarm PPU Status)
-                    durasiOver: cols[12] || '-', // Kolom M (Durasi Over)
-                    rawAlarmAllCols: cols.slice(10, 15) // Debug: store kolom 10-15
+                return {
+                    site: cols[0] || '',
+                    type: cols[1] || '',
+                    noUnit: cols[2] || '',
+                    modelUnit: cols[3] || '',
+                    alarmStatus: cols[11] || '',
+                    durasiOver: cols[12] || '-',
                 };
-                
-                rawDataForAnalysis.push({
-                    rowNum: idx + 2,
-                    noUnit: item.noUnit,
-                    colL: cols[11] || '[EMPTY]',
-                    allCols: cols
-                });
-                
-                return item;
             });
-            
-            // Debug: Hitung OVER dengan berbagai metode
-            const overCount1 = globalPpuData.filter(d => 
-                (d.alarmStatus || '').toString().trim().toUpperCase().includes('OVER')
-            ).length;
-            
-            // Coba search di semua kolom
-            const overCount2 = globalPpuData.filter(d => {
-                const allStr = Object.values(d).join(' ').toUpperCase();
-                return allStr.includes('OVER');
-            }).length;
-            
-            console.log(`✅ OVER di kolom L: ${overCount1} unit`);
-            console.log(`✅ OVER di semua kolom: ${overCount2} unit`);
-            console.log(`📋 Total unit di dashboard: ${globalPpuData.length}`);
-            
-            // Log data yang TIDAK terbaca sebagai OVER (sample 10 pertama)
-            console.log(`\n🔍 Sample data TIDAK OVER di kolom L (10 pertama):`);
-            const notOverSample = rawDataForAnalysis.filter((r, i) => 
-                !r.colL.toUpperCase().includes('OVER') && i < 15
-            ).slice(0, 10);
-            
-            notOverSample.forEach(d => {
-                console.log(`Row ${d.rowNum}: ${d.noUnit} - ColL: "${d.colL}"`);
-            });
-            
-            // Log SEMUA yang OVER untuk verifikasi
-            console.log(`\n🔍 Data dengan "OVER" di kolom L (all):`);
-            const allOverRows = rawDataForAnalysis.filter(r => r.colL.toUpperCase().includes('OVER'));
-            console.log(`Total: ${allOverRows.length}`);
-            
-            // Cek juga di kolom lain (col 13, 14 dst)
-            console.log(`\n🔍 Checking kolom M (index 12) untuk OVER:`);
-            const overInColM = rawDataForAnalysis.filter((r, i) => {
-                const col12 = globalPpuData[i].durasiOver;
-                return col12 && col12.toUpperCase().includes('OVER');
-            }).length;
-            console.log(`Found in kolom M: ${overInColM}`);
 
             populateDropdowns(globalPpuData);
-            renderDashboard(globalPpuData);
+            renderPpuDashboard(globalPpuData);
+            
+            // Load mock data untuk Review Lifetime
+            loadReviewLifetimeData();
             
         } catch (error) {
             console.error('❌ Gagal mengambil data dari Google Sheets:', error);
@@ -425,21 +612,25 @@
         fillSelectOptions('siteFilter', sites, 'Semua Site');
         fillSelectOptions('typeFilter', types, 'Semua TYPE');
         fillSelectOptions('modelFilter', models, 'Semua Model');
+
+        // Populate Review Lifetime dropdowns
+        fillSelectOptions('reviewSiteFilter', sites, 'Semua Site');
+        fillSelectOptions('reviewTypeFilter', types, 'Semua TYPE');
+        fillSelectOptions('reviewModelFilter', models, 'Semua Model');
     }
 
     function fillSelectOptions(elementId, items, defaultText) {
         const select = document.getElementById(elementId);
+        if (!select) return;
         select.innerHTML = `<option value="ALL">${defaultText}</option>`;
         items.forEach(item => {
             select.innerHTML += `<option value="${item}">${item}</option>`;
         });
     }
 
-    function renderDashboard(data) {
-        // Helper: Normalisasi & parsing status
+    function renderPpuDashboard(data) {
         const getStatus = (item) => (item.alarmStatus || '').toString().trim().toUpperCase();
         
-        // Helper: Cek status OVER - tangkap semua variasi
         const isStatusOver = (st) => {
             return st && (
                 st === 'OVER' || 
@@ -449,10 +640,9 @@
             );
         };
         
-        // Helper: Cek status MENDEKATI
         const isStatusMendekati = (st) => st && st.includes('MENDEKATI');
 
-        // 1. Hitung KPI Cards
+        // KPI Cards
         const totalUnit = data.length;
         const overUnit = data.filter(d => isStatusOver(getStatus(d))).length;
         const mendekatiUnit = data.filter(d => isStatusMendekati(getStatus(d))).length;
@@ -460,13 +650,12 @@
         const totalAman = totalUnit - overUnit;
         const achievementPct = totalUnit > 0 ? ((totalAman / totalUnit) * 100).toFixed(1) : 0;
 
-        // Update KPI Cards
         document.getElementById('cardTotalUnit').innerText = `${totalUnit} Unit`;
         document.getElementById('cardOverUnit').innerText = `${overUnit} Unit`;
         document.getElementById('cardMendekatiUnit').innerText = `${mendekatiUnit} Unit`;
         document.getElementById('cardAchievementPercent').innerText = `${achievementPct}%`;
 
-        // 2. Render Tabel
+        // Render Table
         const tableBody = document.getElementById('ppuTableBody');
         tableBody.innerHTML = '';
 
@@ -499,7 +688,7 @@
             tableBody.appendChild(tr);
         });
 
-        // 3. Update Charts
+        // Update Charts
         const sites = [...new Set(data.map(d => d.site).filter(Boolean))].sort();
         
         const siteAchievementData = [];
@@ -521,18 +710,20 @@
             }
         });
 
-        achievementChart.updateOptions({
-            xaxis: { categories: sites },
-            series: [{ name: 'Achievement (%)', data: siteAchievementData }]
-        });
+        if (achievementChart && overChart) {
+            achievementChart.updateOptions({
+                xaxis: { categories: sites },
+                series: [{ name: 'Achievement (%)', data: siteAchievementData }]
+            });
 
-        overChart.updateOptions({
-            labels: siteOverLabels,
-            series: siteOverSeries
-        });
+            overChart.updateOptions({
+                labels: siteOverLabels,
+                series: siteOverSeries
+            });
+        }
     }
 
-    function applyFilters() {
+    function applyPpuFilters() {
         const siteVal = document.getElementById('siteFilter').value;
         const typeVal = document.getElementById('typeFilter').value;
         const modelVal = document.getElementById('modelFilter').value;
@@ -547,22 +738,129 @@
             return matchSite && matchType && matchModel && matchAlarm;
         });
 
-        renderDashboard(filteredData);
+        renderPpuDashboard(filteredData);
     }
 
-    ['siteFilter', 'typeFilter', 'modelFilter', 'alarmFilter'].forEach(id => {
-        document.getElementById(id).addEventListener('change', applyFilters);
-    });
+    // ==================== REVIEW LIFETIME DASHBOARD ====================
+    function loadReviewLifetimeData() {
+        // Generate mock data dari globalPpuData dengan status lifecycle
+        globalReviewData = globalPpuData.map((item, idx) => ({
+            ...item,
+            lifetimeStatus: idx % 2 === 0 ? 'TERCAPAI' : 'TIDAK TERCAPAI',
+            lastUpdate: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000).toLocaleDateString('id-ID')
+        }));
 
-    document.getElementById('resetFilterBtn').addEventListener('click', () => {
-        document.getElementById('siteFilter').value = 'ALL';
-        document.getElementById('typeFilter').value = 'ALL';
-        document.getElementById('modelFilter').value = 'ALL';
-        document.getElementById('alarmFilter').value = 'ALL';
-        renderDashboard(globalPpuData);
-    });
+        populateReviewDropdowns(globalReviewData);
+        renderReviewLifetimeDashboard(globalReviewData);
+    }
 
-    loadPpuData();
-</script>
+    function populateReviewDropdowns(data) {
+        const sites = [...new Set(data.map(d => d.site).filter(Boolean))].sort();
+        const types = [...new Set(data.map(d => d.type).filter(Boolean))].sort();
+        const models = [...new Set(data.map(d => d.modelUnit).filter(Boolean))].sort();
+
+        fillSelectOptions('reviewSiteFilter', sites, 'Semua Site');
+        fillSelectOptions('reviewTypeFilter', types, 'Semua TYPE');
+        fillSelectOptions('reviewModelFilter', models, 'Semua Model');
+    }
+
+    function renderReviewLifetimeDashboard(data) {
+        // KPI Cards
+        const totalUnit = data.length;
+        const tercapaiUnit = data.filter(d => d.lifetimeStatus === 'TERCAPAI').length;
+        const tidakTercapaiUnit = data.filter(d => d.lifetimeStatus === 'TIDAK TERCAPAI').length;
+        const successRate = totalUnit > 0 ? ((tercapaiUnit / totalUnit) * 100).toFixed(1) : 0;
+
+        document.getElementById('reviewCardTotal').innerText = `${totalUnit} Unit`;
+        document.getElementById('reviewCardTercapai').innerText = `${tercapaiUnit} Unit`;
+        document.getElementById('reviewCardTidakTercapai').innerText = `${tidakTercapaiUnit} Unit`;
+        document.getElementById('reviewCardSuccessRate').innerText = `${successRate}%`;
+
+        // Render Table
+        const tableBody = document.getElementById('reviewTableBody');
+        tableBody.innerHTML = '';
+
+        data.forEach(item => {
+            const tr = document.createElement('tr');
+            tr.className = 'hover:bg-slate-800/40 border-b border-slate-800';
+            
+            let statusBadge = '';
+            if (item.lifetimeStatus === 'TERCAPAI') {
+                statusBadge = `<span class="px-2.5 py-1 rounded text-xs font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">TERCAPAI</span>`;
+            } else {
+                statusBadge = `<span class="px-2.5 py-1 rounded text-xs font-bold bg-rose-500/10 text-rose-400 border border-rose-500/20">TIDAK TERCAPAI</span>`;
+            }
+
+            tr.innerHTML = `
+                <td class="p-3 font-bold text-white">${item.site}</td>
+                <td class="p-3 text-slate-300">${item.type}</td>
+                <td class="p-3 text-slate-300">${item.modelUnit}</td>
+                <td class="p-3 font-semibold text-white">${item.noUnit}</td>
+                <td class="p-3">${statusBadge}</td>
+                <td class="p-3 text-slate-300 text-[10px]">${item.lastUpdate}</td>
+            `;
+            tableBody.appendChild(tr);
+        });
+    }
+
+    function applyReviewFilters() {
+        const siteVal = document.getElementById('reviewSiteFilter').value;
+        const statusVal = document.getElementById('reviewStatusFilter').value;
+        const typeVal = document.getElementById('reviewTypeFilter').value;
+        const modelVal = document.getElementById('reviewModelFilter').value;
+
+        const filteredData = globalReviewData.filter(item => {
+            const matchSite = (siteVal === 'ALL' || item.site === siteVal);
+            const matchStatus = (statusVal === 'ALL' || item.lifetimeStatus === statusVal);
+            const matchType = (typeVal === 'ALL' || item.type === typeVal);
+            const matchModel = (modelVal === 'ALL' || item.modelUnit === modelVal);
+            
+            return matchSite && matchStatus && matchType && matchModel;
+        });
+
+        renderReviewLifetimeDashboard(filteredData);
+    }
+
+    // ==================== EVENT LISTENERS ====================
+    function initEventListeners() {
+        // PPU Filters
+        ['siteFilter', 'typeFilter', 'modelFilter', 'alarmFilter'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.addEventListener('change', applyPpuFilters);
+        });
+
+        document.getElementById('resetFilterBtn').addEventListener('click', () => {
+            document.getElementById('siteFilter').value = 'ALL';
+            document.getElementById('typeFilter').value = 'ALL';
+            document.getElementById('modelFilter').value = 'ALL';
+            document.getElementById('alarmFilter').value = 'ALL';
+            renderPpuDashboard(globalPpuData);
+        });
+
+        // Review Lifetime Filters
+        ['reviewSiteFilter', 'reviewStatusFilter', 'reviewTypeFilter', 'reviewModelFilter'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.addEventListener('change', applyReviewFilters);
+        });
+
+        document.getElementById('resetFilterBtnReview').addEventListener('click', () => {
+            document.getElementById('reviewSiteFilter').value = 'ALL';
+            document.getElementById('reviewStatusFilter').value = 'ALL';
+            document.getElementById('reviewTypeFilter').value = 'ALL';
+            document.getElementById('reviewModelFilter').value = 'ALL';
+            renderReviewLifetimeDashboard(globalReviewData);
+        });
+    }
+
+    // ==================== INITIALIZATION ====================
+    async function init() {
+        initPpuCharts();
+        initTabSwitching();
+        initEventListeners();
+        await loadPpuData();
+    }
+
+    init();
+    </script>
 </body>
 </html>
