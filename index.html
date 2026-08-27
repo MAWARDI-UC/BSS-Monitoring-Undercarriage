@@ -403,7 +403,8 @@
                                 <th class="p-3">Model Unit</th>
                                 <th class="p-3">No Unit</th>
                                 <th class="p-3">Status Paket On Track</th>
-                                <th class="p-3">Last Update</th>
+                                <th class="p-3">Lifetime Ontrack</th>
+                                <th class="p-3">Merk Terinstall</th>
                             </tr>
                         </thead>
                         <tbody id="reviewTableBody" class="divide-y divide-slate-800">
@@ -642,8 +643,11 @@
                     type: (cols[1] || '').trim(),
                     noUnit: (cols[2] || '').trim(),
                     modelUnit: (cols[3] || '').trim(),
-                    alarmStatus: (cols[11] || '').trim(), // KOLOM L (Indeks 11)
-                    durasiOver: (cols[12] || '-').trim(),  // KOLOM M (Indeks 12)
+                    lifetimeOntrack: (cols[9] || '-').trim(),      // KOLOM J (Indeks 9)
+                    statusPaketOnTrack: (cols[10] || '-').trim(),  // KOLOM K (Indeks 10)
+                    merkTerinstall: (cols[11] || '-').trim(),     // KOLOM L (Indeks 11)
+                    alarmStatus: (cols[11] || '').trim(), 
+                    durasiOver: (cols[12] || '-').trim(),
                     maxWear: parseFloat(cols[14]) || 0
                 };
             }).filter(item => item.site !== '');
@@ -710,7 +714,6 @@
 
     // ==================== DASHBOARD RENDER LOGIC ====================
     function renderPpuDashboard(data) {
-        // Pembersihan string status dari Kolom L
         const getCleanStatus = (item) => (item.alarmStatus || '').toString().trim().toUpperCase();
         
         const isStatusOver = (st) => st === 'OVER' || st.includes('OVER');
@@ -728,7 +731,6 @@
         document.getElementById('cardMendekatiUnit').innerText = `${mendekatiUnit} Unit`;
         document.getElementById('cardAchievementPercent').innerText = `${achievementPct}%`;
 
-        // Render Tabel (Hanya menampilkan status OVER dan MENDEKATI PLAN PPU)
         const tableBody = document.getElementById('ppuTableBody');
         tableBody.innerHTML = '';
 
@@ -761,7 +763,6 @@
             tableBody.appendChild(tr);
         });
 
-        // Update Charts
         const sites = [...new Set(data.map(d => d.site).filter(Boolean))].sort();
         const siteAchievementData = [];
         const siteOverSeries = [];
@@ -815,28 +816,17 @@
 
     // ==================== REVIEW LIFETIME LOGIC ====================
     function loadReviewLifetimeData() {
-        const statusList = ['TERCAPAI', 'MENDEKATI POLICY', 'AMAN'];
-        
-        globalReviewData = globalPpuData.map((item, idx) => {
-            let statusPaket = statusList[idx % 3];
-            if (item.maxWear > 85) statusPaket = 'MENDEKATI POLICY';
-            else if (item.maxWear > 95) statusPaket = 'TERCAPAI';
-
-            return {
-                ...item,
-                statusPaketOnTrack: statusPaket,
-                lastUpdate: new Date().toLocaleDateString('id-ID')
-            };
-        });
-
+        globalReviewData = globalPpuData;
         renderReviewLifetimeDashboard(globalReviewData);
     }
 
     function renderReviewLifetimeDashboard(data) {
+        const getCleanReviewStatus = (st) => (st || '').toString().trim().toUpperCase();
+
         const totalUnit = data.length;
-        const tercapaiUnit = data.filter(d => d.statusPaketOnTrack === 'TERCAPAI').length;
-        const mendekatiUnit = data.filter(d => d.statusPaketOnTrack === 'MENDEKATI POLICY').length;
-        const amanUnit = data.filter(d => d.statusPaketOnTrack === 'AMAN').length;
+        const tercapaiUnit = data.filter(d => getCleanReviewStatus(d.statusPaketOnTrack) === 'TERCAPAI').length;
+        const mendekatiUnit = data.filter(d => getCleanReviewStatus(d.statusPaketOnTrack).includes('MENDEKATI')).length;
+        const amanUnit = data.filter(d => getCleanReviewStatus(d.statusPaketOnTrack) === 'AMAN').length;
 
         document.getElementById('reviewCardTotal').innerText = `${totalUnit} Unit`;
         document.getElementById('reviewCardTercapai').innerText = `${tercapaiUnit} Unit`;
@@ -851,9 +841,11 @@
             tr.className = 'hover:bg-slate-800/40 border-b border-slate-800';
             
             let statusBadge = '';
-            if (item.statusPaketOnTrack === 'TERCAPAI') {
+            const st = getCleanReviewStatus(item.statusPaketOnTrack);
+
+            if (st === 'TERCAPAI') {
                 statusBadge = `<span class="px-2.5 py-1 rounded text-xs font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">TERCAPAI</span>`;
-            } else if (item.statusPaketOnTrack === 'MENDEKATI POLICY') {
+            } else if (st.includes('MENDEKATI')) {
                 statusBadge = `<span class="px-2.5 py-1 rounded text-xs font-bold bg-amber-500/10 text-amber-400 border border-amber-500/20">MENDEKATI POLICY</span>`;
             } else {
                 statusBadge = `<span class="px-2.5 py-1 rounded text-xs font-bold bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">AMAN</span>`;
@@ -865,7 +857,8 @@
                 <td class="p-3 text-slate-300">${item.modelUnit}</td>
                 <td class="p-3 font-semibold text-white">${item.noUnit}</td>
                 <td class="p-3">${statusBadge}</td>
-                <td class="p-3 text-slate-300 text-[10px]">${item.lastUpdate}</td>
+                <td class="p-3 text-slate-300 font-semibold">${item.lifetimeOntrack}</td>
+                <td class="p-3 text-slate-300 font-semibold">${item.merkTerinstall}</td>
             `;
             tableBody.appendChild(tr);
         });
@@ -877,9 +870,9 @@
 
         sites.forEach(siteName => {
             const siteUnits = data.filter(d => d.site === siteName);
-            tercapaiSeries.push(siteUnits.filter(d => d.statusPaketOnTrack === 'TERCAPAI').length);
-            mendekatiSeries.push(siteUnits.filter(d => d.statusPaketOnTrack === 'MENDEKATI POLICY').length);
-            amanSeries.push(siteUnits.filter(d => d.statusPaketOnTrack === 'AMAN').length);
+            tercapaiSeries.push(siteUnits.filter(d => getCleanReviewStatus(d.statusPaketOnTrack) === 'TERCAPAI').length);
+            mendekatiSeries.push(siteUnits.filter(d => getCleanReviewStatus(d.statusPaketOnTrack).includes('MENDEKATI')).length);
+            amanSeries.push(siteUnits.filter(d => getCleanReviewStatus(d.statusPaketOnTrack) === 'AMAN').length);
         });
 
         if (reviewChart) {
@@ -904,7 +897,7 @@
             const matchSite = (siteVal === 'ALL' || item.site === siteVal);
             const matchType = (typeVal === 'ALL' || item.type === typeVal);
             const matchModel = (modelVal === 'ALL' || item.modelUnit === modelVal);
-            const matchStatus = (statusVal === 'ALL' || item.statusPaketOnTrack === statusVal);
+            const matchStatus = (statusVal === 'ALL' || (item.statusPaketOnTrack || '').toUpperCase().includes(statusVal.toUpperCase()));
             
             return matchSite && matchType && matchModel && matchStatus;
         });
