@@ -178,7 +178,7 @@
                 <div class="bg-slate-900/90 border border-slate-800 p-5 rounded-2xl flex items-center justify-between shadow-md">
                     <div>
                         <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Mendekati Plan PPU</p>
-                        <h3 id="cardMendekatiUnit" class="text-2xl font-black text-rose-400 mt-1">8 Unit</h3>
+                        <h3 id="cardMendekatiUnit" class="text-2xl font-black text-rose-400 mt-1">0 Unit</h3>
                         <p class="text-[10px] text-rose-400 mt-1 font-semibold">Perlu schedule PPU</p>
                     </div>
                     <div class="w-12 h-12 rounded-2xl bg-rose-500/10 border border-rose-500/30 flex items-center justify-center text-rose-400">
@@ -278,7 +278,7 @@
                 </div>
             </div>
 
-            <!-- Filter Bar: SITE, TYPE, MODEL, STATUS PAKET ON TRACK -->
+            <!-- Filter Bar -->
             <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-5 shadow-lg space-y-4">
                 <div class="flex items-center justify-between border-b border-slate-800 pb-3">
                     <div class="flex items-center space-x-2 text-cyan-400 font-bold text-sm">
@@ -503,7 +503,7 @@
         }, 100);
     }
 
-    // ==================== PPU DASHBOARD ====================
+    // ==================== PPU CHARTS INIT ====================
     function initPpuCharts() {
         achievementChart = new ApexCharts(document.querySelector("#wearChart"), {
             series: [{ name: 'Achievement (%)', data: [] }],
@@ -576,7 +576,7 @@
         overChart.render();
     }
 
-    // ==================== REVIEW LIFETIME CHART ====================
+    // ==================== REVIEW LIFETIME CHART INIT ====================
     function initReviewChart() {
         reviewChart = new ApexCharts(document.querySelector("#reviewLifetimeChart"), {
             series: [
@@ -591,7 +591,7 @@
                 toolbar: { show: false },
                 background: 'transparent'
             },
-            colors: ['#10b981', '#f59e0b', '#06b6d4'], // Green, Amber, Cyan
+            colors: ['#10b981', '#f59e0b', '#06b6d4'],
             plotOptions: {
                 bar: {
                     horizontal: false,
@@ -628,61 +628,62 @@
         reviewChart.render();
     }
 
+    // ==================== CSV DATA LOADING ====================
     async function loadPpuData() {
-    try {
-        const response = await fetch(sheetCsvUrl);
-        const dataText = await response.text();
-        const rows = dataText.split('\n').filter(r => r.trim() !== '');
-        
-        globalPpuData = rows.slice(1).map((row) => {
-            const cols = parseCSVLine(row);  // ← Gunakan parser robust
-            return {
-                site: cols[0] || '',
-                type: cols[1] || '',
-                noUnit: cols[2] || '',
-                modelUnit: cols[3] || '',
-                alarmStatus: cols[11] || '',
-                durasiOver: cols[12] || '-',
-                maxWear: parseFloat(cols[14]) || 0
-            };
-        }).filter(item => item.site.trim() !== '');  // ← Hanya filter baris kosong
+        try {
+            const response = await fetch(sheetCsvUrl);
+            const dataText = await response.text();
+            const rows = dataText.split('\n').filter(r => r.trim() !== '');
+            
+            globalPpuData = rows.slice(1).map((row) => {
+                const cols = parseCSVLine(row);
+                return {
+                    site: (cols[0] || '').trim(),
+                    type: (cols[1] || '').trim(),
+                    noUnit: (cols[2] || '').trim(),
+                    modelUnit: (cols[3] || '').trim(),
+                    alarmStatus: (cols[11] || '').trim(), // KOLOM L (Indeks 11)
+                    durasiOver: (cols[12] || '-').trim(),  // KOLOM M (Indeks 12)
+                    maxWear: parseFloat(cols[14]) || 0
+                };
+            }).filter(item => item.site !== '');
 
-        populateDropdowns(globalPpuData);
-        renderPpuDashboard(globalPpuData);
-        loadReviewLifetimeData();
-        
-    } catch (error) {
-        console.error('❌ Gagal mengambil data:', error);
-    }
-}
-
-function parseCSVLine(line) {
-    const result = [];
-    let current = '';
-    let insideQuotes = false;
-    
-    for (let i = 0; i < line.length; i++) {
-        const char = line[i];
-        const nextChar = line[i + 1];
-        
-        if (char === '"') {
-            if (insideQuotes && nextChar === '"') {
-                current += '"';
-                i++;
-            } else {
-                insideQuotes = !insideQuotes;
-            }
-        } else if (char === ',' && !insideQuotes) {
-            result.push(current.trim());
-            current = '';
-        } else {
-            current += char;
+            populateDropdowns(globalPpuData);
+            renderPpuDashboard(globalPpuData);
+            loadReviewLifetimeData();
+            
+        } catch (error) {
+            console.error('❌ Gagal mengambil data:', error);
         }
     }
-    
-    result.push(current.trim());
-    return result;
-}
+
+    function parseCSVLine(line) {
+        const result = [];
+        let current = '';
+        let insideQuotes = false;
+        
+        for (let i = 0; i < line.length; i++) {
+            const char = line[i];
+            const nextChar = line[i + 1];
+            
+            if (char === '"') {
+                if (insideQuotes && nextChar === '"') {
+                    current += '"';
+                    i++;
+                } else {
+                    insideQuotes = !insideQuotes;
+                }
+            } else if (char === ',' && !insideQuotes) {
+                result.push(current.trim());
+                current = '';
+            } else {
+                current += char;
+            }
+        }
+        
+        result.push(current.trim());
+        return result;
+    }
 
     function populateDropdowns(data) {
         const sites = [...new Set(data.map(d => d.site).filter(Boolean))].sort();
@@ -707,96 +708,91 @@ function parseCSVLine(line) {
         });
     }
 
+    // ==================== DASHBOARD RENDER LOGIC ====================
     function renderPpuDashboard(data) {
-    // Helper fungsi untuk standarisasi teks status dari Kolom L (cols[11])
-    const getStatus = (item) => (item.alarmStatus || '').toString().trim().toUpperCase();
-    const isStatusOver = (st) => st === 'OVER' || st.includes('OVER');
-    const isStatusMendekati = (st) => st.includes('MENDEKATI');
-
-    // 1. Perhitungan KPI Cards
-    const totalUnit = data.length;
-    const overUnit = data.filter(d => isStatusOver(getStatus(d))).length;
-    
-    // Perbaikan: Menghitung total unit dengan status "MENDEKATI PLAN PPU" secara riil dari Kolom L
-    const mendekatiUnit = data.filter(d => isStatusMendekati(getStatus(d))).length;
-
-    const totalAman = totalUnit - overUnit;
-    const achievementPct = totalUnit > 0 ? ((totalAman / totalUnit) * 100).toFixed(1) : 0;
-
-    // Render data ke Card KPI
-    document.getElementById('cardTotalUnit').innerText = `${totalUnit} Unit`;
-    document.getElementById('cardOverUnit').innerText = `${overUnit} Unit`;
-    document.getElementById('cardMendekatiUnit').innerText = `${mendekatiUnit} Unit`;
-    document.getElementById('cardAchievementPercent').innerText = `${achievementPct}%`;
-
-    // 2. Render Table Status Unit (Hanya 2 Kategori: OVER & MENDEKATI PLAN PPU)
-    const tableBody = document.getElementById('ppuTableBody');
-    tableBody.innerHTML = '';
-
-    // Filter baris yang hanya memiliki status OVER atau MENDEKATI PLAN PPU dari Kolom L
-    const tableFilteredData = data.filter(item => {
-        const st = getStatus(item);
-        return isStatusOver(st) || isStatusMendekati(st);
-    });
-
-    tableFilteredData.forEach(item => {
-        const tr = document.createElement('tr');
-        tr.className = 'hover:bg-slate-800/40 border-b border-slate-800';
+        // Pembersihan string status dari Kolom L
+        const getCleanStatus = (item) => (item.alarmStatus || '').toString().trim().toUpperCase();
         
-        let alarmBadge = '';
-        const st = getStatus(item);
-        
-        // Perbaikan Badge Status Tabel
-        if (isStatusOver(st)) {
-            alarmBadge = `<span class="px-2.5 py-1 rounded text-xs font-bold bg-rose-500/10 text-rose-400 border border-rose-500/20">OVER</span>`;
-        } else if (isStatusMendekati(st)) {
-            alarmBadge = `<span class="px-2.5 py-1 rounded text-xs font-bold bg-amber-500/10 text-amber-400 border border-amber-500/20">MENDEKATI PLAN PPU</span>`;
-        }
+        const isStatusOver = (st) => st === 'OVER' || st.includes('OVER');
+        const isStatusMendekati = (st) => st.includes('MENDEKATI');
 
-        tr.innerHTML = `
-            <td class="p-3 font-bold text-white">${item.site}</td>
-            <td class="p-3 text-slate-300">${item.type}</td>
-            <td class="p-3 text-slate-300">${item.modelUnit}</td>
-            <td class="p-3 font-semibold text-white">${item.noUnit}</td>
-            <td class="p-3">${alarmBadge}</td>
-            <td class="p-3 text-slate-300 font-semibold">${item.durasiOver}</td>
-        `;
-        tableBody.appendChild(tr);
-    });
+        const totalUnit = data.length;
+        const overUnit = data.filter(d => isStatusOver(getCleanStatus(d))).length;
+        const mendekatiUnit = data.filter(d => isStatusMendekati(getCleanStatus(d))).length;
 
-    // 3. Render Chart Achievement & Over Per Site
-    const sites = [...new Set(data.map(d => d.site).filter(Boolean))].sort();
-    const siteAchievementData = [];
-    const siteOverSeries = [];
-    const siteOverLabels = [];
+        const totalAman = totalUnit - overUnit;
+        const achievementPct = totalUnit > 0 ? ((totalAman / totalUnit) * 100).toFixed(1) : 0;
 
-    sites.forEach(siteName => {
-        const siteUnits = data.filter(d => d.site === siteName);
-        const totalSiteUnits = siteUnits.length;
-        const overSiteUnits = siteUnits.filter(d => isStatusOver(getStatus(d))).length;
-        const amanSiteUnits = totalSiteUnits - overSiteUnits;
-        
-        const siteAch = totalSiteUnits > 0 ? parseFloat(((amanSiteUnits / totalSiteUnits) * 100).toFixed(1)) : 0;
-        siteAchievementData.push(siteAch);
+        document.getElementById('cardTotalUnit').innerText = `${totalUnit} Unit`;
+        document.getElementById('cardOverUnit').innerText = `${overUnit} Unit`;
+        document.getElementById('cardMendekatiUnit').innerText = `${mendekatiUnit} Unit`;
+        document.getElementById('cardAchievementPercent').innerText = `${achievementPct}%`;
 
-        if (overSiteUnits > 0) {
-            siteOverSeries.push(overSiteUnits);
-            siteOverLabels.push(siteName);
-        }
-    });
+        // Render Tabel (Hanya menampilkan status OVER dan MENDEKATI PLAN PPU)
+        const tableBody = document.getElementById('ppuTableBody');
+        tableBody.innerHTML = '';
 
-    if (achievementChart && overChart) {
-        achievementChart.updateOptions({
-            xaxis: { categories: sites },
-            series: [{ name: 'Achievement (%)', data: siteAchievementData }]
+        const tableFilteredData = data.filter(item => {
+            const st = getCleanStatus(item);
+            return isStatusOver(st) || isStatusMendekati(st);
         });
 
-        overChart.updateOptions({
-            labels: siteOverLabels,
-            series: siteOverSeries
+        tableFilteredData.forEach(item => {
+            const tr = document.createElement('tr');
+            tr.className = 'hover:bg-slate-800/40 border-b border-slate-800';
+            
+            let alarmBadge = '';
+            const st = getCleanStatus(item);
+            
+            if (isStatusOver(st)) {
+                alarmBadge = `<span class="px-2.5 py-1 rounded text-xs font-bold bg-rose-500/10 text-rose-400 border border-rose-500/20">OVER</span>`;
+            } else if (isStatusMendekati(st)) {
+                alarmBadge = `<span class="px-2.5 py-1 rounded text-xs font-bold bg-amber-500/10 text-amber-400 border border-amber-500/20">MENDEKATI PLAN PPU</span>`;
+            }
+
+            tr.innerHTML = `
+                <td class="p-3 font-bold text-white">${item.site}</td>
+                <td class="p-3 text-slate-300">${item.type}</td>
+                <td class="p-3 text-slate-300">${item.modelUnit}</td>
+                <td class="p-3 font-semibold text-white">${item.noUnit}</td>
+                <td class="p-3">${alarmBadge}</td>
+                <td class="p-3 text-slate-300 font-semibold">${item.durasiOver}</td>
+            `;
+            tableBody.appendChild(tr);
         });
-    }
-}
+
+        // Update Charts
+        const sites = [...new Set(data.map(d => d.site).filter(Boolean))].sort();
+        const siteAchievementData = [];
+        const siteOverSeries = [];
+        const siteOverLabels = [];
+
+        sites.forEach(siteName => {
+            const siteUnits = data.filter(d => d.site === siteName);
+            const totalSiteUnits = siteUnits.length;
+            const overSiteUnits = siteUnits.filter(d => isStatusOver(getCleanStatus(d))).length;
+            const amanSiteUnits = totalSiteUnits - overSiteUnits;
+            
+            const siteAch = totalSiteUnits > 0 ? parseFloat(((amanSiteUnits / totalSiteUnits) * 100).toFixed(1)) : 0;
+            siteAchievementData.push(siteAch);
+
+            if (overSiteUnits > 0) {
+                siteOverSeries.push(overSiteUnits);
+                siteOverLabels.push(siteName);
+            }
+        });
+
+        if (achievementChart && overChart) {
+            achievementChart.updateOptions({
+                xaxis: { categories: sites },
+                series: [{ name: 'Achievement (%)', data: siteAchievementData }]
+            });
+
+            overChart.updateOptions({
+                labels: siteOverLabels,
+                series: siteOverSeries
+            });
+        }
     }
 
     function applyPpuFilters() {
@@ -819,12 +815,9 @@ function parseCSVLine(line) {
 
     // ==================== REVIEW LIFETIME LOGIC ====================
     function loadReviewLifetimeData() {
-        // Parsing data dari sheet atau memetakan status Paket On Track
         const statusList = ['TERCAPAI', 'MENDEKATI POLICY', 'AMAN'];
         
         globalReviewData = globalPpuData.map((item, idx) => {
-            // Pemetaan status: bila dari CSV sudah ada kolom status, gunakan kolom tersebut.
-            // Di sini dikondisikan pemetaan dinamis berdasarkan index/keausan unit
             let statusPaket = statusList[idx % 3];
             if (item.maxWear > 85) statusPaket = 'MENDEKATI POLICY';
             else if (item.maxWear > 95) statusPaket = 'TERCAPAI';
@@ -840,7 +833,6 @@ function parseCSVLine(line) {
     }
 
     function renderReviewLifetimeDashboard(data) {
-        // KPI Summary Cards
         const totalUnit = data.length;
         const tercapaiUnit = data.filter(d => d.statusPaketOnTrack === 'TERCAPAI').length;
         const mendekatiUnit = data.filter(d => d.statusPaketOnTrack === 'MENDEKATI POLICY').length;
@@ -851,7 +843,6 @@ function parseCSVLine(line) {
         document.getElementById('reviewCardMendekati').innerText = `${mendekatiUnit} Unit`;
         document.getElementById('reviewCardAman').innerText = `${amanUnit} Unit`;
 
-        // Render Table
         const tableBody = document.getElementById('reviewTableBody');
         tableBody.innerHTML = '';
 
@@ -879,9 +870,7 @@ function parseCSVLine(line) {
             tableBody.appendChild(tr);
         });
 
-        // Update Review Lifetime Grouped Bar Chart
         const sites = [...new Set(data.map(d => d.site).filter(Boolean))].sort();
-        
         const tercapaiSeries = [];
         const mendekatiSeries = [];
         const amanSeries = [];
