@@ -708,84 +708,96 @@ function parseCSVLine(line) {
     }
 
     function renderPpuDashboard(data) {
-        const getStatus = (item) => (item.alarmStatus || '').toString().trim().toUpperCase();
-        const isStatusOver = (st) => st && st.includes('OVER');
-        const isStatusMendekati = (st) => st && st.includes('MENDEKATI');
+    // Helper fungsi untuk standarisasi teks status dari Kolom L (cols[11])
+    const getStatus = (item) => (item.alarmStatus || '').toString().trim().toUpperCase();
+    const isStatusOver = (st) => st === 'OVER' || st.includes('OVER');
+    const isStatusMendekati = (st) => st.includes('MENDEKATI');
 
-        const totalUnit = data.length;
-        const overUnit = data.filter(d => isStatusOver(getStatus(d))).length;
+    // 1. Perhitungan KPI Cards
+    const totalUnit = data.length;
+    const overUnit = data.filter(d => isStatusOver(getStatus(d))).length;
+    
+    // Perbaikan: Menghitung total unit dengan status "MENDEKATI PLAN PPU" secara riil dari Kolom L
+    const mendekatiUnit = data.filter(d => isStatusMendekati(getStatus(d))).length;
+
+    const totalAman = totalUnit - overUnit;
+    const achievementPct = totalUnit > 0 ? ((totalAman / totalUnit) * 100).toFixed(1) : 0;
+
+    // Render data ke Card KPI
+    document.getElementById('cardTotalUnit').innerText = `${totalUnit} Unit`;
+    document.getElementById('cardOverUnit').innerText = `${overUnit} Unit`;
+    document.getElementById('cardMendekatiUnit').innerText = `${mendekatiUnit} Unit`;
+    document.getElementById('cardAchievementPercent').innerText = `${achievementPct}%`;
+
+    // 2. Render Table Status Unit (Hanya 2 Kategori: OVER & MENDEKATI PLAN PPU)
+    const tableBody = document.getElementById('ppuTableBody');
+    tableBody.innerHTML = '';
+
+    // Filter baris yang hanya memiliki status OVER atau MENDEKATI PLAN PPU dari Kolom L
+    const tableFilteredData = data.filter(item => {
+        const st = getStatus(item);
+        return isStatusOver(st) || isStatusMendekati(st);
+    });
+
+    tableFilteredData.forEach(item => {
+        const tr = document.createElement('tr');
+        tr.className = 'hover:bg-slate-800/40 border-b border-slate-800';
         
-        const highWearUnits = data.filter(d => d.maxWear > 80 || isStatusMendekati(getStatus(d)));
-        const totalHighWear = highWearUnits.length > 0 ? 8 : 0;
-
-        const totalAman = totalUnit - overUnit;
-        const achievementPct = totalUnit > 0 ? ((totalAman / totalUnit) * 100).toFixed(1) : 0;
-
-        document.getElementById('cardTotalUnit').innerText = `${totalUnit} Unit`;
-        document.getElementById('cardOverUnit').innerText = `${overUnit} Unit`;
-        document.getElementById('cardMendekatiUnit').innerText = `${totalHighWear} Unit`;
-        document.getElementById('cardAchievementPercent').innerText = `${achievementPct}%`;
-
-        const tableBody = document.getElementById('ppuTableBody');
-        tableBody.innerHTML = '';
-
-        const tableFilteredData = data.filter(item => isStatusOver(getStatus(item)) || isStatusMendekati(getStatus(item)));
-
-        tableFilteredData.forEach(item => {
-            const tr = document.createElement('tr');
-            tr.className = 'hover:bg-slate-800/40 border-b border-slate-800';
-            
-            let alarmBadge = '';
-            const st = getStatus(item);
-            
-            if (isStatusOver(st)) {
-                alarmBadge = `<span class="px-2.5 py-1 rounded text-xs font-bold bg-rose-500/10 text-rose-400 border border-rose-500/20">OVER</span>`;
-            } else if (isStatusMendekati(st)) {
-                alarmBadge = `<span class="px-2.5 py-1 rounded text-xs font-bold bg-amber-500/10 text-amber-400 border border-amber-500/20">KEAUSAN > 80%</span>`;
-            }
-
-            tr.innerHTML = `
-                <td class="p-3 font-bold text-white">${item.site}</td>
-                <td class="p-3 text-slate-300">${item.type}</td>
-                <td class="p-3 text-slate-300">${item.modelUnit}</td>
-                <td class="p-3 font-semibold text-white">${item.noUnit}</td>
-                <td class="p-3">${alarmBadge}</td>
-                <td class="p-3 text-slate-300 font-semibold">${item.durasiOver}</td>
-            `;
-            tableBody.appendChild(tr);
-        });
-
-        const sites = [...new Set(data.map(d => d.site).filter(Boolean))].sort();
-        const siteAchievementData = [];
-        const siteOverSeries = [];
-        const siteOverLabels = [];
-
-        sites.forEach(siteName => {
-            const siteUnits = data.filter(d => d.site === siteName);
-            const totalSiteUnits = siteUnits.length;
-            const overSiteUnits = siteUnits.filter(d => isStatusOver(getStatus(d))).length;
-            const amanSiteUnits = totalSiteUnits - overSiteUnits;
-            
-            const siteAch = totalSiteUnits > 0 ? parseFloat(((amanSiteUnits / totalSiteUnits) * 100).toFixed(1)) : 0;
-            siteAchievementData.push(siteAch);
-
-            if (overSiteUnits > 0) {
-                siteOverSeries.push(overSiteUnits);
-                siteOverLabels.push(siteName);
-            }
-        });
-
-        if (achievementChart && overChart) {
-            achievementChart.updateOptions({
-                xaxis: { categories: sites },
-                series: [{ name: 'Achievement (%)', data: siteAchievementData }]
-            });
-
-            overChart.updateOptions({
-                labels: siteOverLabels,
-                series: siteOverSeries
-            });
+        let alarmBadge = '';
+        const st = getStatus(item);
+        
+        // Perbaikan Badge Status Tabel
+        if (isStatusOver(st)) {
+            alarmBadge = `<span class="px-2.5 py-1 rounded text-xs font-bold bg-rose-500/10 text-rose-400 border border-rose-500/20">OVER</span>`;
+        } else if (isStatusMendekati(st)) {
+            alarmBadge = `<span class="px-2.5 py-1 rounded text-xs font-bold bg-amber-500/10 text-amber-400 border border-amber-500/20">MENDEKATI PLAN PPU</span>`;
         }
+
+        tr.innerHTML = `
+            <td class="p-3 font-bold text-white">${item.site}</td>
+            <td class="p-3 text-slate-300">${item.type}</td>
+            <td class="p-3 text-slate-300">${item.modelUnit}</td>
+            <td class="p-3 font-semibold text-white">${item.noUnit}</td>
+            <td class="p-3">${alarmBadge}</td>
+            <td class="p-3 text-slate-300 font-semibold">${item.durasiOver}</td>
+        `;
+        tableBody.appendChild(tr);
+    });
+
+    // 3. Render Chart Achievement & Over Per Site
+    const sites = [...new Set(data.map(d => d.site).filter(Boolean))].sort();
+    const siteAchievementData = [];
+    const siteOverSeries = [];
+    const siteOverLabels = [];
+
+    sites.forEach(siteName => {
+        const siteUnits = data.filter(d => d.site === siteName);
+        const totalSiteUnits = siteUnits.length;
+        const overSiteUnits = siteUnits.filter(d => isStatusOver(getStatus(d))).length;
+        const amanSiteUnits = totalSiteUnits - overSiteUnits;
+        
+        const siteAch = totalSiteUnits > 0 ? parseFloat(((amanSiteUnits / totalSiteUnits) * 100).toFixed(1)) : 0;
+        siteAchievementData.push(siteAch);
+
+        if (overSiteUnits > 0) {
+            siteOverSeries.push(overSiteUnits);
+            siteOverLabels.push(siteName);
+        }
+    });
+
+    if (achievementChart && overChart) {
+        achievementChart.updateOptions({
+            xaxis: { categories: sites },
+            series: [{ name: 'Achievement (%)', data: siteAchievementData }]
+        });
+
+        overChart.updateOptions({
+            labels: siteOverLabels,
+            series: siteOverSeries
+        });
+    }
+}
+        
     }
 
     function applyPpuFilters() {
