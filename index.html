@@ -629,33 +629,60 @@
     }
 
     async function loadPpuData() {
-        try {
-            const response = await fetch(sheetCsvUrl);
-            const dataText = await response.text();
-            const rows = dataText.split('\n').filter(r => r.trim() !== '').slice(1);
-            
-            globalPpuData = rows.map((row) => {
-                const cols = row.split(',').map(c => c.trim().replace(/^"(.*)"$/, '$1'));
-                return {
-                    site: cols[0] || '',
-                    type: cols[1] || '',
-                    noUnit: cols[2] || '',
-                    modelUnit: cols[3] || '',
-                    alarmStatus: cols[11] || '',
-                    durasiOver: cols[12] || '-',
-                    maxWear: parseFloat(cols[14]) || 0
-                };
-            }).filter(item => item.site.toUpperCase() !== 'CDI');
+    try {
+        const response = await fetch(sheetCsvUrl);
+        const dataText = await response.text();
+        const rows = dataText.split('\n').filter(r => r.trim() !== '');
+        
+        globalPpuData = rows.slice(1).map((row) => {
+            const cols = parseCSVLine(row);  // ← Gunakan parser robust
+            return {
+                site: cols[0] || '',
+                type: cols[1] || '',
+                noUnit: cols[2] || '',
+                modelUnit: cols[3] || '',
+                alarmStatus: cols[11] || '',
+                durasiOver: cols[12] || '-',
+                maxWear: parseFloat(cols[14]) || 0
+            };
+        }).filter(item => item.site.trim() !== '');  // ← Hanya filter baris kosong
 
-            populateDropdowns(globalPpuData);
-            renderPpuDashboard(globalPpuData);
-            
-            loadReviewLifetimeData();
-            
-        } catch (error) {
-            console.error('❌ Gagal mengambil data dari Google Sheets:', error);
+        populateDropdowns(globalPpuData);
+        renderPpuDashboard(globalPpuData);
+        loadReviewLifetimeData();
+        
+    } catch (error) {
+        console.error('❌ Gagal mengambil data:', error);
+    }
+}
+
+function parseCSVLine(line) {
+    const result = [];
+    let current = '';
+    let insideQuotes = false;
+    
+    for (let i = 0; i < line.length; i++) {
+        const char = line[i];
+        const nextChar = line[i + 1];
+        
+        if (char === '"') {
+            if (insideQuotes && nextChar === '"') {
+                current += '"';
+                i++;
+            } else {
+                insideQuotes = !insideQuotes;
+            }
+        } else if (char === ',' && !insideQuotes) {
+            result.push(current.trim());
+            current = '';
+        } else {
+            current += char;
         }
     }
+    
+    result.push(current.trim());
+    return result;
+}
 
     function populateDropdowns(data) {
         const sites = [...new Set(data.map(d => d.site).filter(Boolean))].sort();
