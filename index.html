@@ -646,8 +646,8 @@ async function loadPpuData() {
                 lifetimeOntrack: (cols[9] || '-').trim(),       // KOLOM J (Indeks 9)
                 statusPaketOnTrack: (cols[10] || '-').trim(),   // KOLOM K (Indeks 10)
                 merkTerinstall: (cols[11] || '-').trim(),      // KOLOM L (Indeks 11)
-                alarmStatus: (cols[12] || '').trim(),         // KOLOM M (Indeks 12 - Alarm PPU)
-                durasiOver: (cols[13] || '-').trim(),          // KOLOM N (Indeks 13 - Durasi Over)
+                alarmStatus: (cols[12] || '').trim(),
+                durasiOver: (cols[13] || '-').trim(),
                 maxWear: parseFloat(cols[14]) || 0
             };
         }).filter(item => item.site !== '');
