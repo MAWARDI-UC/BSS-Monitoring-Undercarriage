@@ -644,10 +644,10 @@
                     noUnit: (cols[2] || '').trim(),
                     modelUnit: (cols[3] || '').trim(),
                     lifetimeOntrack: (cols[9] || '-').trim(),      // KOLOM J (Indeks 9)
-                    statusPaketOnTrack: (cols[10] || '-').trim(),  // KOLOM K (Indeks 10)
-                    merkTerinstall: (cols[11] || '-').trim(),     // KOLOM L (Indeks 11)
-                    alarmStatus: (cols[11] || '').trim(), 
-                    durasiOver: (cols[12] || '-').trim(),
+                    statusPaketOnTrack: (cols[10] || '-').trim(),  // KOLOM K (Indeks 10): TERCAPAI / MENDEKATI POLICY / AMAN
+                    merkTerinstall: (cols[11] || '-').trim(),     // KOLOM L (Indeks 11): MERK TERINSTALL
+                    alarmStatus: (cols[12] || '').trim(),         // KOLOM M (Indeks 12): ALARM PPU STATUS
+                    durasiOver: (cols[13] || '-').trim(),          // KOLOM N (Indeks 13): DURASI OVER
                     maxWear: parseFloat(cols[14]) || 0
                 };
             }).filter(item => item.site !== '');
