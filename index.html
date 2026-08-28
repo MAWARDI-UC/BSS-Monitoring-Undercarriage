@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BSS UCR MONITORING - System Management</title>
     <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/tailwindcss5"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- ApexCharts CDN -->
     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
@@ -48,6 +47,10 @@
                             <p class="text-slate-400 text-[10px]">Role: <span class="text-amber-400 font-semibold">Plant / Technical</span></p>
                         </div>
                     </div>
+                    <button class="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 text-xs transition">
+                        <i data-lucide="log-out" class="w-4 h-4"></i>
+                        <span>Logout</span>
+                    </button>
                 </div>
             </div>
 
@@ -92,6 +95,12 @@
                         <h2 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">Alarm & Achievement PPU</h2>
                         <p class="text-xs text-amber-400 font-semibold tracking-wider uppercase mt-1">PROGRAM PEMERIKSAAN UNDERCARRIAGE (PPU)</p>
                     </div>
+                    <div class="flex items-center space-x-3">
+                        <button class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 font-semibold text-xs flex items-center space-x-1.5 transition">
+                            <i data-lucide="file-text" class="w-4 h-4"></i>
+                            <span>Export Report</span>
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -108,6 +117,7 @@
                     </button>
                 </div>
 
+                <!-- Filter Controls Grid -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
                     <div>
                         <label class="block text-[11px] font-medium text-slate-400 mb-1">SITE</label>
@@ -115,18 +125,21 @@
                             <option value="ALL">Semua Site</option>
                         </select>
                     </div>
+
                     <div>
                         <label class="block text-[11px] font-medium text-slate-400 mb-1">TYPE</label>
                         <select id="typeFilter" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-amber-500">
                             <option value="ALL">Semua TYPE</option>
                         </select>
                     </div>
+
                     <div>
                         <label class="block text-[11px] font-medium text-slate-400 mb-1">MODEL</label>
                         <select id="modelFilter" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-amber-500">
                             <option value="ALL">Semua Model</option>
                         </select>
                     </div>
+
                     <div>
                         <label class="block text-[11px] font-medium text-slate-400 mb-1">ALARM PPU</label>
                         <select id="alarmFilter" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-amber-500">
@@ -144,33 +157,40 @@
                     <div>
                         <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Total Unit Track Monitored</p>
                         <h3 id="cardTotalUnit" class="text-2xl font-black text-white mt-1">0 Unit</h3>
+                        <p class="text-[10px] text-slate-500 mt-1">Dalam monitoring UCR Site</p>
                     </div>
                     <div class="w-12 h-12 rounded-2xl bg-blue-500/10 border border-blue-500/30 flex items-center justify-center text-blue-400">
                         <i data-lucide="truck" class="w-6 h-6"></i>
                     </div>
                 </div>
+
                 <div class="bg-slate-900/90 border border-slate-800 p-5 rounded-2xl flex items-center justify-between shadow-md">
                     <div>
                         <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">OVER Interval PPU</p>
                         <h3 id="cardOverUnit" class="text-2xl font-black text-amber-400 mt-1">0 Unit</h3>
+                        <p class="text-[10px] text-amber-500 mt-1 font-semibold">Perlu Dilakukan PPU</p>
                     </div>
                     <div class="w-12 h-12 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-500">
                         <i data-lucide="alert-triangle" class="w-6 h-6"></i>
                     </div>
                 </div>
+
                 <div class="bg-slate-900/90 border border-slate-800 p-5 rounded-2xl flex items-center justify-between shadow-md">
                     <div>
                         <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Mendekati Plan PPU</p>
                         <h3 id="cardMendekatiUnit" class="text-2xl font-black text-rose-400 mt-1">0 Unit</h3>
+                        <p class="text-[10px] text-rose-400 mt-1 font-semibold">Perlu schedule PPU</p>
                     </div>
                     <div class="w-12 h-12 rounded-2xl bg-rose-500/10 border border-rose-500/30 flex items-center justify-center text-rose-400">
                         <i data-lucide="disc" class="w-6 h-6"></i>
                     </div>
                 </div>
+
                 <div class="bg-slate-900/90 border border-slate-800 p-5 rounded-2xl flex items-center justify-between shadow-md">
                     <div>
                         <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">PPU Achievement</p>
                         <h3 id="cardAchievementPercent" class="text-2xl font-black text-white mt-1">0%</h3>
+                        <p class="text-[10px] text-emerald-400 mt-1 font-semibold">Inspeksi On-Schedule</p>
                     </div>
                     <div class="w-12 h-12 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
                         <i data-lucide="check-circle-2" class="w-6 h-6"></i>
@@ -186,15 +206,18 @@
                             <i data-lucide="bar-chart-3" class="w-4 h-4 text-amber-400"></i>
                             <h3 class="font-bold text-sm text-slate-100">PPU Achievement Masing-masing Site (%)</h3>
                         </div>
+                        <span class="text-[10px] font-semibold bg-slate-800 text-slate-400 px-2.5 py-1 rounded-md border border-slate-700">Persentase Unit tanpa Over</span>
                     </div>
                     <div id="wearChart" class="w-full"></div>
                 </div>
+
                 <div class="lg:col-span-5 bg-slate-900/90 border border-slate-800 p-5 rounded-2xl shadow-lg flex flex-col justify-between">
                     <div class="flex items-center justify-between mb-4">
                         <div class="flex items-center space-x-2">
                             <i data-lucide="pie-chart" class="w-4 h-4 text-amber-400"></i>
                             <h3 class="font-bold text-sm text-slate-100">Total OVER Interval PPU Masing-masing Site</h3>
                         </div>
+                        <span class="text-[10px] font-semibold bg-slate-800 text-slate-400 px-2.5 py-1 rounded-md border border-slate-700">Total/Site</span>
                     </div>
                     <div id="categoryChart" class="w-full flex items-center justify-center my-auto"></div>
                 </div>
@@ -207,7 +230,9 @@
                         <i data-lucide="table" class="w-4 h-4 text-amber-400"></i>
                         <h3 class="font-bold text-sm text-slate-100">Status Unit Over Interval PPU (PPU Real-time Monitoring)</h3>
                     </div>
+                    <span class="text-xs text-slate-400">Berdasarkan Update Monitoring UCR Tiap Site</span>
                 </div>
+
                 <div class="overflow-x-auto">
                     <table class="w-full text-left text-xs text-slate-300">
                         <thead class="bg-slate-800/80 uppercase text-[10px] text-slate-400 border-b border-slate-700">
@@ -220,7 +245,9 @@
                                 <th class="p-3">Durasi Over (HM)</th>
                             </tr>
                         </thead>
-                        <tbody id="ppuTableBody" class="divide-y divide-slate-800"></tbody>
+                        <tbody id="ppuTableBody" class="divide-y divide-slate-800">
+                            <!-- Content Rendered by JS -->
+                        </tbody>
                     </table>
                 </div>
             </div>
@@ -241,6 +268,12 @@
                         </div>
                         <h2 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">Review Lifetime Unit</h2>
                         <p class="text-xs text-cyan-400 font-semibold tracking-wider uppercase mt-1">MONITORING STATUS LIFETIME UNIT</p>
+                    </div>
+                    <div class="flex items-center space-x-3">
+                        <button class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 font-semibold text-xs flex items-center space-x-1.5 transition">
+                            <i data-lucide="file-text" class="w-4 h-4"></i>
+                            <span>Export Report</span>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -265,63 +298,73 @@
                             <option value="ALL">Semua Site</option>
                         </select>
                     </div>
+
                     <div>
                         <label class="block text-[11px] font-medium text-slate-400 mb-1">TYPE</label>
                         <select id="reviewTypeFilter" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-cyan-500">
                             <option value="ALL">Semua TYPE</option>
                         </select>
                     </div>
+
                     <div>
                         <label class="block text-[11px] font-medium text-slate-400 mb-1">MODEL</label>
                         <select id="reviewModelFilter" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-cyan-500">
                             <option value="ALL">Semua Model</option>
                         </select>
                     </div>
+
                     <div>
-                        <label class="block text-[11px] font-medium text-slate-400 mb-1">STATUS PAKET ON TRACK (Kolom K)</label>
+                        <label class="block text-[11px] font-medium text-slate-400 mb-1">STATUS PAKET ON TRACK</label>
                         <select id="reviewStatusFilter" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-cyan-500">
                             <option value="ALL">Semua Status</option>
-                            <option value="TERCAPAI">TERCAPAI</option>
-                            <option value="MENDEKATI POLICY">MENDEKATI POLICY</option>
-                            <option value="AMAN">AMAN</option>
+                            <option value="TERCAPAI">Tercapai</option>
+                            <option value="MENDEKATI POLICY">Mendekati Policy</option>
+                            <option value="AMAN">Aman</option>
                         </select>
                     </div>
                 </div>
             </div>
 
-            <!-- KPI Summary Cards Review Lifetime -->
+            <!-- KPI Summary Cards -->
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div class="bg-slate-900/90 border border-slate-800 p-5 rounded-2xl flex items-center justify-between shadow-md">
                     <div>
                         <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Total Unit Review</p>
                         <h3 id="reviewCardTotal" class="text-2xl font-black text-white mt-1">0 Unit</h3>
+                        <p class="text-[10px] text-slate-500 mt-1">Dalam Review Lifetime</p>
                     </div>
                     <div class="w-12 h-12 rounded-2xl bg-blue-500/10 border border-blue-500/30 flex items-center justify-center text-blue-400">
                         <i data-lucide="truck" class="w-6 h-6"></i>
                     </div>
                 </div>
+
                 <div class="bg-slate-900/90 border border-slate-800 p-5 rounded-2xl flex items-center justify-between shadow-md">
                     <div>
-                        <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Total TERCAPAI</p>
+                        <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Status Tercapai</p>
                         <h3 id="reviewCardTercapai" class="text-2xl font-black text-emerald-400 mt-1">0 Unit</h3>
+                        <p class="text-[10px] text-emerald-400 mt-1 font-semibold">Lifetime Target Sesuai</p>
                     </div>
                     <div class="w-12 h-12 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
                         <i data-lucide="check-circle-2" class="w-6 h-6"></i>
                     </div>
                 </div>
+
                 <div class="bg-slate-900/90 border border-slate-800 p-5 rounded-2xl flex items-center justify-between shadow-md">
                     <div>
-                        <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Total MENDEKATI POLICY</p>
+                        <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Mendekati Policy</p>
                         <h3 id="reviewCardMendekati" class="text-2xl font-black text-amber-400 mt-1">0 Unit</h3>
+                        <p class="text-[10px] text-amber-400 mt-1 font-semibold">Perlu Perhatian PPU</p>
                     </div>
                     <div class="w-12 h-12 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400">
                         <i data-lucide="alert-triangle" class="w-6 h-6"></i>
                     </div>
                 </div>
+
                 <div class="bg-slate-900/90 border border-slate-800 p-5 rounded-2xl flex items-center justify-between shadow-md">
                     <div>
-                        <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Total AMAN</p>
+                        <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Status Aman</p>
                         <h3 id="reviewCardAman" class="text-2xl font-black text-cyan-400 mt-1">0 Unit</h3>
+                        <p class="text-[10px] text-cyan-400 mt-1 font-semibold">Lifetime Belum Mendekati Target</p>
                     </div>
                     <div class="w-12 h-12 rounded-2xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400">
                         <i data-lucide="shield-check" class="w-6 h-6"></i>
@@ -334,8 +377,9 @@
                 <div class="flex items-center justify-between border-b border-slate-800 pb-3">
                     <div class="flex items-center space-x-2">
                         <i data-lucide="bar-chart-2" class="w-4 h-4 text-cyan-400"></i>
-                        <h3 class="font-bold text-sm text-slate-100">Distribusi Status Paket On-Track Per Site (Kolom K)</h3>
+                        <h3 class="font-bold text-sm text-slate-100">Distribusi Status Paket On-Track Per Site</h3>
                     </div>
+                    <span class="text-[10px] font-semibold bg-slate-800 text-slate-400 px-2.5 py-1 rounded-md border border-slate-700">Tercapai vs Mendekati Policy vs Aman</span>
                 </div>
                 <div id="reviewLifetimeChart" class="w-full"></div>
             </div>
@@ -345,9 +389,11 @@
                 <div class="flex items-center justify-between border-b border-slate-800 pb-3">
                     <div class="flex items-center space-x-2">
                         <i data-lucide="table" class="w-4 h-4 text-cyan-400"></i>
-                        <h3 class="font-bold text-sm text-slate-100">Daftar Review Lifetime (Kolom K & Kolom L)</h3>
+                        <h3 class="font-bold text-sm text-slate-100">Daftar Review Lifetime (Real-time Monitoring)</h3>
                     </div>
+                    <span class="text-xs text-slate-400">Data Real-Time Monitoring Lifetime</span>
                 </div>
+
                 <div class="overflow-x-auto">
                     <table class="w-full text-left text-xs text-slate-300">
                         <thead class="bg-slate-800/80 uppercase text-[10px] text-slate-400 border-b border-slate-700">
@@ -356,12 +402,14 @@
                                 <th class="p-3">Type</th>
                                 <th class="p-3">Model Unit</th>
                                 <th class="p-3">No Unit</th>
-                                <th class="p-3">Status Paket On Track (Kolom K)</th>
-                                <th class="p-3">Lifetime Ontrack (Kolom J)</th>
-                                <th class="p-3">Merk Terinstall (Kolom L)</th>
+                                <th class="p-3">Status Paket On Track</th>
+                                <th class="p-3">Lifetime Ontrack</th>
+                                <th class="p-3">Merk Terinstall</th>
                             </tr>
                         </thead>
-                        <tbody id="reviewTableBody" class="divide-y divide-slate-800"></tbody>
+                        <tbody id="reviewTableBody" class="divide-y divide-slate-800">
+                            <!-- Content Rendered by JS -->
+                        </tbody>
                     </table>
                 </div>
             </div>
@@ -370,20 +418,42 @@
         <!-- ==================== KLASIFIKASI UNIT DASHBOARD ==================== -->
         <div id="klasifikasi-content" class="dashboard-content space-y-6 hidden">
             <div class="relative overflow-hidden rounded-2xl bg-gradient-to-r from-slate-900 via-slate-800 to-purple-950/40 p-6 border border-slate-800 shadow-xl">
-                <h2 class="text-2xl font-extrabold text-white">Klasifikasi Unit (A/B/C)</h2>
+                <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div>
+                        <div class="flex items-center space-x-2 mb-2">
+                            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold tracking-wide uppercase bg-purple-500 text-slate-950">KLASIFIKASI</span>
+                        </div>
+                        <h2 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">Klasifikasi Unit (A/B/C)</h2>
+                        <p class="text-xs text-purple-400 font-semibold tracking-wider uppercase mt-1">MONITORING KLASIFIKASI UNIT</p>
+                    </div>
+                </div>
             </div>
-            <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-8 shadow-lg text-center text-slate-400">
-                <p class="text-sm">Dalam pengembangan...</p>
+            <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-8 shadow-lg">
+                <div class="text-center text-slate-400">
+                    <i data-lucide="construction" class="w-12 h-12 mx-auto mb-4 opacity-50"></i>
+                    <p class="text-sm">Konten Klasifikasi Unit sedang dalam tahap pengembangan...</p>
+                </div>
             </div>
         </div>
 
         <!-- ==================== PLAN REPLACEMENT DASHBOARD ==================== -->
         <div id="plan-replacement-content" class="dashboard-content space-y-6 hidden">
             <div class="relative overflow-hidden rounded-2xl bg-gradient-to-r from-slate-900 via-slate-800 to-pink-950/40 p-6 border border-slate-800 shadow-xl">
-                <h2 class="text-2xl font-extrabold text-white">Plan Replacement</h2>
+                <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div>
+                        <div class="flex items-center space-x-2 mb-2">
+                            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold tracking-wide uppercase bg-pink-500 text-slate-950">PLAN</span>
+                        </div>
+                        <h2 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">Plan Replacement</h2>
+                        <p class="text-xs text-pink-400 font-semibold tracking-wider uppercase mt-1">MONITORING RENCANA PENGGANTIAN UNIT</p>
+                    </div>
+                </div>
             </div>
-            <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-8 shadow-lg text-center text-slate-400">
-                <p class="text-sm">Dalam pengembangan...</p>
+            <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-8 shadow-lg">
+                <div class="text-center text-slate-400">
+                    <i data-lucide="construction" class="w-12 h-12 mx-auto mb-4 opacity-50"></i>
+                    <p class="text-sm">Konten Plan Replacement sedang dalam tahap pengembangan...</p>
+                </div>
             </div>
         </div>
 
@@ -392,40 +462,62 @@
     <script>
     lucide.createIcons();
 
+    // ==================== GLOBAL STATE ====================
     const sheetCsvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSMyvNRqkn65gL_4tIjZKJeKRIQG9ODScl-6uIst7HobQXwRsP4J2BdI1NsA81_pHqxrH2t_sF75_Ch/pub?output=csv';
     let globalPpuData = [];
+    let globalReviewData = [];
+
     let achievementChart, overChart, reviewChart;
 
-    // Tab Switching Logic
-    document.querySelectorAll('.tab-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            const tabName = btn.dataset.tab;
-            document.querySelectorAll('.dashboard-content').forEach(c => c.classList.add('hidden'));
-            document.getElementById(tabName + '-content').classList.remove('hidden');
-
-            document.querySelectorAll('.tab-btn').forEach(b => {
-                if (b.dataset.tab === tabName) {
-                    b.className = 'tab-btn px-3 py-1.5 rounded-md text-xs font-semibold bg-amber-500 text-slate-950 flex items-center space-x-1.5 shadow-md shadow-amber-500/20 whitespace-nowrap';
-                } else {
-                    b.className = 'tab-btn px-3 py-1.5 rounded-md text-xs font-medium text-slate-400 hover:text-slate-200 hover:bg-slate-800 flex items-center space-x-1.5 whitespace-nowrap transition';
-                }
+    // ==================== TAB SWITCHING ====================
+    function initTabSwitching() {
+        const tabBtns = document.querySelectorAll('.tab-btn');
+        tabBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const tabName = btn.dataset.tab;
+                switchToTab(tabName);
             });
-
-            setTimeout(() => {
-                if (achievementChart) achievementChart.reflow();
-                if (overChart) overChart.reflow();
-                if (reviewChart) reviewChart.reflow();
-            }, 100);
         });
-    });
+    }
 
-    // Initialize Charts
-    function initCharts() {
+    function switchToTab(tabName) {
+        const allContents = document.querySelectorAll('.dashboard-content');
+        allContents.forEach(content => content.classList.add('hidden'));
+
+        document.getElementById(tabName + '-content').classList.remove('hidden');
+
+        const tabBtns = document.querySelectorAll('.tab-btn');
+        tabBtns.forEach(btn => {
+            if (btn.dataset.tab === tabName) {
+                btn.classList.remove('text-slate-400', 'hover:text-slate-200', 'hover:bg-slate-800');
+                btn.classList.add('bg-amber-500', 'text-slate-950', 'shadow-md', 'shadow-amber-500/20');
+            } else {
+                btn.classList.add('text-slate-400', 'hover:text-slate-200', 'hover:bg-slate-800');
+                btn.classList.remove('bg-amber-500', 'text-slate-950', 'shadow-md', 'shadow-amber-500/20');
+            }
+        });
+
+        setTimeout(() => {
+            if (achievementChart) achievementChart.reflow();
+            if (overChart) overChart.reflow();
+            if (reviewChart) reviewChart.reflow();
+        }, 100);
+    }
+
+    // ==================== PPU CHARTS INIT ====================
+    function initPpuCharts() {
         achievementChart = new ApexCharts(document.querySelector("#wearChart"), {
             series: [{ name: 'Achievement (%)', data: [] }],
             chart: { type: 'bar', height: 280, toolbar: { show: false }, background: 'transparent' },
-            plotOptions: { bar: { borderRadius: 6, columnWidth: '45%', distributed: true, dataLabels: { position: 'top' } } },
-            dataLabels: { enabled: true, formatter: (val) => val + '%', offsetY: -20, style: { colors: ['#f8fafc'], fontSize: '11px', fontWeight: 'bold' } },
+            plotOptions: { 
+                bar: { borderRadius: 6, columnWidth: '45%', distributed: true, dataLabels: { position: 'top' } } 
+            },
+            dataLabels: {
+                enabled: true,
+                formatter: (val) => val + '%',
+                offsetY: -20,
+                style: { colors: ['#f8fafc'], fontSize: '11px', fontWeight: 'bold' }
+            },
             theme: { mode: 'dark' },
             colors: ['#3b82f6', '#10b981', '#f59e0b', '#ec4899', '#8b5cf6', '#06b6d4'],
             legend: { show: false },
@@ -436,85 +528,165 @@
         achievementChart.render();
 
         overChart = new ApexCharts(document.querySelector("#categoryChart"), {
-            series: [], labels: [],
+            series: [],
+            labels: [],
             chart: { type: 'donut', height: 290, background: 'transparent' },
             colors: ['#ef4444', '#f97316', '#f59e0b', '#eab308', '#84cc16', '#06b6d4', '#3b82f6', '#8b5cf6'],
             stroke: { colors: ['#0f172a'] },
-            legend: { position: 'bottom', fontSize: '11px', labels: { colors: '#cbd5e1' } },
-            dataLabels: { enabled: true, formatter: (val, opts) => opts.w.config.series[opts.seriesIndex] + " Unit", style: { fontSize: '11px', fontWeight: 'bold' } },
-            plotOptions: { pie: { donut: { size: '70%', labels: { show: true, total: { show: true, label: 'Total Over', color: '#94a3b8', fontSize: '11px', formatter: (w) => w.globals.seriesTotals.reduce((a, b) => a + b, 0) + ' Unit' }, value: { color: '#ef4444', fontSize: '18px', fontWeight: '800' } } } } },
-            tooltip: { theme: 'dark', y: { formatter: (val) => val + ' Unit' } },
+            legend: { 
+                position: 'bottom', 
+                fontSize: '11px', 
+                labels: { colors: '#cbd5e1' } 
+            },
+            dataLabels: { 
+                enabled: true,
+                formatter: function (val, opts) {
+                    const seriesVal = opts.w.config.series[opts.seriesIndex];
+                    return seriesVal + " Unit";
+                },
+                style: { fontSize: '11px', fontWeight: 'bold' },
+                dropShadow: { enabled: false }
+            },
+            plotOptions: {
+                pie: {
+                    donut: {
+                        size: '70%',
+                        labels: {
+                            show: true,
+                            total: { 
+                                show: true, 
+                                label: 'Total Over PPU', 
+                                color: '#94a3b8', 
+                                fontSize: '11px', 
+                                formatter: (w) => {
+                                    const total = w.globals.seriesTotals.reduce((a, b) => a + b, 0);
+                                    return total + ' Unit';
+                                }
+                            },
+                            value: { color: '#ef4444', fontSize: '18px', fontWeight: '800' }
+                        }
+                    }
+                }
+            },
+            tooltip: {
+                theme: 'dark',
+                y: { formatter: (val) => val + ' Unit' }
+            },
             theme: { mode: 'dark' }
         });
         overChart.render();
+    }
 
+    // ==================== REVIEW LIFETIME CHART INIT ====================
+    function initReviewChart() {
         reviewChart = new ApexCharts(document.querySelector("#reviewLifetimeChart"), {
             series: [
                 { name: 'TERCAPAI', data: [] },
                 { name: 'MENDEKATI POLICY', data: [] },
                 { name: 'AMAN', data: [] }
             ],
-            chart: { type: 'bar', height: 320, stacked: false, toolbar: { show: false }, background: 'transparent' },
+            chart: {
+                type: 'bar',
+                height: 320,
+                stacked: false,
+                toolbar: { show: false },
+                background: 'transparent'
+            },
             colors: ['#10b981', '#f59e0b', '#06b6d4'],
-            plotOptions: { bar: { horizontal: false, columnWidth: '55%', borderRadius: 4, dataLabels: { position: 'top' } } },
-            dataLabels: { enabled: true, offsetY: -20, style: { fontSize: '10px', colors: ['#f8fafc'] } },
+            plotOptions: {
+                bar: {
+                    horizontal: false,
+                    columnWidth: '55%',
+                    borderRadius: 4,
+                    dataLabels: { position: 'top' }
+                }
+            },
+            dataLabels: {
+                enabled: true,
+                offsetY: -20,
+                style: { fontSize: '10px', colors: ['#f8fafc'] }
+            },
             stroke: { show: true, width: 2, colors: ['transparent'] },
-            xaxis: { categories: [], labels: { style: { colors: '#94a3b8', fontSize: '11px', fontWeight: 'bold' } } },
-            yaxis: { labels: { style: { colors: '#94a3b8', fontSize: '10px' } } },
-            legend: { position: 'top', horizontalAlign: 'right', labels: { colors: '#cbd5e1' } },
+            xaxis: {
+                categories: [],
+                labels: { style: { colors: '#94a3b8', fontSize: '11px', fontWeight: 'bold' } }
+            },
+            yaxis: {
+                title: { text: 'Jumlah Unit', style: { color: '#94a3b8', fontSize: '11px' } },
+                labels: { style: { colors: '#94a3b8', fontSize: '10px' } }
+            },
+            legend: {
+                position: 'top',
+                horizontalAlign: 'right',
+                labels: { colors: '#cbd5e1' }
+            },
             grid: { borderColor: '#1e293b', strokeDashArray: 3 },
-            tooltip: { theme: 'dark', y: { formatter: (val) => val + ' Unit' } }
+            tooltip: {
+                theme: 'dark',
+                y: { formatter: (val) => val + ' Unit' }
+            }
         });
         reviewChart.render();
     }
 
-    // CSV Parsing
-    function parseCSVLine(line) {
-        const result = [];
-        let current = '';
-        let insideQuotes = false;
-        for (let i = 0; i < line.length; i++) {
-            const char = line[i];
-            const nextChar = line[i + 1];
-            if (char === '"') {
-                if (insideQuotes && nextChar === '"') { current += '"'; i++; }
-                else { insideQuotes = !insideQuotes; }
-            } else if (char === ',' && !insideQuotes) {
-                result.push(current.trim());
-                current = '';
-            } else { current += char; }
-        }
-        result.push(current.trim());
-        return result;
-    }
-
-    async function loadData() {
+    // ==================== CSV DATA LOADING ====================
+    async function loadPpuData() {
         try {
             const response = await fetch(sheetCsvUrl);
             const dataText = await response.text();
             const rows = dataText.split('\n').filter(r => r.trim() !== '');
-
-            globalPpuData = rows.slice(1).map(row => {
+            
+            globalPpuData = rows.slice(1).map((row) => {
                 const cols = parseCSVLine(row);
                 return {
-                    site: (cols[0] || '').trim(),              // Kolom A
-                    type: (cols[1] || '').trim(),              // Kolom B
-                    noUnit: (cols[2] || '').trim(),            // Kolom C
-                    modelUnit: (cols[3] || '').trim(),         // Kolom D
-                    lifetimeOntrack: (cols[9] || '-').trim(),  // Kolom J (Indeks 9)
-                    statusPaketOnTrack: (cols[10] || '-').trim(), // Kolom K (Indeks 10): TERCAPAI / MENDEKATI POLICY / AMAN
-                    merkTerinstall: (cols[11] || '-').trim(),  // Kolom L (Indeks 11): MERK TERINSTALL
-                    alarmStatus: (cols[12] || '').trim(),      // Kolom M (Indeks 12): ALARM PPU STATUS
-                    durasiOver: (cols[13] || '-').trim()       // Kolom N (Indeks 13)
+                    site: (cols[0] || '').trim(),
+                    type: (cols[1] || '').trim(),
+                    noUnit: (cols[2] || '').trim(),
+                    modelUnit: (cols[3] || '').trim(),
+                    lifetimeOntrack: (cols[9] || '-').trim(),      // KOLOM J (Indeks 9)
+                    statusPaketOnTrack: (cols[10] || '-').trim(),  // KOLOM K (Indeks 10)
+                    merkTerinstall: (cols[11] || '-').trim(),     // KOLOM L (Indeks 11)
+                    alarmStatus: (cols[11] || '').trim(), 
+                    durasiOver: (cols[12] || '-').trim(),
+                    maxWear: parseFloat(cols[14]) || 0
                 };
             }).filter(item => item.site !== '');
 
             populateDropdowns(globalPpuData);
             renderPpuDashboard(globalPpuData);
-            renderReviewLifetimeDashboard(globalPpuData);
+            loadReviewLifetimeData();
+            
         } catch (error) {
-            console.error('Gagal mengambil data CSV:', error);
+            console.error('❌ Gagal mengambil data:', error);
         }
+    }
+
+    function parseCSVLine(line) {
+        const result = [];
+        let current = '';
+        let insideQuotes = false;
+        
+        for (let i = 0; i < line.length; i++) {
+            const char = line[i];
+            const nextChar = line[i + 1];
+            
+            if (char === '"') {
+                if (insideQuotes && nextChar === '"') {
+                    current += '"';
+                    i++;
+                } else {
+                    insideQuotes = !insideQuotes;
+                }
+            } else if (char === ',' && !insideQuotes) {
+                result.push(current.trim());
+                current = '';
+            } else {
+                current += char;
+            }
+        }
+        
+        result.push(current.trim());
+        return result;
     }
 
     function populateDropdowns(data) {
@@ -522,188 +694,256 @@
         const types = [...new Set(data.map(d => d.type).filter(Boolean))].sort();
         const models = [...new Set(data.map(d => d.modelUnit).filter(Boolean))].sort();
 
-        fillSelect('siteFilter', sites);
-        fillSelect('typeFilter', types);
-        fillSelect('modelFilter', models);
-        fillSelect('reviewSiteFilter', sites);
-        fillSelect('reviewTypeFilter', types);
-        fillSelect('reviewModelFilter', models);
+        fillSelectOptions('siteFilter', sites, 'Semua Site');
+        fillSelectOptions('typeFilter', types, 'Semua TYPE');
+        fillSelectOptions('modelFilter', models, 'Semua Model');
+
+        fillSelectOptions('reviewSiteFilter', sites, 'Semua Site');
+        fillSelectOptions('reviewTypeFilter', types, 'Semua TYPE');
+        fillSelectOptions('reviewModelFilter', models, 'Semua Model');
     }
 
-    function fillSelect(id, items) {
-        const el = document.getElementById(id);
-        if (!el) return;
-        el.innerHTML = `<option value="ALL">Semua</option>`;
-        items.forEach(i => el.innerHTML += `<option value="${i}">${i}</option>`);
+    function fillSelectOptions(elementId, items, defaultText) {
+        const select = document.getElementById(elementId);
+        if (!select) return;
+        select.innerHTML = `<option value="ALL">${defaultText}</option>`;
+        items.forEach(item => {
+            select.innerHTML += `<option value="${item}">${item}</option>`;
+        });
     }
 
-    // Render Dashboard PPU
+    // ==================== DASHBOARD RENDER LOGIC ====================
     function renderPpuDashboard(data) {
+        const getCleanStatus = (item) => (item.alarmStatus || '').toString().trim().toUpperCase();
+        
+        const isStatusOver = (st) => st === 'OVER' || st.includes('OVER');
+        const isStatusMendekati = (st) => st.includes('MENDEKATI');
+
         const totalUnit = data.length;
-        const overUnit = data.filter(d => d.alarmStatus.toUpperCase().includes('OVER')).length;
-        const mendekatiUnit = data.filter(d => d.alarmStatus.toUpperCase().includes('MENDEKATI')).length;
-        const achievementPct = totalUnit > 0 ? (((totalUnit - overUnit) / totalUnit) * 100).toFixed(1) : 0;
+        const overUnit = data.filter(d => isStatusOver(getCleanStatus(d))).length;
+        const mendekatiUnit = data.filter(d => isStatusMendekati(getCleanStatus(d))).length;
+
+        const totalAman = totalUnit - overUnit;
+        const achievementPct = totalUnit > 0 ? ((totalAman / totalUnit) * 100).toFixed(1) : 0;
 
         document.getElementById('cardTotalUnit').innerText = `${totalUnit} Unit`;
         document.getElementById('cardOverUnit').innerText = `${overUnit} Unit`;
         document.getElementById('cardMendekatiUnit').innerText = `${mendekatiUnit} Unit`;
         document.getElementById('cardAchievementPercent').innerText = `${achievementPct}%`;
 
-        // Render Table PPU
-        const ppuTableBody = document.getElementById('ppuTableBody');
-        ppuTableBody.innerHTML = '';
-        data.filter(d => d.alarmStatus.toUpperCase().includes('OVER') || d.alarmStatus.toUpperCase().includes('MENDEKATI')).forEach(item => {
-            const badge = item.alarmStatus.toUpperCase().includes('OVER') 
-                ? `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-500/10 text-rose-400 border border-rose-500/20">OVER</span>`
-                : `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/10 text-amber-400 border border-amber-500/20">MENDEKATI PLAN PPU</span>`;
-            
-            ppuTableBody.innerHTML += `
-                <tr class="hover:bg-slate-800/40 border-b border-slate-800">
-                    <td class="p-3 font-bold text-white">${item.site}</td>
-                    <td class="p-3 text-slate-300">${item.type}</td>
-                    <td class="p-3 text-slate-300">${item.modelUnit}</td>
-                    <td class="p-3 font-semibold text-white">${item.noUnit}</td>
-                    <td class="p-3">${badge}</td>
-                    <td class="p-3 text-slate-300">${item.durasiOver}</td>
-                </tr>`;
+        const tableBody = document.getElementById('ppuTableBody');
+        tableBody.innerHTML = '';
+
+        const tableFilteredData = data.filter(item => {
+            const st = getCleanStatus(item);
+            return isStatusOver(st) || isStatusMendekati(st);
         });
 
-        // Chart PPU
-        const sites = [...new Set(data.map(d => d.site).filter(Boolean))].sort();
-        const achData = []; const overSeries = []; const overLabels = [];
+        tableFilteredData.forEach(item => {
+            const tr = document.createElement('tr');
+            tr.className = 'hover:bg-slate-800/40 border-b border-slate-800';
+            
+            let alarmBadge = '';
+            const st = getCleanStatus(item);
+            
+            if (isStatusOver(st)) {
+                alarmBadge = `<span class="px-2.5 py-1 rounded text-xs font-bold bg-rose-500/10 text-rose-400 border border-rose-500/20">OVER</span>`;
+            } else if (isStatusMendekati(st)) {
+                alarmBadge = `<span class="px-2.5 py-1 rounded text-xs font-bold bg-amber-500/10 text-amber-400 border border-amber-500/20">MENDEKATI PLAN PPU</span>`;
+            }
 
-        sites.forEach(site => {
-            const sUnits = data.filter(d => d.site === site);
-            const sOver = sUnits.filter(d => d.alarmStatus.toUpperCase().includes('OVER')).length;
-            achData.setItem ? null : achData.push(sUnits.length > 0 ? parseFloat((((sUnits.length - sOver) / sUnits.length) * 100).toFixed(1)) : 0);
-            if (sOver > 0) { overSeries.push(sOver); overLabels.push(site); }
+            tr.innerHTML = `
+                <td class="p-3 font-bold text-white">${item.site}</td>
+                <td class="p-3 text-slate-300">${item.type}</td>
+                <td class="p-3 text-slate-300">${item.modelUnit}</td>
+                <td class="p-3 font-semibold text-white">${item.noUnit}</td>
+                <td class="p-3">${alarmBadge}</td>
+                <td class="p-3 text-slate-300 font-semibold">${item.durasiOver}</td>
+            `;
+            tableBody.appendChild(tr);
+        });
+
+        const sites = [...new Set(data.map(d => d.site).filter(Boolean))].sort();
+        const siteAchievementData = [];
+        const siteOverSeries = [];
+        const siteOverLabels = [];
+
+        sites.forEach(siteName => {
+            const siteUnits = data.filter(d => d.site === siteName);
+            const totalSiteUnits = siteUnits.length;
+            const overSiteUnits = siteUnits.filter(d => isStatusOver(getCleanStatus(d))).length;
+            const amanSiteUnits = totalSiteUnits - overSiteUnits;
+            
+            const siteAch = totalSiteUnits > 0 ? parseFloat(((amanSiteUnits / totalSiteUnits) * 100).toFixed(1)) : 0;
+            siteAchievementData.push(siteAch);
+
+            if (overSiteUnits > 0) {
+                siteOverSeries.push(overSiteUnits);
+                siteOverLabels.push(siteName);
+            }
         });
 
         if (achievementChart && overChart) {
-            achievementChart.updateOptions({ xaxis: { categories: sites }, series: [{ name: 'Achievement (%)', data: achData }] });
-            overChart.updateOptions({ labels: overLabels, series: overSeries });
-        }
-    }
-
-    // Render Dashboard Review Lifetime
-    function renderReviewLifetimeDashboard(data) {
-        const total = data.length;
-        const tercapai = data.filter(d => d.statusPaketOnTrack.toUpperCase() === 'TERCAPAI').length;
-        const mendekati = data.filter(d => d.statusPaketOnTrack.toUpperCase().includes('MENDEKATI')).length;
-        const aman = data.filter(d => d.statusPaketOnTrack.toUpperCase() === 'AMAN').length;
-
-        document.getElementById('reviewCardTotal').innerText = `${total} Unit`;
-        document.getElementById('reviewCardTercapai').innerText = `${tercapai} Unit`;
-        document.getElementById('reviewCardMendekati').innerText = `${mendekati} Unit`;
-        document.getElementById('reviewCardAman').innerText = `${aman} Unit`;
-
-        // Render Table Review Lifetime
-        const reviewTableBody = document.getElementById('reviewTableBody');
-        reviewTableBody.innerHTML = '';
-        data.forEach(item => {
-            const st = item.statusPaketOnTrack.toUpperCase();
-            let badge = `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">AMAN</span>`;
-            if (st === 'TERCAPAI') {
-                badge = `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">TERCAPAI</span>`;
-            } else if (st.includes('MENDEKATI')) {
-                badge = `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/10 text-amber-400 border border-amber-500/20">MENDEKATI POLICY</span>`;
-            }
-
-            reviewTableBody.innerHTML += `
-                <tr class="hover:bg-slate-800/40 border-b border-slate-800">
-                    <td class="p-3 font-bold text-white">${item.site}</td>
-                    <td class="p-3 text-slate-300">${item.type}</td>
-                    <td class="p-3 text-slate-300">${item.modelUnit}</td>
-                    <td class="p-3 font-semibold text-white">${item.noUnit}</td>
-                    <td class="p-3">${badge}</td>
-                    <td class="p-3 text-slate-300">${item.lifetimeOntrack}</td>
-                    <td class="p-3 text-slate-300 font-semibold text-amber-400">${item.merkTerinstall}</td>
-                </tr>`;
-        });
-
-        // Chart Review Lifetime
-        const sites = [...new Set(data.map(d => d.site).filter(Boolean))].sort();
-        const tSeries = [], mSeries = [], aSeries = [];
-
-        sites.forEach(site => {
-            const sUnits = data.filter(d => d.site === site);
-            tSeries.push(sUnits.filter(d => d.statusPaketOnTrack.toUpperCase() === 'TERCAPAI').length);
-            mSeries.push(sUnits.filter(d => d.statusPaketOnTrack.toUpperCase().includes('MENDEKATI')).length);
-            aSeries.push(sUnits.filter(d => d.statusPaketOnTrack.toUpperCase() === 'AMAN').length);
-        });
-
-        if (reviewChart) {
-            reviewChart.updateOptions({
+            achievementChart.updateOptions({
                 xaxis: { categories: sites },
-                series: [
-                    { name: 'TERCAPAI', data: tSeries },
-                    { name: 'MENDEKATI POLICY', data: mSeries },
-                    { name: 'AMAN', data: aSeries }
-                ]
+                series: [{ name: 'Achievement (%)', data: siteAchievementData }]
+            });
+
+            overChart.updateOptions({
+                labels: siteOverLabels,
+                series: siteOverSeries
             });
         }
     }
 
-    // Filter Listeners
-    function applyFilters() {
-        const s = document.getElementById('siteFilter').value;
-        const t = document.getElementById('typeFilter').value;
-        const m = document.getElementById('modelFilter').value;
-        const a = document.getElementById('alarmFilter').value;
+    function applyPpuFilters() {
+        const siteVal = document.getElementById('siteFilter').value;
+        const typeVal = document.getElementById('typeFilter').value;
+        const modelVal = document.getElementById('modelFilter').value;
+        const alarmVal = document.getElementById('alarmFilter').value;
 
-        const filtered = globalPpuData.filter(item => {
-            return (s === 'ALL' || item.site === s) &&
-                   (t === 'ALL' || item.type === t) &&
-                   (m === 'ALL' || item.modelUnit === m) &&
-                   (a === 'ALL' || item.alarmStatus.toUpperCase().includes(a));
+        const filteredData = globalPpuData.filter(item => {
+            const matchSite = (siteVal === 'ALL' || item.site === siteVal);
+            const matchType = (typeVal === 'ALL' || item.type === typeVal);
+            const matchModel = (modelVal === 'ALL' || item.modelUnit === modelVal);
+            const matchAlarm = (alarmVal === 'ALL' || (item.alarmStatus || '').toUpperCase().includes(alarmVal.toUpperCase()));
+            
+            return matchSite && matchType && matchModel && matchAlarm;
         });
-        renderPpuDashboard(filtered);
+
+        renderPpuDashboard(filteredData);
     }
+
+    // ==================== REVIEW LIFETIME LOGIC ====================
+    function loadReviewLifetimeData() {
+        globalReviewData = globalPpuData;
+        renderReviewLifetimeDashboard(globalReviewData);
+    }
+
+   function renderReviewLifetimeDashboard(data) {
+    const getCleanReviewStatus = (st) => (st || '').toString().trim().toUpperCase();
+
+    const totalUnit = data.length;
+    const tercapaiUnit = data.filter(d => getCleanReviewStatus(d.statusPaketOnTrack).includes('TERCAPAI')).length;
+    const mendekatiUnit = data.filter(d => getCleanReviewStatus(d.statusPaketOnTrack).includes('MENDEKATI')).length;
+    const amanUnit = data.filter(d => getCleanReviewStatus(d.statusPaketOnTrack).includes('AMAN')).length;
+
+    document.getElementById('reviewCardTotal').innerText = `${totalUnit} Unit`;
+    document.getElementById('reviewCardTercapai').innerText = `${tercapaiUnit} Unit`;
+    document.getElementById('reviewCardMendekati').innerText = `${mendekatiUnit} Unit`;
+    document.getElementById('reviewCardAman').innerText = `${amanUnit} Unit`;
+
+    const tableBody = document.getElementById('reviewTableBody');
+    tableBody.innerHTML = '';
+
+    data.forEach(item => {
+        const tr = document.createElement('tr');
+        tr.className = 'hover:bg-slate-800/40 border-b border-slate-800';
+        
+        let statusBadge = '';
+        const st = getCleanReviewStatus(item.statusPaketOnTrack);
+
+        if (st.includes('TERCAPAI')) {
+            statusBadge = `<span class="px-2.5 py-1 rounded text-xs font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">TERCAPAI</span>`;
+        } else if (st.includes('MENDEKATI')) {
+            statusBadge = `<span class="px-2.5 py-1 rounded text-xs font-bold bg-amber-500/10 text-amber-400 border border-amber-500/20">MENDEKATI POLICY</span>`;
+        } else {
+            statusBadge = `<span class="px-2.5 py-1 rounded text-xs font-bold bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">AMAN</span>`;
+        }
+
+        tr.innerHTML = `
+            <td class="p-3 font-bold text-white">${item.site}</td>
+            <td class="p-3 text-slate-300">${item.type}</td>
+            <td class="p-3 text-slate-300">${item.modelUnit}</td>
+            <td class="p-3 font-semibold text-white">${item.noUnit}</td>
+            <td class="p-3">${statusBadge}</td>
+            <td class="p-3 text-slate-300 font-semibold">${item.lifetimeOntrack}</td>
+            <td class="p-3 text-slate-300 font-semibold">${item.merkTerinstall}</td>
+        `;
+        tableBody.appendChild(tr);
+    });
+
+    const sites = [...new Set(data.map(d => d.site).filter(Boolean))].sort();
+    const tercapaiSeries = [];
+    const mendekatiSeries = [];
+    const amanSeries = [];
+
+    sites.forEach(siteName => {
+        const siteUnits = data.filter(d => d.site === siteName);
+        tercapaiSeries.push(siteUnits.filter(d => getCleanReviewStatus(d.statusPaketOnTrack).includes('TERCAPAI')).length);
+        mendekatiSeries.push(siteUnits.filter(d => getCleanReviewStatus(d.statusPaketOnTrack).includes('MENDEKATI')).length);
+        amanSeries.push(siteUnits.filter(d => getCleanReviewStatus(d.statusPaketOnTrack).includes('AMAN')).length);
+    });
+
+    if (reviewChart) {
+        reviewChart.updateOptions({
+            xaxis: { categories: sites },
+            series: [
+                { name: 'TERCAPAI', data: tercapaiSeries },
+                { name: 'MENDEKATI POLICY', data: mendekatiSeries },
+                { name: 'AMAN', data: amanSeries }
+            ]
+        });
+    }
+}
 
     function applyReviewFilters() {
-        const s = document.getElementById('reviewSiteFilter').value;
-        const t = document.getElementById('reviewTypeFilter').value;
-        const m = document.getElementById('reviewModelFilter').value;
-        const st = document.getElementById('reviewStatusFilter').value;
+        const siteVal = document.getElementById('reviewSiteFilter').value;
+        const typeVal = document.getElementById('reviewTypeFilter').value;
+        const modelVal = document.getElementById('reviewModelFilter').value;
+        const statusVal = document.getElementById('reviewStatusFilter').value;
 
-        const filtered = globalPpuData.filter(item => {
-            return (s === 'ALL' || item.site === s) &&
-                   (t === 'ALL' || item.type === t) &&
-                   (m === 'ALL' || item.modelUnit === m) &&
-                   (st === 'ALL' || item.statusPaketOnTrack.toUpperCase().includes(st));
+        const filteredData = globalReviewData.filter(item => {
+            const matchSite = (siteVal === 'ALL' || item.site === siteVal);
+            const matchType = (typeVal === 'ALL' || item.type === typeVal);
+            const matchModel = (modelVal === 'ALL' || item.modelUnit === modelVal);
+            const matchStatus = (statusVal === 'ALL' || (item.statusPaketOnTrack || '').toUpperCase().includes(statusVal.toUpperCase()));
+            
+            return matchSite && matchType && matchModel && matchStatus;
         });
-        renderReviewLifetimeDashboard(filtered);
+
+        renderReviewLifetimeDashboard(filteredData);
     }
 
-    document.getElementById('siteFilter').addEventListener('change', applyFilters);
-    document.getElementById('typeFilter').addEventListener('change', applyFilters);
-    document.getElementById('modelFilter').addEventListener('change', applyFilters);
-    document.getElementById('alarmFilter').addEventListener('change', applyFilters);
+    // ==================== EVENT LISTENERS ====================
+    function initEventListeners() {
+        ['siteFilter', 'typeFilter', 'modelFilter', 'alarmFilter'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.addEventListener('change', applyPpuFilters);
+        });
 
-    document.getElementById('reviewSiteFilter').addEventListener('change', applyReviewFilters);
-    document.getElementById('reviewTypeFilter').addEventListener('change', applyReviewFilters);
-    document.getElementById('reviewModelFilter').addEventListener('change', applyReviewFilters);
-    document.getElementById('reviewStatusFilter').addEventListener('change', applyReviewFilters);
+        document.getElementById('resetFilterBtn').addEventListener('click', () => {
+            document.getElementById('siteFilter').value = 'ALL';
+            document.getElementById('typeFilter').value = 'ALL';
+            document.getElementById('modelFilter').value = 'ALL';
+            document.getElementById('alarmFilter').value = 'ALL';
+            renderPpuDashboard(globalPpuData);
+        });
 
-    document.getElementById('resetFilterBtn').addEventListener('click', () => {
-        document.getElementById('siteFilter').value = 'ALL';
-        document.getElementById('typeFilter').value = 'ALL';
-        document.getElementById('modelFilter').value = 'ALL';
-        document.getElementById('alarmFilter').value = 'ALL';
-        renderPpuDashboard(globalPpuData);
-    });
+        ['reviewSiteFilter', 'reviewTypeFilter', 'reviewModelFilter', 'reviewStatusFilter'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.addEventListener('change', applyReviewFilters);
+        });
 
-    document.getElementById('resetFilterBtnReview').addEventListener('click', () => {
-        document.getElementById('reviewSiteFilter').value = 'ALL';
-        document.getElementById('reviewTypeFilter').value = 'ALL';
-        document.getElementById('reviewModelFilter').value = 'ALL';
-        document.getElementById('reviewStatusFilter').value = 'ALL';
-        renderReviewLifetimeDashboard(globalPpuData);
-    });
+        document.getElementById('resetFilterBtnReview').addEventListener('click', () => {
+            document.getElementById('reviewSiteFilter').value = 'ALL';
+            document.getElementById('reviewTypeFilter').value = 'ALL';
+            document.getElementById('reviewModelFilter').value = 'ALL';
+            document.getElementById('reviewStatusFilter').value = 'ALL';
+            renderReviewLifetimeDashboard(globalReviewData);
+        });
+    }
 
-    // Run Initialization
-    initCharts();
-    loadData();
+    // ==================== INITIALIZATION ====================
+    async function init() {
+        initPpuCharts();
+        initReviewChart();
+        initTabSwitching();
+        initEventListeners();
+        await loadPpuData();
+    }
+
+    init();
     </script>
 </body>
 </html>
