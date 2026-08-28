@@ -629,37 +629,37 @@
         reviewChart.render();
     }
 
-    // ==================== CSV DATA LOADING ====================
-    async function loadPpuData() {
-        try {
-            const response = await fetch(sheetCsvUrl);
-            const dataText = await response.text();
-            const rows = dataText.split('\n').filter(r => r.trim() !== '');
-            
-            globalPpuData = rows.slice(1).map((row) => {
-                const cols = parseCSVLine(row);
-                return {
-                    site: (cols[0] || '').trim(),
-                    type: (cols[1] || '').trim(),
-                    noUnit: (cols[2] || '').trim(),
-                    modelUnit: (cols[3] || '').trim(),
-                    lifetimeOntrack: (cols[9] || '-').trim(),      // KOLOM J (Indeks 9)
-                    statusPaketOnTrack: (cols[10] || '-').trim(),  // KOLOM K (Indeks 10)
-                    merkTerinstall: (cols[11] || '-').trim(),     // KOLOM L (Indeks 11)
-                    alarmStatus: (cols[11] || '').trim(), 
-                    durasiOver: (cols[12] || '-').trim(),
-                    maxWear: parseFloat(cols[14]) || 0
-                };
-            }).filter(item => item.site !== '');
+    // ==================== CSV DATA LOADING (FIXED) ====================
+async function loadPpuData() {
+    try {
+        const response = await fetch(sheetCsvUrl);
+        const dataText = await response.text();
+        const rows = dataText.split('\n').filter(r => r.trim() !== '');
+        
+        globalPpuData = rows.slice(1).map((row) => {
+            const cols = parseCSVLine(row);
+            return {
+                site: (cols[0] || '').trim(),
+                type: (cols[1] || '').trim(),
+                noUnit: (cols[2] || '').trim(),
+                modelUnit: (cols[3] || '').trim(),
+                lifetimeOntrack: (cols[9] || '-').trim(),       // KOLOM J (Indeks 9)
+                statusPaketOnTrack: (cols[10] || '-').trim(),   // KOLOM K (Indeks 10)
+                merkTerinstall: (cols[11] || '-').trim(),      // KOLOM L (Indeks 11)
+                alarmStatus: (cols[12] || '').trim(),         // KOLOM M (Indeks 12 - Alarm PPU)
+                durasiOver: (cols[13] || '-').trim(),          // KOLOM N (Indeks 13 - Durasi Over)
+                maxWear: parseFloat(cols[14]) || 0
+            };
+        }).filter(item => item.site !== '');
 
-            populateDropdowns(globalPpuData);
-            renderPpuDashboard(globalPpuData);
-            loadReviewLifetimeData();
-            
-        } catch (error) {
-            console.error('❌ Gagal mengambil data:', error);
-        }
+        populateDropdowns(globalPpuData);
+        renderPpuDashboard(globalPpuData);
+        loadReviewLifetimeData();
+        
+    } catch (error) {
+        console.error('❌ Gagal mengambil data:', error);
     }
+}
 
     function parseCSVLine(line) {
         const result = [];
