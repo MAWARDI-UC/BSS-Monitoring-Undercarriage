@@ -814,7 +814,7 @@
         renderPpuDashboard(filteredData);
     }
 
-    // ==================== REVIEW LIFETIME LOGIC (FIXED & SAFE) ====================
+    // ==================== REVIEW LIFETIME LOGIC (FIXED & FULL) ====================
 function loadReviewLifetimeData() {
     // 1. Cek ketersediaan data utama agar script tidak crash jika data belum siap
     if (!window.globalPpuData || !Array.isArray(window.globalPpuData) || window.globalPpuData.length === 0) {
@@ -854,18 +854,7 @@ function renderReviewLifetimeDashboard(data) {
     const mendekatiUnit = data.filter(d => d.statusPaketOnTrack === 'MENDEKATI POLICY').length;
     const amanUnit = data.filter(d => d.statusPaketOnTrack === 'AMAN').length;
 
-    // Update Kartu KPI jika elemen ada di DOM
-    const cardTotal = document.getElementById('reviewCardTotal');
-    const cardTercapai = document.getElementById('reviewCardTercapai');
-    const cardMendekati = document.getElementById('reviewCardMendekati');
-    const cardAman = document.getElementById('reviewCardAman');
-
-    if (cardTotal) cardTotal.innerText = `${totalUnit} Unit`;
-    if (cardTercapai) cardTercapai.innerText = `${tercapaiUnit} Unit`;
-    if (cardMendekati) cardMendekati.innerText = `${mendekatiUnit} Unit`;
-    if (cardAman) cardAman.innerText = `${amanUnit} Unit`;
-
-    // Render Tabel
+    // 1. Render Tabel
     const tableBody = document.getElementById('reviewTableBody');
     if (tableBody) {
         tableBody.innerHTML = '';
@@ -898,8 +887,8 @@ function renderReviewLifetimeDashboard(data) {
             tableBody.appendChild(tr);
         });
     }
-}
-    // Update KPI Card dengan validasi elemen (mencegah error script berhenti)
+
+    // 2. Update Kartu KPI
     const cardTotal = document.getElementById('reviewCardTotal');
     const cardTercapai = document.getElementById('reviewCardTercapai');
     const cardMendekati = document.getElementById('reviewCardMendekati');
@@ -909,88 +898,98 @@ function renderReviewLifetimeDashboard(data) {
     if (cardTercapai) cardTercapai.innerText = `${tercapaiUnit} Unit`;
     if (cardMendekati) cardMendekati.innerText = `${mendekatiUnit} Unit`;
     if (cardAman) cardAman.innerText = `${amanUnit} Unit`;
+
+    // 3. Update Chart Review Lifetime
+    const sites = [...new Set(data.map(d => d.site).filter(Boolean))].sort();
+    const tercapaiSeries = [];
+    const mendekatiSeries = [];
+    const amanSeries = [];
+
+    sites.forEach(siteName => {
+        const siteUnits = data.filter(d => d.site === siteName);
+        tercapaiSeries.push(siteUnits.filter(d => d.statusPaketOnTrack === 'TERCAPAI').length);
+        mendekatiSeries.push(siteUnits.filter(d => d.statusPaketOnTrack === 'MENDEKATI POLICY').length);
+        amanSeries.push(siteUnits.filter(d => d.statusPaketOnTrack === 'AMAN').length);
+    });
+
+    if (typeof reviewChart !== 'undefined' && reviewChart) {
+        reviewChart.updateOptions({
+            xaxis: { categories: sites },
+            series: [
+                { name: 'TERCAPAI', data: tercapaiSeries },
+                { name: 'MENDEKATI POLICY', data: mendekatiSeries },
+                { name: 'AMAN', data: amanSeries }
+            ]
+        });
+    }
 }
-        const sites = [...new Set(data.map(d => d.site).filter(Boolean))].sort();
-        const tercapaiSeries = [];
-        const mendekatiSeries = [];
-        const amanSeries = [];
 
-        sites.forEach(siteName => {
-            const siteUnits = data.filter(d => d.site === siteName);
-            tercapaiSeries.push(siteUnits.filter(d => d.statusPaketOnTrack === 'TERCAPAI').length);
-            mendekatiSeries.push(siteUnits.filter(d => d.statusPaketOnTrack === 'MENDEKATI POLICY').length);
-            amanSeries.push(siteUnits.filter(d => d.statusPaketOnTrack === 'AMAN').length);
-        });
+function applyReviewFilters() {
+    if (!window.globalReviewData) return;
+    
+    const siteVal = document.getElementById('reviewSiteFilter').value;
+    const typeVal = document.getElementById('reviewTypeFilter').value;
+    const modelVal = document.getElementById('reviewModelFilter').value;
+    const statusVal = document.getElementById('reviewStatusFilter').value;
 
-        if (reviewChart) {
-            reviewChart.updateOptions({
-                xaxis: { categories: sites },
-                series: [
-                    { name: 'TERCAPAI', data: tercapaiSeries },
-                    { name: 'MENDEKATI POLICY', data: mendekatiSeries },
-                    { name: 'AMAN', data: amanSeries }
-                ]
-            });
-        }
-    }
+    const filteredData = globalReviewData.filter(item => {
+        const matchSite = (siteVal === 'ALL' || item.site === siteVal);
+        const matchType = (typeVal === 'ALL' || item.type === typeVal);
+        const matchModel = (modelVal === 'ALL' || (item.modelUnit || item.model) === modelVal);
+        const matchStatus = (statusVal === 'ALL' || item.statusPaketOnTrack === statusVal);
+        
+        return matchSite && matchType && matchModel && matchStatus;
+    });
 
-    function applyReviewFilters() {
-        const siteVal = document.getElementById('reviewSiteFilter').value;
-        const typeVal = document.getElementById('reviewTypeFilter').value;
-        const modelVal = document.getElementById('reviewModelFilter').value;
-        const statusVal = document.getElementById('reviewStatusFilter').value;
+    renderReviewLifetimeDashboard(filteredData);
+}
 
-        const filteredData = globalReviewData.filter(item => {
-            const matchSite = (siteVal === 'ALL' || item.site === siteVal);
-            const matchType = (typeVal === 'ALL' || item.type === typeVal);
-            const matchModel = (modelVal === 'ALL' || item.modelUnit === modelVal);
-            const matchStatus = (statusVal === 'ALL' || item.statusPaketOnTrack === statusVal);
-            
-            return matchSite && matchType && matchModel && matchStatus;
-        });
+// ==================== EVENT LISTENERS ====================
+function initEventListeners() {
+    ['siteFilter', 'typeFilter', 'modelFilter', 'alarmFilter'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.addEventListener('change', typeof applyPpuFilters === 'function' ? applyPpuFilters : () => {});
+    });
 
-        renderReviewLifetimeDashboard(filteredData);
-    }
-
-    // ==================== EVENT LISTENERS ====================
-    function initEventListeners() {
-        ['siteFilter', 'typeFilter', 'modelFilter', 'alarmFilter'].forEach(id => {
-            const el = document.getElementById(id);
-            if (el) el.addEventListener('change', applyPpuFilters);
-        });
-
-        document.getElementById('resetFilterBtn').addEventListener('click', () => {
-            document.getElementById('siteFilter').value = 'ALL';
-            document.getElementById('typeFilter').value = 'ALL';
-            document.getElementById('modelFilter').value = 'ALL';
-            document.getElementById('alarmFilter').value = 'ALL';
-            renderPpuDashboard(globalPpuData);
-        });
-
-        ['reviewSiteFilter', 'reviewTypeFilter', 'reviewModelFilter', 'reviewStatusFilter'].forEach(id => {
-            const el = document.getElementById(id);
-            if (el) el.addEventListener('change', applyReviewFilters);
-        });
-
-        document.getElementById('resetFilterBtnReview').addEventListener('click', () => {
-            document.getElementById('reviewSiteFilter').value = 'ALL';
-            document.getElementById('reviewTypeFilter').value = 'ALL';
-            document.getElementById('reviewModelFilter').value = 'ALL';
-            document.getElementById('reviewStatusFilter').value = 'ALL';
-            renderReviewLifetimeDashboard(globalReviewData);
+    const resetBtnPpu = document.getElementById('resetFilterBtn');
+    if (resetBtnPpu) {
+        resetBtnPpu.addEventListener('click', () => {
+            if (document.getElementById('siteFilter')) document.getElementById('siteFilter').value = 'ALL';
+            if (document.getElementById('typeFilter')) document.getElementById('typeFilter').value = 'ALL';
+            if (document.getElementById('modelFilter')) document.getElementById('modelFilter').value = 'ALL';
+            if (document.getElementById('alarmFilter')) document.getElementById('alarmFilter').value = 'ALL';
+            if (typeof renderPpuDashboard === 'function' && window.globalPpuData) renderPpuDashboard(globalPpuData);
         });
     }
 
-    // ==================== INITIALIZATION ====================
-    async function init() {
-        initPpuCharts();
-        initReviewChart();
-        initTabSwitching();
-        initEventListeners();
+    ['reviewSiteFilter', 'reviewTypeFilter', 'reviewModelFilter', 'reviewStatusFilter'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.addEventListener('change', applyReviewFilters);
+    });
+
+    const resetBtnReview = document.getElementById('resetFilterBtnReview');
+    if (resetBtnReview) {
+        resetBtnReview.addEventListener('click', () => {
+            if (document.getElementById('reviewSiteFilter')) document.getElementById('reviewSiteFilter').value = 'ALL';
+            if (document.getElementById('reviewTypeFilter')) document.getElementById('reviewTypeFilter').value = 'ALL';
+            if (document.getElementById('reviewModelFilter')) document.getElementById('reviewModelFilter').value = 'ALL';
+            if (document.getElementById('reviewStatusFilter')) document.getElementById('reviewStatusFilter').value = 'ALL';
+            if (window.globalReviewData) renderReviewLifetimeDashboard(globalReviewData);
+        });
+    }
+}
+
+// ==================== INITIALIZATION ====================
+async function init() {
+    if (typeof initPpuCharts === 'function') initPpuCharts();
+    if (typeof initReviewChart === 'function') initReviewChart();
+    if (typeof initTabSwitching === 'function') initTabSwitching();
+    
+    initEventListeners();
+    
+    if (typeof loadPpuData === 'function') {
         await loadPpuData();
     }
+}
 
-    init();
-    </script>
-</body>
-</html>
+init();
