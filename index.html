@@ -630,33 +630,34 @@
     }
 
     // ==================== CSV DATA LOADING ====================
-    async function loadPpuData() {
-        try {
-            const response = await fetch(sheetCsvUrl);
-            const dataText = await response.text();
-            const rows = dataText.split('\n').filter(r => r.trim() !== '');
-            
-            globalPpuData = rows.slice(1).map((row) => {
-                const cols = parseCSVLine(row);
-                return {
-                    site: (cols[0] || '').trim(),
-                    type: (cols[1] || '').trim(),
-                    noUnit: (cols[2] || '').trim(),
-                    modelUnit: (cols[3] || '').trim(),
-                    alarmStatus: (cols[11] || '').trim(), // KOLOM L (Indeks 11)
-                    durasiOver: (cols[12] || '-').trim(),  // KOLOM M (Indeks 12)
-                    maxWear: parseFloat(cols[14]) || 0
-                };
-            }).filter(item => item.site !== '');
+async function loadPpuData() {
+    try {
+        const response = await fetch(sheetCsvUrl);
+        const dataText = await response.text();
+        const rows = dataText.split('\n').filter(r => r.trim() !== '');
+        
+        globalPpuData = rows.slice(1).map((row) => {
+            const cols = parseCSVLine(row);
+            return {
+                site: (cols[0] || '').trim(),               // KOLOM A (Index 0)
+                type: (cols[1] || '').trim(),               // KOLOM B (Index 1)
+                noUnit: (cols[2] || '').trim(),             // KOLOM C (Index 2)
+                modelUnit: (cols[3] || '').trim(),          // KOLOM D (Index 3)
+                statusPaketOnTrack: (cols[10] || '').trim().toUpperCase(), // KOLOM K (Index 10)
+                alarmStatus: (cols[11] || '').trim(),       // KOLOM L (Index 11)
+                durasiOver: (cols[12] || '-').trim(),       // KOLOM M (Index 12)
+                maxWear: parseFloat(cols[14]) || 0
+            };
+        }).filter(item => item.site !== '');
 
-            populateDropdowns(globalPpuData);
-            renderPpuDashboard(globalPpuData);
-            loadReviewLifetimeData();
-            
-        } catch (error) {
-            console.error('❌ Gagal mengambil data:', error);
-        }
+        populateDropdowns(globalPpuData);
+        renderPpuDashboard(globalPpuData);
+        loadReviewLifetimeData();
+        
+    } catch (error) {
+        console.error('❌ Gagal mengambil data:', error);
     }
+}
 
     function parseCSVLine(line) {
         const result = [];
@@ -815,23 +816,19 @@
     }
 
     // ==================== REVIEW LIFETIME LOGIC ====================
-    function loadReviewLifetimeData() {
-        const statusList = ['TERCAPAI', 'MENDEKATI POLICY', 'AMAN'];
-        
-        globalReviewData = globalPpuData.map((item, idx) => {
-            let statusPaket = statusList[idx % 3];
-            if (item.maxWear > 85) statusPaket = 'MENDEKATI POLICY';
-            else if (item.maxWear > 95) statusPaket = 'TERCAPAI';
+function loadReviewLifetimeData() {
+    // Memakai langsung data dari Kolom K yang sudah dimuat di globalPpuData
+    globalReviewData = globalPpuData.map((item) => {
+        return {
+            ...item,
+            // Jika ada nilai kosong dari spreadsheet, beri default 'AMAN' atau disesuaikan
+            statusPaketOnTrack: item.statusPaketOnTrack || 'AMAN', 
+            lastUpdate: new Date().toLocaleDateString('id-ID')
+        };
+    });
 
-            return {
-                ...item,
-                statusPaketOnTrack: statusPaket,
-                lastUpdate: new Date().toLocaleDateString('id-ID')
-            };
-        });
-
-        renderReviewLifetimeDashboard(globalReviewData);
-    }
+    renderReviewLifetimeDashboard(globalReviewData);
+}
 
     function renderReviewLifetimeDashboard(data) {
         const totalUnit = data.length;
@@ -896,22 +893,25 @@
     }
 
     function applyReviewFilters() {
-        const siteVal = document.getElementById('reviewSiteFilter').value;
-        const typeVal = document.getElementById('reviewTypeFilter').value;
-        const modelVal = document.getElementById('reviewModelFilter').value;
-        const statusVal = document.getElementById('reviewStatusFilter').value;
+    const siteVal = document.getElementById('reviewSiteFilter').value;
+    const typeVal = document.getElementById('reviewTypeFilter').value;
+    const modelVal = document.getElementById('reviewModelFilter').value;
+    const statusVal = document.getElementById('reviewStatusFilter').value;
 
-        const filteredData = globalReviewData.filter(item => {
-            const matchSite = (siteVal === 'ALL' || item.site === siteVal);
-            const matchType = (typeVal === 'ALL' || item.type === typeVal);
-            const matchModel = (modelVal === 'ALL' || item.modelUnit === modelVal);
-            const matchStatus = (statusVal === 'ALL' || item.statusPaketOnTrack === statusVal);
-            
-            return matchSite && matchType && matchModel && matchStatus;
-        });
+    const filteredData = globalReviewData.filter(item => {
+        const matchSite = (siteVal === 'ALL' || item.site === siteVal);
+        const matchType = (typeVal === 'ALL' || item.type === typeVal);
+        const matchModel = (matchModel === 'ALL' || item.modelUnit === modelVal);
+        
+        // Pencocokan status Kolom K
+        const itemStatus = (item.statusPaketOnTrack || '').toUpperCase();
+        const matchStatus = (statusVal === 'ALL' || itemStatus.includes(statusVal.toUpperCase()));
+        
+        return matchSite && matchType && matchModel && matchStatus;
+    });
 
-        renderReviewLifetimeDashboard(filteredData);
-    }
+    renderReviewLifetimeDashboard(filteredData);
+}
 
     // ==================== EVENT LISTENERS ====================
     function initEventListeners() {
