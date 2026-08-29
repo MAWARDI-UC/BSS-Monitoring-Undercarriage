@@ -814,88 +814,77 @@
         renderPpuDashboard(filteredData);
     }
 
-    // ==================== REVIEW LIFETIME LOGIC (VALID DATA) ====================
+    // ==================== REVIEW LIFETIME LOGIC (SAFE FIX) ====================
 function loadReviewLifetimeData() {
-    globalReviewData = globalPpuData.map((item) => {
-        // Ambil nilai murni dari Kolom K (menangani berbagai kemungkinan nama properti dari Sheet API)
-        const rawStatusFromColumnK = item.statusPaketOnTrack || item.StatusPaketOnTrack || item.status || item.STATUS || item.kolomK || '';
-        
-        // Normalisasi teks (ubah ke uppercase & hapus spasi berlebih)
-        const cleanStatus = rawStatusFromColumnK.toString().trim().toUpperCase();
+    // Gunakan data murni tanpa menimpa/merusak struktur globalPpuData
+    if (!globalPpuData || !Array.isArray(globalPpuData)) return;
 
-        let finalStatus = '';
-
-        // Validasi presisi sesuai teks di Kolom K
-        if (cleanStatus.includes('TERCAPAI')) {
-            finalStatus = 'TERCAPAI';
-        } else if (cleanStatus.includes('MENDEKATI')) {
-            finalStatus = 'MENDEKATI POLICY';
-        } else if (cleanStatus.includes('AMAN')) {
-            finalStatus = 'AMAN';
-        } else {
-            finalStatus = 'LAINNYA'; // Jika ada data kosong/tidak sesuai format
-        }
-
-        return {
-            ...item,
-            statusPaketOnTrack: finalStatus,
-            lastUpdate: new Date().toLocaleDateString('id-ID')
-        };
-    });
-
-    renderReviewLifetimeDashboard(globalReviewData);
+    renderReviewLifetimeDashboard(globalPpuData);
 }
 
 function renderReviewLifetimeDashboard(data) {
     const totalUnit = data.length;
     
-    // Hitung akurat berdasarkan hasil parsing Kolom K
-    const tercapaiUnit = data.filter(d => d.statusPaketOnTrack === 'TERCAPAI').length;
-    const mendekatiUnit = data.filter(d => d.statusPaketOnTrack === 'MENDEKATI POLICY').length;
-    const amanUnit = data.filter(d => d.statusPaketOnTrack === 'AMAN').length;
+    // Inisialisasi hitungan akurat dari Kolom K
+    let tercapaiUnit = 0;
+    let mendekatiUnit = 0;
+    let amanUnit = 0;
 
-    // Update KPI Card di Dashboard
-    document.getElementById('reviewCardTotal').innerText = `${totalUnit} Unit`;
-    document.getElementById('reviewCardTercapai').innerText = `${tercapaiUnit} Unit`;
-    document.getElementById('reviewCardMendekati').innerText = `${mendekatiUnit} Unit`;
-    document.getElementById('reviewCardAman').innerText = `${amanUnit} Unit`;
-
-    // Render Tabel
+    // Bersihkan tabel sebelum render
     const tableBody = document.getElementById('reviewTableBody');
-    tableBody.innerHTML = '';
+    if (tableBody) tableBody.innerHTML = '';
 
     data.forEach(item => {
-        const tr = document.createElement('tr');
-        tr.className = 'hover:bg-slate-800/40 border-b border-slate-800';
-        
-        const st = item.statusPaketOnTrack;
+        // Ambil nilai murni dari Kolom K (fleksibel terhadap nama properti Sheet)
+        const rawStatus = item.statusPaketOnTrack || item.StatusPaketOnTrack || item.status || item.STATUS || item.kolomK || item.K || '';
+        const cleanStatus = rawStatus.toString().trim().toUpperCase();
 
+        // Tentukan status aktual & kalkulasi total KPI
         let statusBadge = '';
-        if (st === 'TERCAPAI') {
+        if (cleanStatus.includes('TERCAPAI')) {
+            tercapaiUnit++;
             statusBadge = `<span class="px-2.5 py-1 rounded text-xs font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">TERCAPAI</span>`;
-        } else if (st === 'MENDEKATI POLICY') {
+        } else if (cleanStatus.includes('MENDEKATI')) {
+            mendekatiUnit++;
             statusBadge = `<span class="px-2.5 py-1 rounded text-xs font-bold bg-amber-500/10 text-amber-400 border border-amber-500/20">MENDEKATI POLICY</span>`;
-        } else if (st === 'AMAN') {
+        } else if (cleanStatus.includes('AMAN')) {
+            amanUnit++;
             statusBadge = `<span class="px-2.5 py-1 rounded text-xs font-bold bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">AMAN</span>`;
         } else {
             statusBadge = `<span class="px-2.5 py-1 rounded text-xs font-bold bg-slate-500/10 text-slate-400 border border-slate-500/20">-</span>`;
         }
 
-        const valLifetime = item.lifetimeOntrack || item.LifetimeOntrack || '-';
-        const valMerk = item.merkTerinstall || item.MerkTerinstall || '-';
+        // Render baris tabel jika elemen tabel ditemukan
+        if (tableBody) {
+            const tr = document.createElement('tr');
+            tr.className = 'hover:bg-slate-800/40 border-b border-slate-800';
 
-        tr.innerHTML = `
-            <td class="p-3 font-bold text-white">${item.site || '-'}</td>
-            <td class="p-3 text-slate-300">${item.type || '-'}</td>
-            <td class="p-3 text-slate-300">${item.modelUnit || '-'}</td>
-            <td class="p-3 font-semibold text-white">${item.noUnit || '-'}</td>
-            <td class="p-3">${statusBadge}</td>
-            <td class="p-3 text-slate-300 font-semibold">${valLifetime}</td>
-            <td class="p-3 text-slate-300 font-semibold">${valMerk}</td>
-        `;
-        
-        tableBody.appendChild(tr);
+            const valLifetime = item.lifetimeOntrack || item.LifetimeOntrack || item.lifetime || '-';
+            const valMerk = item.merkTerinstall || item.MerkTerinstall || item.merk || '-';
+
+            tr.innerHTML = `
+                <td class="p-3 font-bold text-white">${item.site || '-'}</td>
+                <td class="p-3 text-slate-300">${item.type || '-'}</td>
+                <td class="p-3 text-slate-300">${item.modelUnit || item.model || '-'}</td>
+                <td class="p-3 font-semibold text-white">${item.noUnit || '-'}</td>
+                <td class="p-3">${statusBadge}</td>
+                <td class="p-3 text-slate-300 font-semibold">${valLifetime}</td>
+                <td class="p-3 text-slate-300 font-semibold">${valMerk}</td>
+            `;
+            tableBody.appendChild(tr);
+        }
     });
+
+    // Update KPI Card dengan validasi elemen (mencegah error script berhenti)
+    const cardTotal = document.getElementById('reviewCardTotal');
+    const cardTercapai = document.getElementById('reviewCardTercapai');
+    const cardMendekati = document.getElementById('reviewCardMendekati');
+    const cardAman = document.getElementById('reviewCardAman');
+
+    if (cardTotal) cardTotal.innerText = `${totalUnit} Unit`;
+    if (cardTercapai) cardTercapai.innerText = `${tercapaiUnit} Unit`;
+    if (cardMendekati) cardMendekati.innerText = `${mendekatiUnit} Unit`;
+    if (cardAman) cardAman.innerText = `${amanUnit} Unit`;
 }
         const sites = [...new Set(data.map(d => d.site).filter(Boolean))].sort();
         const tercapaiSeries = [];
