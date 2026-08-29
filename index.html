@@ -814,72 +814,89 @@
         renderPpuDashboard(filteredData);
     }
 
-    // ==================== REVIEW LIFETIME LOGIC ====================
-    function loadReviewLifetimeData() {
-        const statusList = ['TERCAPAI', 'MENDEKATI POLICY', 'AMAN'];
+    // ==================== REVIEW LIFETIME LOGIC (VALID DATA) ====================
+function loadReviewLifetimeData() {
+    globalReviewData = globalPpuData.map((item) => {
+        // Ambil nilai murni dari Kolom K (menangani berbagai kemungkinan nama properti dari Sheet API)
+        const rawStatusFromColumnK = item.statusPaketOnTrack || item.StatusPaketOnTrack || item.status || item.STATUS || item.kolomK || '';
         
-        globalReviewData = globalPpuData.map((item, idx) => {
-            let statusPaket = statusList[idx % 3];
-            if (item.maxWear > 85) statusPaket = 'MENDEKATI POLICY';
-            else if (item.maxWear > 95) statusPaket = 'TERCAPAI';
+        // Normalisasi teks (ubah ke uppercase & hapus spasi berlebih)
+        const cleanStatus = rawStatusFromColumnK.toString().trim().toUpperCase();
 
-            return {
-                ...item,
-                statusPaketOnTrack: statusPaket,
-                lastUpdate: new Date().toLocaleDateString('id-ID')
-            };
-        });
+        let finalStatus = '';
 
-        renderReviewLifetimeDashboard(globalReviewData);
-    }
+        // Validasi presisi sesuai teks di Kolom K
+        if (cleanStatus.includes('TERCAPAI')) {
+            finalStatus = 'TERCAPAI';
+        } else if (cleanStatus.includes('MENDEKATI')) {
+            finalStatus = 'MENDEKATI POLICY';
+        } else if (cleanStatus.includes('AMAN')) {
+            finalStatus = 'AMAN';
+        } else {
+            finalStatus = 'LAINNYA'; // Jika ada data kosong/tidak sesuai format
+        }
 
-    function renderReviewLifetimeDashboard(data) {
-        const totalUnit = data.length;
-        const tercapaiUnit = data.filter(d => d.statusPaketOnTrack === 'TERCAPAI').length;
-        const mendekatiUnit = data.filter(d => d.statusPaketOnTrack === 'MENDEKATI POLICY').length;
-        const amanUnit = data.filter(d => d.statusPaketOnTrack === 'AMAN').length;
+        return {
+            ...item,
+            statusPaketOnTrack: finalStatus,
+            lastUpdate: new Date().toLocaleDateString('id-ID')
+        };
+    });
 
-        document.getElementById('reviewCardTotal').innerText = `${totalUnit} Unit`;
-        document.getElementById('reviewCardTercapai').innerText = `${tercapaiUnit} Unit`;
-        document.getElementById('reviewCardMendekati').innerText = `${mendekatiUnit} Unit`;
-        document.getElementById('reviewCardAman').innerText = `${amanUnit} Unit`;
+    renderReviewLifetimeDashboard(globalReviewData);
+}
 
-        const tableBody = document.getElementById('reviewTableBody');
-        tableBody.innerHTML = '';
-
-        data.forEach(item => {
-    const tr = document.createElement('tr');
-    tr.className = 'hover:bg-slate-800/40 border-b border-slate-800';
+function renderReviewLifetimeDashboard(data) {
+    const totalUnit = data.length;
     
-    // Normalisasi teks status (diubah ke huruf besar dan hapus spasi ekstra)
-    const st = (item.statusPaketOnTrack || '').toString().trim().toUpperCase();
+    // Hitung akurat berdasarkan hasil parsing Kolom K
+    const tercapaiUnit = data.filter(d => d.statusPaketOnTrack === 'TERCAPAI').length;
+    const mendekatiUnit = data.filter(d => d.statusPaketOnTrack === 'MENDEKATI POLICY').length;
+    const amanUnit = data.filter(d => d.statusPaketOnTrack === 'AMAN').length;
 
-    let statusBadge = '';
-    if (st.includes('TERCAPAI')) {
-        statusBadge = `<span class="px-2.5 py-1 rounded text-xs font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">TERCAPAI</span>`;
-    } else if (st.includes('MENDEKATI')) {
-        statusBadge = `<span class="px-2.5 py-1 rounded text-xs font-bold bg-amber-500/10 text-amber-400 border border-amber-500/20">MENDEKATI POLICY</span>`;
-    } else {
-        statusBadge = `<span class="px-2.5 py-1 rounded text-xs font-bold bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">AMAN</span>`;
-    }
+    // Update KPI Card di Dashboard
+    document.getElementById('reviewCardTotal').innerText = `${totalUnit} Unit`;
+    document.getElementById('reviewCardTercapai').innerText = `${tercapaiUnit} Unit`;
+    document.getElementById('reviewCardMendekati').innerText = `${mendekatiUnit} Unit`;
+    document.getElementById('reviewCardAman').innerText = `${amanUnit} Unit`;
 
-    // Ambil data dengan penanganan l/L kapital serta nilai fallback '-'
-    const valLifetime = item.lifetimeOntrack || item.LifetimeOntrack || '-';
-    const valMerk = item.merkTerinstall || item.MerkTerinstall || '-';
+    // Render Tabel
+    const tableBody = document.getElementById('reviewTableBody');
+    tableBody.innerHTML = '';
 
-    tr.innerHTML = `
-        <td class="p-3 font-bold text-white">${item.site || '-'}</td>
-        <td class="p-3 text-slate-300">${item.type || '-'}</td>
-        <td class="p-3 text-slate-300">${item.modelUnit || '-'}</td>
-        <td class="p-3 font-semibold text-white">${item.noUnit || '-'}</td>
-        <td class="p-3">${statusBadge}</td>
-        <td class="p-3 text-slate-300 font-semibold">${valLifetime}</td>
-        <td class="p-3 text-slate-300 font-semibold">${valMerk}</td>
-    `;
-    
-    tableBody.appendChild(tr);
-});
+    data.forEach(item => {
+        const tr = document.createElement('tr');
+        tr.className = 'hover:bg-slate-800/40 border-b border-slate-800';
+        
+        const st = item.statusPaketOnTrack;
 
+        let statusBadge = '';
+        if (st === 'TERCAPAI') {
+            statusBadge = `<span class="px-2.5 py-1 rounded text-xs font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">TERCAPAI</span>`;
+        } else if (st === 'MENDEKATI POLICY') {
+            statusBadge = `<span class="px-2.5 py-1 rounded text-xs font-bold bg-amber-500/10 text-amber-400 border border-amber-500/20">MENDEKATI POLICY</span>`;
+        } else if (st === 'AMAN') {
+            statusBadge = `<span class="px-2.5 py-1 rounded text-xs font-bold bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">AMAN</span>`;
+        } else {
+            statusBadge = `<span class="px-2.5 py-1 rounded text-xs font-bold bg-slate-500/10 text-slate-400 border border-slate-500/20">-</span>`;
+        }
+
+        const valLifetime = item.lifetimeOntrack || item.LifetimeOntrack || '-';
+        const valMerk = item.merkTerinstall || item.MerkTerinstall || '-';
+
+        tr.innerHTML = `
+            <td class="p-3 font-bold text-white">${item.site || '-'}</td>
+            <td class="p-3 text-slate-300">${item.type || '-'}</td>
+            <td class="p-3 text-slate-300">${item.modelUnit || '-'}</td>
+            <td class="p-3 font-semibold text-white">${item.noUnit || '-'}</td>
+            <td class="p-3">${statusBadge}</td>
+            <td class="p-3 text-slate-300 font-semibold">${valLifetime}</td>
+            <td class="p-3 text-slate-300 font-semibold">${valMerk}</td>
+        `;
+        
+        tableBody.appendChild(tr);
+    });
+}
         const sites = [...new Set(data.map(d => d.site).filter(Boolean))].sort();
         const tercapaiSeries = [];
         const mendekatiSeries = [];
