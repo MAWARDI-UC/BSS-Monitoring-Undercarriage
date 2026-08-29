@@ -462,51 +462,21 @@
     <script>
     lucide.createIcons();
 
-    // ==================== GLOBAL STATE ====================
-    const sheetCsvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSMyvNRqkn65gL_4tIjZKJeKRIQG9ODScl-6uIst7HobQXwRsP4J2BdI1NsA81_pHqxrH2t_sF75_Ch/pub?output=csv';
-    let globalPpuData = [];
-    let globalReviewData = [];
+    // ==================== GLOBAL VARIABLES ====================
+window.globalPpuData = [];
+window.globalReviewData = [];
+let achievementChart = null;
+let overChart = null;
+let reviewChart = null;
 
-    let achievementChart, overChart, reviewChart;
+// URL CSV Google Sheets / File CSV Anda
+const sheetCsvUrl = typeof sheetCsvUrl !== 'undefined' ? sheetCsvUrl : '';
 
-    // ==================== TAB SWITCHING ====================
-    function initTabSwitching() {
-        const tabBtns = document.querySelectorAll('.tab-btn');
-        tabBtns.forEach(btn => {
-            btn.addEventListener('click', () => {
-                const tabName = btn.dataset.tab;
-                switchToTab(tabName);
-            });
-        });
-    }
-
-    function switchToTab(tabName) {
-        const allContents = document.querySelectorAll('.dashboard-content');
-        allContents.forEach(content => content.classList.add('hidden'));
-
-        document.getElementById(tabName + '-content').classList.remove('hidden');
-
-        const tabBtns = document.querySelectorAll('.tab-btn');
-        tabBtns.forEach(btn => {
-            if (btn.dataset.tab === tabName) {
-                btn.classList.remove('text-slate-400', 'hover:text-slate-200', 'hover:bg-slate-800');
-                btn.classList.add('bg-amber-500', 'text-slate-950', 'shadow-md', 'shadow-amber-500/20');
-            } else {
-                btn.classList.add('text-slate-400', 'hover:text-slate-200', 'hover:bg-slate-800');
-                btn.classList.remove('bg-amber-500', 'text-slate-950', 'shadow-md', 'shadow-amber-500/20');
-            }
-        });
-
-        setTimeout(() => {
-            if (achievementChart) achievementChart.reflow();
-            if (overChart) overChart.reflow();
-            if (reviewChart) reviewChart.reflow();
-        }, 100);
-    }
-
-    // ==================== PPU CHARTS INIT ====================
-    function initPpuCharts() {
-        achievementChart = new ApexCharts(document.querySelector("#wearChart"), {
+// ==================== PPU CHARTS INIT ====================
+function initPpuCharts() {
+    const wearEl = document.querySelector("#wearChart");
+    if (wearEl) {
+        achievementChart = new ApexCharts(wearEl, {
             series: [{ name: 'Achievement (%)', data: [] }],
             chart: { type: 'bar', height: 280, toolbar: { show: false }, background: 'transparent' },
             plotOptions: { 
@@ -526,8 +496,11 @@
             grid: { borderColor: '#1e293b', strokeDashArray: 3 }
         });
         achievementChart.render();
+    }
 
-        overChart = new ApexCharts(document.querySelector("#categoryChart"), {
+    const categoryEl = document.querySelector("#categoryChart");
+    if (categoryEl) {
+        overChart = new ApexCharts(categoryEl, {
             series: [],
             labels: [],
             chart: { type: 'donut', height: 290, background: 'transparent' },
@@ -576,10 +549,13 @@
         });
         overChart.render();
     }
+}
 
-    // ==================== REVIEW LIFETIME CHART INIT ====================
-    function initReviewChart() {
-        reviewChart = new ApexCharts(document.querySelector("#reviewLifetimeChart"), {
+// ==================== REVIEW LIFETIME CHART INIT ====================
+function initReviewChart() {
+    const reviewEl = document.querySelector("#reviewLifetimeChart");
+    if (reviewEl) {
+        reviewChart = new ApexCharts(reviewEl, {
             series: [
                 { name: 'TERCAPAI', data: [] },
                 { name: 'MENDEKATI POLICY', data: [] },
@@ -628,111 +604,125 @@
         });
         reviewChart.render();
     }
+}
 
-    // ==================== CSV DATA LOADING ====================
-    async function loadPpuData() {
-        try {
-            const response = await fetch(sheetCsvUrl);
-            const dataText = await response.text();
-            const rows = dataText.split('\n').filter(r => r.trim() !== '');
-            
-            globalPpuData = rows.slice(1).map((row) => {
-                const cols = parseCSVLine(row);
-                return {
-                    site: (cols[0] || '').trim(),
-                    type: (cols[1] || '').trim(),
-                    noUnit: (cols[2] || '').trim(),
-                    modelUnit: (cols[3] || '').trim(),
-                    alarmStatus: (cols[11] || '').trim(), // KOLOM L (Indeks 11)
-                    durasiOver: (cols[12] || '-').trim(),  // KOLOM M (Indeks 12)
-                    maxWear: parseFloat(cols[14]) || 0
-                };
-            }).filter(item => item.site !== '');
-
-            populateDropdowns(globalPpuData);
-            renderPpuDashboard(globalPpuData);
-            loadReviewLifetimeData();
-            
-        } catch (error) {
-            console.error('❌ Gagal mengambil data:', error);
+// ==================== CSV DATA LOADING ====================
+async function loadPpuData() {
+    try {
+        if (!sheetCsvUrl) {
+            console.warn('⚠️ URL CSV (sheetCsvUrl) belum ditentukan.');
+            return;
         }
-    }
 
-    function parseCSVLine(line) {
-        const result = [];
-        let current = '';
-        let insideQuotes = false;
+        const response = await fetch(sheetCsvUrl);
+        const dataText = await response.text();
+        const rows = dataText.split('\n').filter(r => r.trim() !== '');
         
-        for (let i = 0; i < line.length; i++) {
-            const char = line[i];
-            const nextChar = line[i + 1];
-            
-            if (char === '"') {
-                if (insideQuotes && nextChar === '"') {
-                    current += '"';
-                    i++;
-                } else {
-                    insideQuotes = !insideQuotes;
-                }
-            } else if (char === ',' && !insideQuotes) {
-                result.push(current.trim());
-                current = '';
+        window.globalPpuData = rows.slice(1).map((row) => {
+            const cols = parseCSVLine(row);
+            return {
+                site: (cols[0] || '').trim(),
+                type: (cols[1] || '').trim(),
+                noUnit: (cols[2] || '').trim(),
+                modelUnit: (cols[3] || '').trim(),
+                lifetimeOntrack: (cols[9] || '-').trim(),    // Kolom J (Indeks 9)
+                statusPaketOnTrack: (cols[10] || '').trim(),// Kolom K (Indeks 10)
+                alarmStatus: (cols[11] || '').trim(),       // Kolom L (Indeks 11)
+                durasiOver: (cols[12] || '-').trim(),        // Kolom M (Indeks 12)
+                merkTerinstall: (cols[13] || '-').trim(),   // Kolom N (Indeks 13)
+                maxWear: parseFloat(cols[14]) || 0           // Kolom O (Indeks 14)
+            };
+        }).filter(item => item.site !== '');
+
+        populateDropdowns(window.globalPpuData);
+        renderPpuDashboard(window.globalPpuData);
+        loadReviewLifetimeData();
+        
+    } catch (error) {
+        console.error('❌ Gagal mengambil data:', error);
+    }
+}
+
+function parseCSVLine(line) {
+    const result = [];
+    let current = '';
+    let insideQuotes = false;
+    
+    for (let i = 0; i < line.length; i++) {
+        const char = line[i];
+        const nextChar = line[i + 1];
+        
+        if (char === '"') {
+            if (insideQuotes && nextChar === '"') {
+                current += '"';
+                i++;
             } else {
-                current += char;
+                insideQuotes = !insideQuotes;
             }
+        } else if (char === ',' && !insideQuotes) {
+            result.push(current.trim());
+            current = '';
+        } else {
+            current += char;
         }
-        
-        result.push(current.trim());
-        return result;
     }
+    
+    result.push(current.trim());
+    return result;
+}
 
-    function populateDropdowns(data) {
-        const sites = [...new Set(data.map(d => d.site).filter(Boolean))].sort();
-        const types = [...new Set(data.map(d => d.type).filter(Boolean))].sort();
-        const models = [...new Set(data.map(d => d.modelUnit).filter(Boolean))].sort();
+function populateDropdowns(data) {
+    const sites = [...new Set(data.map(d => d.site).filter(Boolean))].sort();
+    const types = [...new Set(data.map(d => d.type).filter(Boolean))].sort();
+    const models = [...new Set(data.map(d => d.modelUnit).filter(Boolean))].sort();
 
-        fillSelectOptions('siteFilter', sites, 'Semua Site');
-        fillSelectOptions('typeFilter', types, 'Semua TYPE');
-        fillSelectOptions('modelFilter', models, 'Semua Model');
+    fillSelectOptions('siteFilter', sites, 'Semua Site');
+    fillSelectOptions('typeFilter', types, 'Semua TYPE');
+    fillSelectOptions('modelFilter', models, 'Semua Model');
 
-        fillSelectOptions('reviewSiteFilter', sites, 'Semua Site');
-        fillSelectOptions('reviewTypeFilter', types, 'Semua TYPE');
-        fillSelectOptions('reviewModelFilter', models, 'Semua Model');
-    }
+    fillSelectOptions('reviewSiteFilter', sites, 'Semua Site');
+    fillSelectOptions('reviewTypeFilter', types, 'Semua TYPE');
+    fillSelectOptions('reviewModelFilter', models, 'Semua Model');
+}
 
-    function fillSelectOptions(elementId, items, defaultText) {
-        const select = document.getElementById(elementId);
-        if (!select) return;
-        select.innerHTML = `<option value="ALL">${defaultText}</option>`;
-        items.forEach(item => {
-            select.innerHTML += `<option value="${item}">${item}</option>`;
-        });
-    }
+function fillSelectOptions(elementId, items, defaultText) {
+    const select = document.getElementById(elementId);
+    if (!select) return;
+    select.innerHTML = `<option value="ALL">${defaultText}</option>`;
+    items.forEach(item => {
+        select.innerHTML += `<option value="${item}">${item}</option>`;
+    });
+}
 
-    // ==================== DASHBOARD RENDER LOGIC ====================
-    function renderPpuDashboard(data) {
-        // Pembersihan string status dari Kolom L
-        const getCleanStatus = (item) => (item.alarmStatus || '').toString().trim().toUpperCase();
-        
-        const isStatusOver = (st) => st === 'OVER' || st.includes('OVER');
-        const isStatusMendekati = (st) => st.includes('MENDEKATI');
+// ==================== DASHBOARD RENDER LOGIC ====================
+function renderPpuDashboard(data) {
+    const getCleanStatus = (item) => (item.alarmStatus || '').toString().trim().toUpperCase();
+    
+    const isStatusOver = (st) => st === 'OVER' || st.includes('OVER');
+    const isStatusMendekati = (st) => st.includes('MENDEKATI');
 
-        const totalUnit = data.length;
-        const overUnit = data.filter(d => isStatusOver(getCleanStatus(d))).length;
-        const mendekatiUnit = data.filter(d => isStatusMendekati(getCleanStatus(d))).length;
+    const totalUnit = data.length;
+    const overUnit = data.filter(d => isStatusOver(getCleanStatus(d))).length;
+    const mendekatiUnit = data.filter(d => isStatusMendekati(getCleanStatus(d))).length;
 
-        const totalAman = totalUnit - overUnit;
-        const achievementPct = totalUnit > 0 ? ((totalAman / totalUnit) * 100).toFixed(1) : 0;
+    // Unit Aman = Total dikurangi yang bermasalah (Over & Mendekati)
+    const totalAman = totalUnit - (overUnit + mendekatiUnit);
+    const achievementPct = totalUnit > 0 ? ((totalAman / totalUnit) * 100).toFixed(1) : 0;
 
-        document.getElementById('cardTotalUnit').innerText = `${totalUnit} Unit`;
-        document.getElementById('cardOverUnit').innerText = `${overUnit} Unit`;
-        document.getElementById('cardMendekatiUnit').innerText = `${mendekatiUnit} Unit`;
-        document.getElementById('cardAchievementPercent').innerText = `${achievementPct}%`;
+    const elTotal = document.getElementById('cardTotalUnit');
+    const elOver = document.getElementById('cardOverUnit');
+    const elMendekati = document.getElementById('cardMendekatiUnit');
+    const elAch = document.getElementById('cardAchievementPercent');
 
-        // Render Tabel (Hanya menampilkan status OVER dan MENDEKATI PLAN PPU)
-        const tableBody = document.getElementById('ppuTableBody');
+    if (elTotal) elTotal.innerText = `${totalUnit} Unit`;
+    if (elOver) elOver.innerText = `${overUnit} Unit`;
+    if (elMendekati) elMendekati.innerText = `${mendekatiUnit} Unit`;
+    if (elAch) elAch.innerText = `${achievementPct}%`;
+
+    // Render Tabel Dashboard Utama
+    const tableBody = document.getElementById('ppuTableBody');
+    if (tableBody) {
         tableBody.innerHTML = '';
-
         const tableFilteredData = data.filter(item => {
             const st = getCleanStatus(item);
             return isStatusOver(st) || isStatusMendekati(st);
@@ -761,70 +751,73 @@
             `;
             tableBody.appendChild(tr);
         });
+    }
 
-        // Update Charts
-        const sites = [...new Set(data.map(d => d.site).filter(Boolean))].sort();
-        const siteAchievementData = [];
-        const siteOverSeries = [];
-        const siteOverLabels = [];
+    // Update Charts
+    const sites = [...new Set(data.map(d => d.site).filter(Boolean))].sort();
+    const siteAchievementData = [];
+    const siteOverSeries = [];
+    const siteOverLabels = [];
 
-        sites.forEach(siteName => {
-            const siteUnits = data.filter(d => d.site === siteName);
-            const totalSiteUnits = siteUnits.length;
-            const overSiteUnits = siteUnits.filter(d => isStatusOver(getCleanStatus(d))).length;
-            const amanSiteUnits = totalSiteUnits - overSiteUnits;
-            
-            const siteAch = totalSiteUnits > 0 ? parseFloat(((amanSiteUnits / totalSiteUnits) * 100).toFixed(1)) : 0;
-            siteAchievementData.push(siteAch);
+    sites.forEach(siteName => {
+        const siteUnits = data.filter(d => d.site === siteName);
+        const totalSiteUnits = siteUnits.length;
+        const overSiteUnits = siteUnits.filter(d => isStatusOver(getCleanStatus(d))).length;
+        const mendekatiSiteUnits = siteUnits.filter(d => isStatusMendekati(getCleanStatus(d))).length;
+        const amanSiteUnits = totalSiteUnits - (overSiteUnits + mendekatiSiteUnits);
+        
+        const siteAch = totalSiteUnits > 0 ? parseFloat(((amanSiteUnits / totalSiteUnits) * 100).toFixed(1)) : 0;
+        siteAchievementData.push(siteAch);
 
-            if (overSiteUnits > 0) {
-                siteOverSeries.push(overSiteUnits);
-                siteOverLabels.push(siteName);
-            }
-        });
-
-        if (achievementChart && overChart) {
-            achievementChart.updateOptions({
-                xaxis: { categories: sites },
-                series: [{ name: 'Achievement (%)', data: siteAchievementData }]
-            });
-
-            overChart.updateOptions({
-                labels: siteOverLabels,
-                series: siteOverSeries
-            });
+        if (overSiteUnits > 0) {
+            siteOverSeries.push(overSiteUnits);
+            siteOverLabels.push(siteName);
         }
-    }
+    });
 
-    function applyPpuFilters() {
-        const siteVal = document.getElementById('siteFilter').value;
-        const typeVal = document.getElementById('typeFilter').value;
-        const modelVal = document.getElementById('modelFilter').value;
-        const alarmVal = document.getElementById('alarmFilter').value;
-
-        const filteredData = globalPpuData.filter(item => {
-            const matchSite = (siteVal === 'ALL' || item.site === siteVal);
-            const matchType = (typeVal === 'ALL' || item.type === typeVal);
-            const matchModel = (modelVal === 'ALL' || item.modelUnit === modelVal);
-            const matchAlarm = (alarmVal === 'ALL' || (item.alarmStatus || '').toUpperCase().includes(alarmVal.toUpperCase()));
-            
-            return matchSite && matchType && matchModel && matchAlarm;
+    if (achievementChart) {
+        achievementChart.updateOptions({
+            xaxis: { categories: sites },
+            series: [{ name: 'Achievement (%)', data: siteAchievementData }]
         });
-
-        renderPpuDashboard(filteredData);
     }
 
-    // ==================== REVIEW LIFETIME LOGIC (FIXED & FULL) ====================
+    if (overChart) {
+        overChart.updateOptions({
+            labels: siteOverLabels,
+            series: siteOverSeries
+        });
+    }
+}
+
+function applyPpuFilters() {
+    if (!window.globalPpuData) return;
+
+    const siteVal = document.getElementById('siteFilter')?.value || 'ALL';
+    const typeVal = document.getElementById('typeFilter')?.value || 'ALL';
+    const modelVal = document.getElementById('modelFilter')?.value || 'ALL';
+    const alarmVal = document.getElementById('alarmFilter')?.value || 'ALL';
+
+    const filteredData = window.globalPpuData.filter(item => {
+        const matchSite = (siteVal === 'ALL' || item.site === siteVal);
+        const matchType = (typeVal === 'ALL' || item.type === typeVal);
+        const matchModel = (modelVal === 'ALL' || item.modelUnit === modelVal);
+        const matchAlarm = (alarmVal === 'ALL' || (item.alarmStatus || '').toUpperCase().includes(alarmVal.toUpperCase()));
+        
+        return matchSite && matchType && matchModel && matchAlarm;
+    });
+
+    renderPpuDashboard(filteredData);
+}
+
+// ==================== REVIEW LIFETIME LOGIC ====================
 function loadReviewLifetimeData() {
-    // 1. Cek ketersediaan data utama agar script tidak crash jika data belum siap
     if (!window.globalPpuData || !Array.isArray(window.globalPpuData) || window.globalPpuData.length === 0) {
         return;
     }
 
-    // 2. Petakan data tanpa mengubah array utama (globalPpuData)
-    globalReviewData = window.globalPpuData.map((item) => {
-        // Ambil data murni dari Kolom K spreadsheet (fleksibel nama properti)
-        const rawStatus = item.statusPaketOnTrack || item.StatusPaketOnTrack || item.status || item.STATUS || item.kolomK || item.K || '';
+    window.globalReviewData = window.globalPpuData.map((item) => {
+        const rawStatus = item.statusPaketOnTrack || '';
         const cleanStatus = rawStatus.toString().trim().toUpperCase();
 
         let finalStatus = 'AMAN';
@@ -843,7 +836,7 @@ function loadReviewLifetimeData() {
         };
     });
 
-    renderReviewLifetimeDashboard(globalReviewData);
+    renderReviewLifetimeDashboard(window.globalReviewData);
 }
 
 function renderReviewLifetimeDashboard(data) {
@@ -854,7 +847,7 @@ function renderReviewLifetimeDashboard(data) {
     const mendekatiUnit = data.filter(d => d.statusPaketOnTrack === 'MENDEKATI POLICY').length;
     const amanUnit = data.filter(d => d.statusPaketOnTrack === 'AMAN').length;
 
-    // 1. Render Tabel
+    // Render Tabel Review Lifetime
     const tableBody = document.getElementById('reviewTableBody');
     if (tableBody) {
         tableBody.innerHTML = '';
@@ -872,23 +865,20 @@ function renderReviewLifetimeDashboard(data) {
                 statusBadge = `<span class="px-2.5 py-1 rounded text-xs font-bold bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">AMAN</span>`;
             }
 
-            const valLifetime = item.lifetimeOntrack || item.LifetimeOntrack || item.lifetime || '-';
-            const valMerk = item.merkTerinstall || item.MerkTerinstall || item.merk || '-';
-
             tr.innerHTML = `
                 <td class="p-3 font-bold text-white">${item.site || '-'}</td>
                 <td class="p-3 text-slate-300">${item.type || '-'}</td>
-                <td class="p-3 text-slate-300">${item.modelUnit || item.model || '-'}</td>
+                <td class="p-3 text-slate-300">${item.modelUnit || '-'}</td>
                 <td class="p-3 font-semibold text-white">${item.noUnit || '-'}</td>
                 <td class="p-3">${statusBadge}</td>
-                <td class="p-3 text-slate-300 font-semibold">${valLifetime}</td>
-                <td class="p-3 text-slate-300 font-semibold">${valMerk}</td>
+                <td class="p-3 text-slate-300 font-semibold">${item.lifetimeOntrack || '-'}</td>
+                <td class="p-3 text-slate-300 font-semibold">${item.merkTerinstall || '-'}</td>
             `;
             tableBody.appendChild(tr);
         });
     }
 
-    // 2. Update Kartu KPI
+    // Update KPI Review Lifetime
     const cardTotal = document.getElementById('reviewCardTotal');
     const cardTercapai = document.getElementById('reviewCardTercapai');
     const cardMendekati = document.getElementById('reviewCardMendekati');
@@ -899,7 +889,7 @@ function renderReviewLifetimeDashboard(data) {
     if (cardMendekati) cardMendekati.innerText = `${mendekatiUnit} Unit`;
     if (cardAman) cardAman.innerText = `${amanUnit} Unit`;
 
-    // 3. Update Chart Review Lifetime
+    // Update Chart Review
     const sites = [...new Set(data.map(d => d.site).filter(Boolean))].sort();
     const tercapaiSeries = [];
     const mendekatiSeries = [];
@@ -912,7 +902,7 @@ function renderReviewLifetimeDashboard(data) {
         amanSeries.push(siteUnits.filter(d => d.statusPaketOnTrack === 'AMAN').length);
     });
 
-    if (typeof reviewChart !== 'undefined' && reviewChart) {
+    if (reviewChart) {
         reviewChart.updateOptions({
             xaxis: { categories: sites },
             series: [
@@ -927,15 +917,15 @@ function renderReviewLifetimeDashboard(data) {
 function applyReviewFilters() {
     if (!window.globalReviewData) return;
     
-    const siteVal = document.getElementById('reviewSiteFilter').value;
-    const typeVal = document.getElementById('reviewTypeFilter').value;
-    const modelVal = document.getElementById('reviewModelFilter').value;
-    const statusVal = document.getElementById('reviewStatusFilter').value;
+    const siteVal = document.getElementById('reviewSiteFilter')?.value || 'ALL';
+    const typeVal = document.getElementById('reviewTypeFilter')?.value || 'ALL';
+    const modelVal = document.getElementById('reviewModelFilter')?.value || 'ALL';
+    const statusVal = document.getElementById('reviewStatusFilter')?.value || 'ALL';
 
-    const filteredData = globalReviewData.filter(item => {
+    const filteredData = window.globalReviewData.filter(item => {
         const matchSite = (siteVal === 'ALL' || item.site === siteVal);
         const matchType = (typeVal === 'ALL' || item.type === typeVal);
-        const matchModel = (modelVal === 'ALL' || (item.modelUnit || item.model) === modelVal);
+        const matchModel = (modelVal === 'ALL' || item.modelUnit === modelVal);
         const matchStatus = (statusVal === 'ALL' || item.statusPaketOnTrack === statusVal);
         
         return matchSite && matchType && matchModel && matchStatus;
@@ -944,21 +934,21 @@ function applyReviewFilters() {
     renderReviewLifetimeDashboard(filteredData);
 }
 
-// ==================== EVENT LISTENERS ====================
+// ==================== EVENT LISTENERS & INITIALIZATION ====================
 function initEventListeners() {
     ['siteFilter', 'typeFilter', 'modelFilter', 'alarmFilter'].forEach(id => {
         const el = document.getElementById(id);
-        if (el) el.addEventListener('change', typeof applyPpuFilters === 'function' ? applyPpuFilters : () => {});
+        if (el) el.addEventListener('change', applyPpuFilters);
     });
 
     const resetBtnPpu = document.getElementById('resetFilterBtn');
     if (resetBtnPpu) {
         resetBtnPpu.addEventListener('click', () => {
-            if (document.getElementById('siteFilter')) document.getElementById('siteFilter').value = 'ALL';
-            if (document.getElementById('typeFilter')) document.getElementById('typeFilter').value = 'ALL';
-            if (document.getElementById('modelFilter')) document.getElementById('modelFilter').value = 'ALL';
-            if (document.getElementById('alarmFilter')) document.getElementById('alarmFilter').value = 'ALL';
-            if (typeof renderPpuDashboard === 'function' && window.globalPpuData) renderPpuDashboard(globalPpuData);
+            ['siteFilter', 'typeFilter', 'modelFilter', 'alarmFilter'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.value = 'ALL';
+            });
+            if (window.globalPpuData) renderPpuDashboard(window.globalPpuData);
         });
     }
 
@@ -970,26 +960,21 @@ function initEventListeners() {
     const resetBtnReview = document.getElementById('resetFilterBtnReview');
     if (resetBtnReview) {
         resetBtnReview.addEventListener('click', () => {
-            if (document.getElementById('reviewSiteFilter')) document.getElementById('reviewSiteFilter').value = 'ALL';
-            if (document.getElementById('reviewTypeFilter')) document.getElementById('reviewTypeFilter').value = 'ALL';
-            if (document.getElementById('reviewModelFilter')) document.getElementById('reviewModelFilter').value = 'ALL';
-            if (document.getElementById('reviewStatusFilter')) document.getElementById('reviewStatusFilter').value = 'ALL';
-            if (window.globalReviewData) renderReviewLifetimeDashboard(globalReviewData);
+            ['reviewSiteFilter', 'reviewTypeFilter', 'reviewModelFilter', 'reviewStatusFilter'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.value = 'ALL';
+            });
+            if (window.globalReviewData) renderReviewLifetimeDashboard(window.globalReviewData);
         });
     }
 }
 
-// ==================== INITIALIZATION ====================
 async function init() {
-    if (typeof initPpuCharts === 'function') initPpuCharts();
-    if (typeof initReviewChart === 'function') initReviewChart();
-    if (typeof initTabSwitching === 'function') initTabSwitching();
-    
+    initPpuCharts();
+    initReviewChart();
     initEventListeners();
-    
-    if (typeof loadPpuData === 'function') {
-        await loadPpuData();
-    }
+    await loadPpuData();
 }
 
-init();
+// Jalankan inisialisasi saat DOM siap
+document.addEventListener('DOMContentLoaded', init);
