@@ -819,6 +819,10 @@ async function loadPpuData() {
 function loadReviewLifetimeData() {
     // Memakai langsung data dari Kolom K yang sudah dimuat di globalPpuData
     globalReviewData = globalPpuData.map((item) => {
+            let statusPaket = statusList[idx % 3];
+            let (item.jumlah) statusPaket = 'MENDEKATI POLICY';
+            let (item.jumlah ) statusPaket = 'TERCAPAI';
+            let (item.jumlah ) statusPaket = 'AMAN';
         return {
             ...item,
             // Jika ada nilai kosong dari spreadsheet, beri default 'AMAN' atau disesuaikan
