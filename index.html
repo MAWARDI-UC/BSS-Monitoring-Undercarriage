@@ -122,7 +122,7 @@
                             </tr>
                         </thead>
                         <tbody id="ppuTableBody" class="divide-y divide-slate-800/50">
-                            <!-- Data inject via JS -->
+                            <!-- Inject JS -->
                         </tbody>
                     </table>
                 </div>
@@ -156,7 +156,7 @@
                         </select>
                     </div>
                     <div>
-                        <label class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Status Paket</label>
+                        <label class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Status Paket On Track</label>
                         <select id="reviewStatusFilter" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-blue-500 transition">
                             <option value="ALL">Semua Status</option>
                             <option value="TERCAPAI">TERCAPAI</option>
@@ -214,7 +214,7 @@
                             </tr>
                         </thead>
                         <tbody id="reviewTableBody" class="divide-y divide-slate-800/50">
-                            <!-- Data inject via JS -->
+                            <!-- Inject JS -->
                         </tbody>
                     </table>
                 </div>
@@ -225,7 +225,7 @@
 
     <!-- JAVASCRIPT LOGIC -->
     <script>
-    // ==================== GLOBAL VARIABLES & CONFIG ====================
+    // ==================== GLOBAL CONFIG ====================
     const sheetCsvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSmL4D1u57849c-Q8U3y722Z8L29eO5lWlM6b8eK59L/pub?output=csv'; 
 
     let globalPpuData = [];
@@ -235,7 +235,7 @@
     let overChart = null;
     let reviewChart = null;
 
-    // ==================== TAB SWITCHING LOGIC ====================
+    // ==================== TAB NAVIGATION ====================
     function initTabSwitching() {
         const btnPpu = document.getElementById('btnTabPpu');
         const btnReview = document.getElementById('btnTabReview');
@@ -257,7 +257,7 @@
         });
     }
 
-    // ==================== PPU CHARTS INIT ====================
+    // ==================== CHART INITIALIZATIONS ====================
     function initPpuCharts() {
         achievementChart = new ApexCharts(document.querySelector("#wearChart"), {
             series: [{ name: 'Achievement (%)', data: [] }],
@@ -274,7 +274,15 @@
             theme: { mode: 'dark' },
             colors: ['#3b82f6', '#10b981', '#f59e0b', '#ec4899', '#8b5cf6', '#06b6d4'],
             legend: { show: false },
-            xaxis: { categories: [], labels: { style: { colors: '#94a3b8', fontSize: '11px', fontWeight: 'bold' } } },
+            xaxis: { 
+                categories: [], 
+                labels: { 
+                    style: { colors: '#94a3b8', fontSize: '11px', fontWeight: 'bold' },
+                    formatter: function(val) {
+                        return typeof val === 'string' ? val : String(val || '');
+                    }
+                } 
+            },
             yaxis: { max: 100, labels: { formatter: (val) => val + '%', style: { colors: '#94a3b8', fontSize: '10px' } } },
             grid: { borderColor: '#1e293b', strokeDashArray: 3 }
         });
@@ -330,7 +338,6 @@
         overChart.render();
     }
 
-    // ==================== REVIEW LIFETIME CHART INIT ====================
     function initReviewChart() {
         reviewChart = new ApexCharts(document.querySelector("#reviewLifetimeChart"), {
             series: [
@@ -362,7 +369,12 @@
             stroke: { show: true, width: 2, colors: ['transparent'] },
             xaxis: {
                 categories: [],
-                labels: { style: { colors: '#94a3b8', fontSize: '11px', fontWeight: 'bold' } }
+                labels: { 
+                    style: { colors: '#94a3b8', fontSize: '11px', fontWeight: 'bold' },
+                    formatter: function(val) {
+                        return typeof val === 'string' ? val : String(val || '');
+                    }
+                }
             },
             yaxis: {
                 title: { text: 'Jumlah Unit', style: { color: '#94a3b8', fontSize: '11px' } },
@@ -382,26 +394,68 @@
         reviewChart.render();
     }
 
-    // ==================== CSV DATA LOADING ====================
+    // ==================== CSV PARSER (FULL STATE MACHINE) ====================
+    function parseFullCSV(text) {
+        const lines = [];
+        let row = [];
+        let cell = '';
+        let inQuotes = false;
+
+        for (let i = 0; i < text.length; i++) {
+            const c = text[i];
+            const next = text[i+1];
+
+            if (c === '"') {
+                if (inQuotes && next === '"') {
+                    cell += '"';
+                    i++;
+                } else {
+                    inQuotes = !inQuotes;
+                }
+            } else if (c === ',' && !inQuotes) {
+                row.push(cell.trim());
+                cell = '';
+            } else if ((c === '\r' || c === '\n') && !inQuotes) {
+                if (c === '\r' && next === '\n') i++;
+                row.push(cell.trim());
+                if (row.some(r => r !== '')) lines.push(row);
+                row = [];
+                cell = '';
+            } else {
+                cell += c;
+            }
+        }
+        if (cell || row.length) {
+            row.push(cell.trim());
+            lines.push(row);
+        }
+        return lines;
+    }
+
+    // ==================== DATA LOADING ====================
     async function loadPpuData() {
         try {
             const response = await fetch(sheetCsvUrl);
             const dataText = await response.text();
-            const rows = dataText.split('\n').filter(r => r.trim() !== '');
             
-            globalPpuData = rows.slice(1).map((row) => {
-                const cols = parseCSVLine(row);
+            const rows = parseFullCSV(dataText);
+            if (rows.length <= 1) return;
+
+            globalPpuData = rows.slice(1).map((cols) => {
                 return {
-                    site: (cols[0] || '').trim(),
-                    type: (cols[1] || '').trim(),
-                    noUnit: (cols[2] || '').trim(),
-                    modelUnit: (cols[3] || '').trim(),
-                    rawStatusK: (cols[10] || '').trim(), // PERBAIKAN: Pembacaan langsung Kolom K (Indeks 10)
-                    alarmStatus: (cols[11] || '').trim(), // KOLOM L (Indeks 11)
-                    durasiOver: (cols[12] || '-').trim(),  // KOLOM M (Indeks 12)
+                    site: (cols[0] || '').trim(),               // KOLOM A
+                    type: (cols[1] || '').trim(),               // KOLOM B
+                    noUnit: (cols[2] || '').trim(),             // KOLOM C
+                    modelUnit: (cols[3] || '').trim(),          // KOLOM D
+                    rawStatusK: (cols[10] || '').trim(),        // KOLOM K (Indeks 10)
+                    alarmStatus: (cols[11] || '').trim(),       // KOLOM L
+                    durasiOver: (cols[12] || '-').trim(),       // KOLOM M
                     maxWear: parseFloat(cols[14]) || 0
                 };
-            }).filter(item => item.site !== '');
+            }).filter(item => {
+                // Filter hanya baris data murni (mengeliminasi header kosong)
+                return item.site !== '' && item.site.length < 15 && item.site.toUpperCase() !== 'SITE';
+            });
 
             populateDropdowns(globalPpuData);
             renderPpuDashboard(globalPpuData);
@@ -410,34 +464,6 @@
         } catch (error) {
             console.error('❌ Gagal mengambil data:', error);
         }
-    }
-
-    function parseCSVLine(line) {
-        const result = [];
-        let current = '';
-        let insideQuotes = false;
-        
-        for (let i = 0; i < line.length; i++) {
-            const char = line[i];
-            const nextChar = line[i + 1];
-            
-            if (char === '"') {
-                if (insideQuotes && nextChar === '"') {
-                    current += '"';
-                    i++;
-                } else {
-                    insideQuotes = !insideQuotes;
-                }
-            } else if (char === ',' && !insideQuotes) {
-                result.push(current.trim());
-                current = '';
-            } else {
-                current += char;
-            }
-        }
-        
-        result.push(current.trim());
-        return result;
     }
 
     function populateDropdowns(data) {
@@ -463,7 +489,7 @@
         });
     }
 
-    // ==================== DASHBOARD RENDER LOGIC ====================
+    // ==================== PPU RENDER ====================
     function renderPpuDashboard(data) {
         const getCleanStatus = (item) => (item.alarmStatus || '').toString().trim().toUpperCase();
         
@@ -482,7 +508,7 @@
         document.getElementById('cardMendekatiUnit').innerText = `${mendekatiUnit} Unit`;
         document.getElementById('cardAchievementPercent').innerText = `${achievementPct}%`;
 
-        // Render Tabel PPU
+        // Render Tabel
         const tableBody = document.getElementById('ppuTableBody');
         tableBody.innerHTML = '';
 
@@ -515,7 +541,7 @@
             tableBody.appendChild(tr);
         });
 
-        // Update Charts PPU
+        // Charts Update
         const sites = [...new Set(data.map(d => d.site).filter(Boolean))].sort();
         const siteAchievementData = [];
         const siteOverSeries = [];
@@ -567,10 +593,9 @@
         renderPpuDashboard(filteredData);
     }
 
-    // ==================== REVIEW LIFETIME LOGIC ====================
+    // ==================== REVIEW LIFETIME RENDER ====================
     function loadReviewLifetimeData() {
         globalReviewData = globalPpuData.map((item) => {
-            // PERBAIKAN: Normalisasi string Kolom K secara teliti
             const statusUpper = (item.rawStatusK || '').toUpperCase().trim();
             let statusNormalized = 'AMAN';
 
