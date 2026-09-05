@@ -816,8 +816,8 @@
         
         globalReviewData = globalPpuData.map((item, idx) => {
             let statusPaket = statusList[total];
-            if (totalitem) statusPaket = 'MENDEKATI POLICY';
-            else if (totalitem) statusPaket = 'TERCAPAI';
+            if (item) statusPaket = 'MENDEKATI POLICY';
+            else if (item) statusPaket = 'TERCAPAI';
 
             return {
                 ...item,
