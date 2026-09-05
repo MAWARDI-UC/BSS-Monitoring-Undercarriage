@@ -25,7 +25,6 @@
     <header class="bg-slate-900 border-b border-slate-800 sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16">
-                <!-- Brand / Logo -->
                 <div class="flex items-center space-x-3">
                     <div class="w-10 h-10 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-500 font-bold">
                         <i data-lucide="shield-alert" class="w-6 h-6 text-amber-500"></i>
@@ -36,7 +35,6 @@
                     </div>
                 </div>
 
-                <!-- Right Side Profile -->
                 <div class="flex items-center space-x-4">
                     <div class="flex items-center space-x-3 bg-slate-800/80 px-3 py-1.5 rounded-lg border border-slate-700">
                         <div class="w-8 h-8 rounded-full bg-amber-500/20 border border-amber-400 flex items-center justify-center text-amber-400 font-bold text-sm">
@@ -355,10 +353,10 @@
     <script>
     lucide.createIcons();
 
-    // ==================== SEPARATE URL SOURCES ====================
+    // ==================== URL SOURCES ====================
     const sheetPpuUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSMyvNRqkn65gL_4tIjZKJeKRIQG9ODScl-6uIst7HobQXwRsP4J2BdI1NsA81_pHqxrH2t_sF75_Ch/pub?output=csv';
     
-    // URL CSV Google Sheets khusus untuk Review Lifetime ID: 14oA6zqWN-IigPYFxP6CdW-MG1offEn57aErnGClUdTk
+    // Ganti URL di bawah dengan URL CSV dari Publish to Web Spreadsheet Review Lifetime Anda
     const sheetReviewUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vT5N8qY8wKsnzWvX0KxS9-cM9x1V5zJ9-S_vG1K_S9L2g8x8aL8k-9_S9l8g/pub?output=csv';
 
     let globalPpuData = [];
@@ -502,6 +500,12 @@
         try {
             const response = await fetch(sheetPpuUrl);
             const dataText = await response.text();
+            
+            if (dataText.trim().startsWith('<!DOCTYPE') || dataText.includes('google-site-verification')) {
+                console.error('❌ Google Sheets PPU belum dipublikasikan sebagai CSV publik.');
+                return;
+            }
+
             const rows = dataText.split('\n').filter(r => r.trim() !== '');
             
             globalPpuData = rows.slice(1).map((row) => {
@@ -515,7 +519,7 @@
                     durasiOver: (cols[12] || '-').trim(),  
                     maxWear: parseFloat(cols[14]) || 0
                 };
-            }).filter(item => item.site !== '');
+            }).filter(item => item.site !== '' && !item.site.includes('function'));
 
             populatePpuDropdowns(globalPpuData);
             renderPpuDashboard(globalPpuData);
@@ -524,11 +528,18 @@
         }
     }
 
-    // ==================== LOAD DATA REVIEW LIFETIME (INDEPENDENT) ====================
+    // ==================== LOAD DATA REVIEW LIFETIME ====================
     async function loadReviewLifetimeData() {
         try {
             const response = await fetch(sheetReviewUrl);
             const dataText = await response.text();
+
+            // Proteksi jika Sheet belum di-publish sebagai CSV sehingga yang didapat halaman login/script
+            if (dataText.trim().startsWith('<!DOCTYPE') || dataText.includes('google-site-verification') || dataText.includes('function(')) {
+                console.error('❌ Link Review Lifetime mengembalikan HTML/JS. Pastikan Sheet sudah di Publish to Web dalam format CSV.');
+                return;
+            }
+
             const rows = dataText.split('\n').filter(r => r.trim() !== '');
             
             globalReviewData = rows.slice(1).map((row) => {
@@ -542,7 +553,7 @@
                     lifetime: (cols[5] || '-').trim(),
                     merkterinstall: (cols[6] || '-').trim()
                 };
-            }).filter(item => item.site !== '');
+            }).filter(item => item.site !== '' && !item.site.includes('function') && !item.site.includes('{'));
 
             populateReviewDropdowns(globalReviewData);
             renderReviewLifetimeDashboard(globalReviewData);
