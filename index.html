@@ -58,9 +58,9 @@
                     <i data-lucide="clipboard-check" class="w-4 h-4"></i>
                     <span>Review Lifetime</span>
                 </button>
-                <button data-tab="klasifikasi" class="tab-btn px-3 py-1.5 rounded-md text-xs font-medium text-slate-400 hover:text-slate-200 hover:bg-slate-800 flex items-center space-x-1.5 whitespace-nowrap transition">
-                    <i data-lucide="layers" class="w-4 h-4"></i>
-                    <span>Klasifikasi Unit (A/B/C)</span>
+                <button data-tab="alarm-worn" class="tab-btn px-3 py-1.5 rounded-md text-xs font-medium text-slate-400 hover:text-slate-200 hover:bg-slate-800 flex items-center space-x-1.5 whitespace-nowrap transition">
+                    <i data-lucide="alert-circle" class="w-4 h-4"></i>
+                    <span>Alarm Worn Up 80%</span>
                 </button>
                 <button data-tab="plan-replacement" class="tab-btn px-3 py-1.5 rounded-md text-xs font-medium text-slate-400 hover:text-slate-200 hover:bg-slate-800 flex items-center space-x-1.5 whitespace-nowrap transition">
                     <i data-lucide="wrench" class="w-4 h-4"></i>
@@ -334,13 +334,141 @@
             </div>
         </div>
 
-        <!-- ==================== OTHER TABS ==================== -->
-        <div id="klasifikasi-content" class="dashboard-content space-y-6 hidden">
-            <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-8 text-center text-slate-400">
-                <i data-lucide="construction" class="w-12 h-12 mx-auto mb-4 opacity-50"></i>
-                <p>Konten Klasifikasi Unit sedang dalam tahap pengembangan...</p>
+        <!-- ==================== ALARM WORN UP 80% DASHBOARD ==================== -->
+        <div id="alarm-worn-content" class="dashboard-content space-y-6 hidden">
+            <div class="relative overflow-hidden rounded-2xl bg-gradient-to-r from-slate-900 via-slate-800 to-rose-950/40 p-6 border border-slate-800 shadow-xl">
+                <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div>
+                        <div class="flex items-center space-x-2 mb-2">
+                            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold tracking-wide uppercase bg-rose-500 text-white">ALERT</span>
+                            <span class="text-xs text-rose-400 font-medium flex items-center space-x-1">
+                                <span class="w-2 h-2 rounded-full bg-rose-500 animate-pulse"></span>
+                                <span>Monitoring Worn Rate ≥ 80%</span>
+                            </span>
+                        </div>
+                        <h2 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">Alarm Worn Up 80%</h2>
+                        <p class="text-xs text-rose-400 font-semibold tracking-wider uppercase mt-1">MONITORING TINGKAT KEHAUSAN KOMPONEN UNDERCARRIAGE</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filter Bar Alarm Worn -->
+            <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-5 shadow-lg space-y-4">
+                <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                    <div class="flex items-center space-x-2 text-rose-400 font-bold text-sm">
+                        <i data-lucide="filter" class="w-4 h-4"></i>
+                        <span class="text-slate-100">Filter Alarm Worn Up 80%</span>
+                    </div>
+                    <button id="resetFilterBtnAlarm" class="text-xs text-slate-400 hover:text-rose-400 flex items-center space-x-1 transition">
+                        <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
+                        <span>Reset Filter</span>
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+                    <div>
+                        <label class="block text-[11px] font-medium text-slate-400 mb-1">SITE</label>
+                        <select id="alarmSiteFilter" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-rose-500">
+                            <option value="ALL">Semua Site</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-medium text-slate-400 mb-1">MODEL</label>
+                        <select id="alarmModelFilter" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-rose-500">
+                            <option value="ALL">Semua Model</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-medium text-slate-400 mb-1">KOMPONEN</label>
+                        <select id="alarmKomponenFilter" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-rose-500">
+                            <option value="ALL">Semua Komponen</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-medium text-slate-400 mb-1">STATUS LIFETIME</label>
+                        <select id="alarmStatusFilter" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-rose-500">
+                            <option value="ALL">Semua Status</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- KPI Cards Alarm Worn -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="bg-slate-900/90 border border-slate-800 p-5 rounded-2xl flex items-center justify-between shadow-md">
+                    <div>
+                        <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Total Item Worn ≥80%</p>
+                        <h3 id="alarmCardTotal" class="text-2xl font-black text-white mt-1">0 Item</h3>
+                    </div>
+                    <div class="w-12 h-12 rounded-2xl bg-rose-500/10 border border-rose-500/30 flex items-center justify-center text-rose-400">
+                        <i data-lucide="alert-triangle" class="w-6 h-6"></i>
+                    </div>
+                </div>
+                <div class="bg-slate-900/90 border border-slate-800 p-5 rounded-2xl flex items-center justify-between shadow-md">
+                    <div>
+                        <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Critical (Worn ≥100%)</p>
+                        <h3 id="alarmCardCritical" class="text-2xl font-black text-rose-500 mt-1">0 Item</h3>
+                    </div>
+                    <div class="w-12 h-12 rounded-2xl bg-rose-500/20 border border-rose-500/40 flex items-center justify-center text-rose-500">
+                        <i data-lucide="zap" class="w-6 h-6"></i>
+                    </div>
+                </div>
+                <div class="bg-slate-900/90 border border-slate-800 p-5 rounded-2xl flex items-center justify-between shadow-md">
+                    <div>
+                        <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Warning (80% - 99%)</p>
+                        <h3 id="alarmCardWarning" class="text-2xl font-black text-amber-400 mt-1">0 Item</h3>
+                    </div>
+                    <div class="w-12 h-12 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400">
+                        <i data-lucide="alert-circle" class="w-6 h-6"></i>
+                    </div>
+                </div>
+                <div class="bg-slate-900/90 border border-slate-800 p-5 rounded-2xl flex items-center justify-between shadow-md">
+                    <div>
+                        <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Jumlah Unit Impacted</p>
+                        <h3 id="alarmCardUnit" class="text-2xl font-black text-cyan-400 mt-1">0 Unit</h3>
+                    </div>
+                    <div class="w-12 h-12 rounded-2xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400">
+                        <i data-lucide="truck" class="w-6 h-6"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts Alarm Worn -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <div class="lg:col-span-7 bg-slate-900/90 border border-slate-800 p-5 rounded-2xl shadow-lg">
+                    <h3 class="font-bold text-sm text-slate-100 mb-4">Jumlah Komponen Worn ≥80% Per Site</h3>
+                    <div id="alarmSiteChart" class="w-full"></div>
+                </div>
+                <div class="lg:col-span-5 bg-slate-900/90 border border-slate-800 p-5 rounded-2xl shadow-lg">
+                    <h3 class="font-bold text-sm text-slate-100 mb-4">Distribusi Komponen Aus</h3>
+                    <div id="alarmKomponenChart" class="w-full flex items-center justify-center"></div>
+                </div>
+            </div>
+
+            <!-- Table Alarm Worn -->
+            <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-5 shadow-lg space-y-4">
+                <h3 class="font-bold text-sm text-slate-100 border-b border-slate-800 pb-3">Daftar Komponen Alarm Worn Up 80%</h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs text-slate-300">
+                        <thead class="bg-slate-800/80 uppercase text-[10px] text-slate-400 border-b border-slate-700">
+                            <tr>
+                                <th class="p-3">Site</th>
+                                <th class="p-3">Model</th>
+                                <th class="p-3">No Unit</th>
+                                <th class="p-3">Komponen</th>
+                                <th class="p-3">Worn</th>
+                                <th class="p-3">Lifetime</th>
+                                <th class="p-3">Policy</th>
+                                <th class="p-3">Status Lifetime</th>
+                            </tr>
+                        </thead>
+                        <tbody id="alarmTableBody" class="divide-y divide-slate-800"></tbody>
+                    </table>
+                </div>
             </div>
         </div>
+
+        <!-- ==================== PLAN REPLACEMENT DASHBOARD ==================== -->
         <div id="plan-replacement-content" class="dashboard-content space-y-6 hidden">
             <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-8 text-center text-slate-400">
                 <i data-lucide="construction" class="w-12 h-12 mx-auto mb-4 opacity-50"></i>
@@ -356,11 +484,13 @@
     // ==================== URL SOURCES ====================
     const sheetPpuUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSMyvNRqkn65gL_4tIjZKJeKRIQG9ODScl-6uIst7HobQXwRsP4J2BdI1NsA81_pHqxrH2t_sF75_Ch/pub?output=csv';
     const sheetReviewUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTQwT7qtjPmwP3JqE22qhGYBjACLqqb6Af-ZZuVTsaqeY4Qlc51HUBchQoiIU09DFlhPxrUlfiN_mo9/pub?output=csv';
+    const sheetAlarmWornUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTWK0pCKlqI_4M982uj2mA_g_TJ3kq6NtKaGdSQnKiwYSi6kx3J-w2B42VG7ctuvwza6oG8g4GEiat7/pub?output=csv';
 
     let globalPpuData = [];
     let globalReviewData = [];
+    let globalAlarmWornData = [];
 
-    let achievementChart, overChart, reviewChart;
+    let achievementChart, overChart, reviewChart, alarmSiteChart, alarmKomponenChart;
 
     // ==================== TAB SWITCHING ====================
     function initTabSwitching() {
@@ -391,6 +521,8 @@
             if (achievementChart) achievementChart.reflow();
             if (overChart) overChart.reflow();
             if (reviewChart) reviewChart.reflow();
+            if (alarmSiteChart) alarmSiteChart.reflow();
+            if (alarmKomponenChart) alarmKomponenChart.reflow();
         }, 100);
     }
 
@@ -463,6 +595,57 @@
             theme: { mode: 'dark' }
         });
         reviewChart.render();
+    }
+
+    function initAlarmWornCharts() {
+        alarmSiteChart = new ApexCharts(document.querySelector("#alarmSiteChart"), {
+            series: [{ name: 'Jumlah Item', data: [] }],
+            chart: { type: 'bar', height: 280, toolbar: { show: false }, background: 'transparent' },
+            plotOptions: { bar: { borderRadius: 6, columnWidth: '45%', distributed: true, dataLabels: { position: 'top' } } },
+            dataLabels: { enabled: true, offsetY: -20, style: { colors: ['#f8fafc'], fontSize: '11px', fontWeight: 'bold' } },
+            theme: { mode: 'dark' },
+            colors: ['#f43f5e', '#fb923c', '#facc15', '#a855f7', '#38bdf8', '#34d399'],
+            legend: { show: false },
+            xaxis: { categories: [], labels: { style: { colors: '#94a3b8', fontSize: '11px', fontWeight: 'bold' } } },
+            yaxis: { labels: { style: { colors: '#94a3b8', fontSize: '10px' } } },
+            grid: { borderColor: '#1e293b', strokeDashArray: 3 }
+        });
+        alarmSiteChart.render();
+
+        alarmKomponenChart = new ApexCharts(document.querySelector("#alarmKomponenChart"), {
+            series: [],
+            labels: [],
+            chart: { type: 'donut', height: 290, background: 'transparent' },
+            colors: ['#f43f5e', '#fb923c', '#facc15', '#a855f7', '#38bdf8', '#34d399', '#818cf8'],
+            stroke: { colors: ['#0f172a'] },
+            legend: { position: 'bottom', fontSize: '11px', labels: { colors: '#cbd5e1' } },
+            dataLabels: {
+                enabled: true,
+                formatter: (val, opts) => opts.w.config.series[opts.seriesIndex] + " Item",
+                style: { fontSize: '11px', fontWeight: 'bold' },
+                dropShadow: { enabled: false }
+            },
+            plotOptions: {
+                pie: {
+                    donut: {
+                        size: '70%',
+                        labels: {
+                            show: true,
+                            total: {
+                                show: true,
+                                label: 'Total Item Worn',
+                                color: '#94a3b8',
+                                fontSize: '11px',
+                                formatter: (w) => w.globals.seriesTotals.reduce((a, b) => a + b, 0) + ' Item'
+                            },
+                            value: { color: '#f43f5e', fontSize: '18px', fontWeight: '800' }
+                        }
+                    }
+                }
+            },
+            theme: { mode: 'dark' }
+        });
+        alarmKomponenChart.render();
     }
 
     // ==================== PARSER CSV PRESET ====================
@@ -543,13 +726,13 @@
             globalReviewData = lines.slice(1).map((row) => {
                 const cols = parseCSVLine(row);
                 return {
-                    site: (cols[0] || '').trim(),               // Kolom A: SITE
-                    type: (cols[1] || '').trim(),               // Kolom B: TYPE
-                    modelUnit: (cols[2] || '').trim(),          // Kolom C: MODEL UNIT
-                    noUnit: (cols[3] || '').trim(),             // Kolom D: NO UNIT
-                    lifetime: (cols[9] || '-').trim(),          // Kolom J: LIFETIME
-                    statusPaketOnTrack: (cols[10] || '-').trim().toUpperCase(), // Kolom K: STATUS PAKET ON TRACK
-                    merkterinstall: (cols[11] || '-').trim()   // Kolom L: MERK TERINSTALL
+                    site: (cols[0] || '').trim(),
+                    type: (cols[1] || '').trim(),
+                    modelUnit: (cols[2] || '').trim(),
+                    noUnit: (cols[3] || '').trim(),
+                    lifetime: (cols[9] || '-').trim(),
+                    statusPaketOnTrack: (cols[10] || '-').trim().toUpperCase(),
+                    merkterinstall: (cols[11] || '-').trim()
                 };
             }).filter(item => item.site !== '' && !item.site.toLowerCase().includes('function'));
 
@@ -558,6 +741,42 @@
 
         } catch (error) {
             console.error('❌ Gagal mengambil data Review Lifetime:', error);
+        }
+    }
+
+    // ==================== LOAD DATA ALARM WORN UP 80% ====================
+    async function loadAlarmWornData() {
+        try {
+            const response = await fetch(sheetAlarmWornUrl);
+            const dataText = await response.text();
+
+            if (dataText.trim().startsWith('<!DOCTYPE') || dataText.includes('google-site-verification')) {
+                console.error('❌ Google Sheets Alarm Worn belum dipublikasikan sebagai CSV publik.');
+                return;
+            }
+
+            const lines = dataText.split(/\r?\n/).filter(r => r.trim() !== '');
+            if (lines.length < 2) return;
+
+            globalAlarmWornData = lines.slice(1).map((row) => {
+                const cols = parseCSVLine(row);
+                return {
+                    site: (cols[0] || '').trim(),           // Kolom A: SITE
+                    model: (cols[1] || '').trim(),          // Kolom B: MODEL
+                    noUnit: (cols[2] || '').trim(),         // Kolom C: NO UNIT
+                    komponen: (cols[3] || '').trim(),       // Kolom D: KOMPONEN
+                    worn: (cols[4] || '-').trim(),          // Kolom E: WORN
+                    lifetime: (cols[5] || '-').trim(),      // Kolom F: LIFETIME
+                    policy: (cols[6] || '-').trim(),        // Kolom G: POLICY
+                    statusLifetime: (cols[7] || '-').trim() // Kolom H: STATUS LIFETIME
+                };
+            }).filter(item => item.site !== '' && !item.site.toLowerCase().includes('function'));
+
+            populateAlarmWornDropdowns(globalAlarmWornData);
+            renderAlarmWornDashboard(globalAlarmWornData);
+
+        } catch (error) {
+            console.error('❌ Gagal mengambil data Alarm Worn Up 80%:', error);
         }
     }
 
@@ -573,6 +792,13 @@
         fillSelectOptions('reviewTypeFilter', [...new Set(data.map(d => d.type).filter(Boolean))].sort(), 'Semua TYPE');
         fillSelectOptions('reviewModelFilter', [...new Set(data.map(d => d.modelUnit).filter(Boolean))].sort(), 'Semua Model');
         fillSelectOptions('reviewStatusFilter', [...new Set(data.map(d => d.statusPaketOnTrack).filter(Boolean))].sort(), 'Semua Status');
+    }
+
+    function populateAlarmWornDropdowns(data) {
+        fillSelectOptions('alarmSiteFilter', [...new Set(data.map(d => d.site).filter(Boolean))].sort(), 'Semua Site');
+        fillSelectOptions('alarmModelFilter', [...new Set(data.map(d => d.model).filter(Boolean))].sort(), 'Semua Model');
+        fillSelectOptions('alarmKomponenFilter', [...new Set(data.map(d => d.komponen).filter(Boolean))].sort(), 'Semua Komponen');
+        fillSelectOptions('alarmStatusFilter', [...new Set(data.map(d => d.statusLifetime).filter(Boolean))].sort(), 'Semua Status');
     }
 
     function fillSelectOptions(elementId, items, defaultText) {
@@ -715,6 +941,90 @@
         }
     }
 
+    // ==================== RENDER ALARM WORN UP 80% DASHBOARD ====================
+    function renderAlarmWornDashboard(data) {
+        const parseWornVal = (valStr) => {
+            if (!valStr) return 0;
+            const clean = valStr.toString().replace('%', '').replace(',', '.').trim();
+            return parseFloat(clean) || 0;
+        };
+
+        const totalItem = data.length;
+        const criticalItem = data.filter(d => parseWornVal(d.worn) >= 100).length;
+        const warningItem = data.filter(d => {
+            const w = parseWornVal(d.worn);
+            return w >= 80 && w < 100;
+        }).length;
+        const impactedUnits = new Set(data.map(d => d.noUnit).filter(Boolean)).size;
+
+        document.getElementById('alarmCardTotal').innerText = `${totalItem} Item`;
+        document.getElementById('alarmCardCritical').innerText = `${criticalItem} Item`;
+        document.getElementById('alarmCardWarning').innerText = `${warningItem} Item`;
+        document.getElementById('alarmCardUnit').innerText = `${impactedUnits} Unit`;
+
+        const tableBody = document.getElementById('alarmTableBody');
+        tableBody.innerHTML = '';
+
+        if (data.length === 0) {
+            tableBody.innerHTML = `<tr><td colspan="8" class="p-4 text-center text-slate-500">Tidak ada data ditemukan</td></tr>`;
+            return;
+        }
+
+        data.forEach(item => {
+            const tr = document.createElement('tr');
+            tr.className = 'hover:bg-slate-800/40 border-b border-slate-800';
+            
+            const wornVal = parseWornVal(item.worn);
+            let wornBadge = `<span class="px-2.5 py-1 rounded text-xs font-bold bg-slate-700 text-slate-200">${item.worn}</span>`;
+            
+            if (wornVal >= 100) {
+                wornBadge = `<span class="px-2.5 py-1 rounded text-xs font-bold bg-rose-500/20 text-rose-400 border border-rose-500/30">${item.worn}</span>`;
+            } else if (wornVal >= 80) {
+                wornBadge = `<span class="px-2.5 py-1 rounded text-xs font-bold bg-amber-500/20 text-amber-400 border border-amber-500/30">${item.worn}</span>`;
+            }
+
+            let statusBadge = `<span class="px-2.5 py-1 rounded text-xs font-bold bg-slate-800 text-slate-300 border border-slate-700">${item.statusLifetime || '-'}</span>`;
+            const st = (item.statusLifetime || '').toUpperCase();
+            if (st.includes('OVER') || st.includes('CRITICAL')) {
+                statusBadge = `<span class="px-2.5 py-1 rounded text-xs font-bold bg-rose-500/10 text-rose-400 border border-rose-500/20">${item.statusLifetime}</span>`;
+            } else if (st.includes('WARNING') || st.includes('MENDEKATI')) {
+                statusBadge = `<span class="px-2.5 py-1 rounded text-xs font-bold bg-amber-500/10 text-amber-400 border border-amber-500/20">${item.statusLifetime}</span>`;
+            } else if (st.includes('AMAN') || st.includes('OK')) {
+                statusBadge = `<span class="px-2.5 py-1 rounded text-xs font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">${item.statusLifetime}</span>`;
+            }
+
+            tr.innerHTML = `
+                <td class="p-3 font-bold text-white">${item.site || '-'}</td>
+                <td class="p-3 text-slate-300">${item.model || '-'}</td>
+                <td class="p-3 font-semibold text-white">${item.noUnit || '-'}</td>
+                <td class="p-3 text-amber-400 font-semibold">${item.komponen || '-'}</td>
+                <td class="p-3">${wornBadge}</td>
+                <td class="p-3 text-slate-300 font-semibold">${item.lifetime}</td>
+                <td class="p-3 text-slate-300">${item.policy}</td>
+                <td class="p-3">${statusBadge}</td>
+            `;
+            tableBody.appendChild(tr);
+        });
+
+        // Update Charts Alarm Worn
+        const sites = [...new Set(data.map(d => d.site).filter(Boolean))].sort();
+        const siteCounts = sites.map(s => data.filter(d => d.site === s).length);
+
+        const komponenList = [...new Set(data.map(d => d.komponen).filter(Boolean))].sort();
+        const komponenCounts = komponenList.map(k => data.filter(d => d.komponen === k).length);
+
+        if (alarmSiteChart && alarmKomponenChart) {
+            alarmSiteChart.updateOptions({
+                xaxis: { categories: sites },
+                series: [{ name: 'Jumlah Item', data: siteCounts }]
+            });
+            alarmKomponenChart.updateOptions({
+                labels: komponenList,
+                series: komponenCounts
+            });
+        }
+    }
+
     // ==================== FILTER HANDLERS ====================
     function applyPpuFilters() {
         const siteVal = document.getElementById('siteFilter').value;
@@ -746,6 +1056,21 @@
         renderReviewLifetimeDashboard(filtered);
     }
 
+    function applyAlarmWornFilters() {
+        const siteVal = document.getElementById('alarmSiteFilter').value;
+        const modelVal = document.getElementById('alarmModelFilter').value;
+        const komponenVal = document.getElementById('alarmKomponenFilter').value;
+        const statusVal = document.getElementById('alarmStatusFilter').value;
+
+        const filtered = globalAlarmWornData.filter(item => {
+            return (siteVal === 'ALL' || item.site === siteVal) &&
+                   (modelVal === 'ALL' || item.model === modelVal) &&
+                   (komponenVal === 'ALL' || item.komponen === komponenVal) &&
+                   (statusVal === 'ALL' || item.statusLifetime === statusVal);
+        });
+        renderAlarmWornDashboard(filtered);
+    }
+
     // ==================== INITIALIZATION ====================
     function initEventListeners() {
         ['siteFilter', 'typeFilter', 'modelFilter', 'alarmFilter'].forEach(id => {
@@ -769,17 +1094,30 @@
             document.getElementById('reviewStatusFilter').value = 'ALL';
             renderReviewLifetimeDashboard(globalReviewData);
         });
+
+        ['alarmSiteFilter', 'alarmModelFilter', 'alarmKomponenFilter', 'alarmStatusFilter'].forEach(id => {
+            document.getElementById(id)?.addEventListener('change', applyAlarmWornFilters);
+        });
+        document.getElementById('resetFilterBtnAlarm')?.addEventListener('click', () => {
+            document.getElementById('alarmSiteFilter').value = 'ALL';
+            document.getElementById('alarmModelFilter').value = 'ALL';
+            document.getElementById('alarmKomponenFilter').value = 'ALL';
+            document.getElementById('alarmStatusFilter').value = 'ALL';
+            renderAlarmWornDashboard(globalAlarmWornData);
+        });
     }
 
     async function init() {
         initPpuCharts();
         initReviewChart();
+        initAlarmWornCharts();
         initTabSwitching();
         initEventListeners();
         
         await Promise.all([
             loadPpuData(),
-            loadReviewLifetimeData()
+            loadReviewLifetimeData(),
+            loadAlarmWornData()
         ]);
     }
 
