@@ -813,18 +813,24 @@
     // ==================== REVIEW LIFETIME LOGIC ====================
     function loadReviewLifetimeData() {
         const statusList = ['TERCAPAI', 'MENDEKATI POLICY', 'AMAN'];
+        const response = await fetch(sheetCsvUrl);
+        const dataText = await response.text();
+        const rows = dataText.split('\n').filter(r => r.trim() !== '');
+            
         
-        globalReviewData = globalPpuData.map((item, idx) => {
-            let statusPaket = statusList[idx % 3];
-            if (item.maxWear > 85) statusPaket = 'MENDEKATI POLICY';
-            else if (item.maxWear > 95) statusPaket = 'TERCAPAI';
+        globalReviewData = row.slice(1).map((row) => {
+            const cols = parceCSVLine(row);
 
             return {
-                ...item,
-                statusPaketOnTrack: statusPaket,
-                lastUpdate: new Date().toLocaleDateString('id-ID')
+                site: (cols[0] || '').trim(),
+                type: (cols[1] || '').trim(),
+                noUnit: (cols[2] || '').trim(),
+                modelUnit: (cols[3] || '').trim(),
+                lifetime: (cols[9] || '').trim(), // KOLOM j (Indeks 9)
+                statuspaketontrack: (cols[10] || '-').trim(),  // KOLOM k (Indeks 10)
+                merkterinstall: (cols[11] || '').trim(), // KOLOM l (Indeks 11)
             };
-        });
+        });filter(item => item.site !== '');
 
         renderReviewLifetimeDashboard(globalReviewData);
     }
@@ -863,6 +869,7 @@
                 <td class="p-3 font-semibold text-white">${item.noUnit}</td>
                 <td class="p-3">${statusBadge}</td>
                 <td class="p-3 text-slate-300 text-[10px]">${item.lastUpdate}</td>
+                <td class="p-3 text-slate-300">${item.merkterinstall}</td>
             `;
             tableBody.appendChild(tr);
         });
