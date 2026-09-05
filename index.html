@@ -639,8 +639,14 @@
                     type: (cols[1] || '').trim(),
                     noUnit: (cols[2] || '').trim(),
                     modelUnit: (cols[3] || '').trim(),
-                    alarmStatus: (cols[11] || '').trim(), // KOLOM L (Indeks 11)
-                    durasiOver: (cols[12] || '-').trim(),  // KOLOM M (Indeks 12)
+                    
+                    // PEMETAAN KOLOM BERDASARKAN INDEKS SPREADSHEET (0 = Kolom A)
+                    lifetime: (cols[9] || '-').trim(),           // KOLOM J (Indeks 9)
+                    statusPaketOnTrack: (cols[10] || '-').trim(),// KOLOM K (Indeks 10)
+                    merkterinstall: (cols[11] || '-').trim(),    // KOLOM L (Indeks 11)
+                    
+                    alarmStatus: (cols[11] || '').trim(), 
+                    durasiOver: (cols[12] || '-').trim(),  
                     maxWear: parseFloat(cols[14]) || 0
                 };
             }).filter(item => item.site !== '');
@@ -707,7 +713,6 @@
 
     // ==================== DASHBOARD RENDER LOGIC ====================
     function renderPpuDashboard(data) {
-        // Pembersihan string status dari Kolom L
         const getCleanStatus = (item) => (item.alarmStatus || '').toString().trim().toUpperCase();
         
         const isStatusOver = (st) => st === 'OVER' || st.includes('OVER');
@@ -725,7 +730,6 @@
         document.getElementById('cardMendekatiUnit').innerText = `${mendekatiUnit} Unit`;
         document.getElementById('cardAchievementPercent').innerText = `${achievementPct}%`;
 
-        // Render Tabel (Hanya menampilkan status OVER dan MENDEKATI PLAN PPU)
         const tableBody = document.getElementById('ppuTableBody');
         tableBody.innerHTML = '';
 
@@ -758,7 +762,6 @@
             tableBody.appendChild(tr);
         });
 
-        // Update Charts
         const sites = [...new Set(data.map(d => d.site).filter(Boolean))].sort();
         const siteAchievementData = [];
         const siteOverSeries = [];
@@ -812,17 +815,25 @@
 
     // ==================== REVIEW LIFETIME LOGIC ====================
     function loadReviewLifetimeData() {
-        const statusList = ['TERCAPAI', 'MENDEKATI POLICY', 'AMAN'];
-        
-        globalReviewData = globalPpuData.map((item, idx) => {
-            let statusPaket = statusList[idx % 3];
-            if (item.maxWear > 85) statusPaket = 'MENDEKATI POLICY';
-            else if (item.maxWear > 95) statusPaket = 'TERCAPAI';
+        globalReviewData = globalPpuData.map((item) => {
+            const statusRaw = (item.statusPaketOnTrack || '').toUpperCase();
+            
+            let finalStatus = 'AMAN';
+            if (statusRaw.includes('TERCAPAI')) {
+                finalStatus = 'TERCAPAI';
+            } else if (statusRaw.includes('MENDEKATI')) {
+                finalStatus = 'MENDEKATI POLICY';
+            } else if (statusRaw.includes('AMAN')) {
+                finalStatus = 'AMAN';
+            } else {
+                finalStatus = statusRaw || 'AMAN';
+            }
 
             return {
                 ...item,
-                statusPaketOnTrack: statusPaket,
-                lastUpdate: new Date().toLocaleDateString('id-ID')
+                statusPaketOnTrack: finalStatus,
+                lifetime: item.lifetime || '-',
+                merkterinstall: item.merkterinstall || '-'
             };
         });
 
@@ -857,12 +868,13 @@
             }
 
             tr.innerHTML = `
-                <td class="p-3 font-bold text-white">${item.site}</td>
-                <td class="p-3 text-slate-300">${item.type}</td>
-                <td class="p-3 text-slate-300">${item.modelUnit}</td>
-                <td class="p-3 font-semibold text-white">${item.noUnit}</td>
+                <td class="p-3 font-bold text-white">${item.site || '-'}</td>
+                <td class="p-3 text-slate-300">${item.type || '-'}</td>
+                <td class="p-3 text-slate-300">${item.modelUnit || '-'}</td>
+                <td class="p-3 font-semibold text-white">${item.noUnit || '-'}</td>
                 <td class="p-3">${statusBadge}</td>
-                <td class="p-3 text-slate-300 text-[10px]">${item.lastUpdate}</td>
+                <td class="p-3 text-slate-300 font-semibold">${item.lifetime}</td>
+                <td class="p-3 text-slate-300">${item.merkterinstall}</td>
             `;
             tableBody.appendChild(tr);
         });
