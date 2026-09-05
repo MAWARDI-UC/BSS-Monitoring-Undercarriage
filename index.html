@@ -1008,22 +1008,56 @@
 
         // Update Charts Alarm Worn
         const sites = [...new Set(data.map(d => d.site).filter(Boolean))].sort();
-        const siteCounts = sites.map(s => data.filter(d => d.site === s).length);
+const siteCounts = sites.map(s => data.filter(d => d.site === s).length);
 
-        const komponenList = [...new Set(data.map(d => d.komponen).filter(Boolean))].sort();
-        const komponenCounts = komponenList.map(k => data.filter(d => d.komponen === k).length);
+const komponenList = [...new Set(data.map(d => d.komponen).filter(Boolean))].sort();
+const komponenCounts = komponenList.map(k => data.filter(d => d.komponen === k).length);
 
-        if (alarmSiteChart && alarmKomponenChart) {
-            alarmSiteChart.updateOptions({
-                xaxis: { categories: sites },
-                series: [{ name: 'Jumlah Item', data: siteCounts }]
-            });
-            alarmKomponenChart.updateOptions({
-                labels: komponenList,
-                series: komponenCounts
-            });
+if (alarmSiteChart && alarmKomponenChart) {
+    alarmSiteChart.updateOptions({
+        xaxis: { categories: sites },
+        series: [{ name: 'Jumlah Item', data: siteCounts }]
+    });
+
+    // Update konversi Donut ke Horizontal Bar Chart
+    alarmKomponenChart.updateOptions({
+        chart: {
+            type: 'bar',
+            height: 380 // Disesuaikan agar muat scroll/space-nya
+        },
+        plotOptions: {
+            bar: {
+                horizontal: true,
+                barHeight: '60%',
+                borderRadius: 4
+            }
+        },
+        xaxis: {
+            categories: komponenList,
+            title: { text: 'Jumlah Item' }
+        },
+        yaxis: {
+            labels: {
+                style: {
+                    colors: '#FFFFFF' // Menyesuaikan warna teks tema gelap
+                }
+            }
+        },
+        series: [{
+            name: 'Jumlah Item',
+            data: komponenCounts
+        }],
+        legend: {
+            show: false // Legend tidak diperlukan lagi karena label sudah ada di sumbu Y
+        },
+        dataLabels: {
+            enabled: true,
+            style: {
+                colors: ['#FFFFFF']
+            }
         }
-    }
+    });
+}
 
     // ==================== FILTER HANDLERS ====================
     function applyPpuFilters() {
