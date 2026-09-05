@@ -540,27 +540,16 @@
             const lines = dataText.split(/\r?\n/).filter(r => r.trim() !== '');
             if (lines.length < 2) return;
 
-            // Membaca header secara cerdas
-            const headers = parseCSVLine(lines[0]).map(h => h.trim().toLowerCase().replace(/[^a-z0-9]/g, ''));
-
-            const siteIdx = headers.findIndex(h => h.includes('site'));
-            const typeIdx = headers.findIndex(h => h.includes('type'));
-            const modelIdx = headers.findIndex(h => h.includes('model'));
-            const noUnitIdx = headers.findIndex(h => h.includes('nounit') || h.includes('unit'));
-            const statusIdx = headers.findIndex(h => h.includes('status') || h.includes('ontrack') || h.includes('paket'));
-            const lifetimeIdx = headers.findIndex(h => h.includes('lifetime'));
-            const merkIdx = headers.findIndex(h => h.includes('merk'));
-
             globalReviewData = lines.slice(1).map((row) => {
                 const cols = parseCSVLine(row);
                 return {
-                    site: (cols[siteIdx !== -1 ? siteIdx : 0] || '').trim(),
-                    type: (cols[typeIdx !== -1 ? typeIdx : 1] || '').trim(),
-                    modelUnit: (cols[modelIdx !== -1 ? modelIdx : 2] || '').trim(),
-                    noUnit: (cols[noUnitIdx !== -1 ? noUnitIdx : 3] || '').trim(),
-                    statusPaketOnTrack: (cols[statusIdx !== -1 ? statusIdx : 4] || '-').trim().toUpperCase(),
-                    lifetime: (cols[lifetimeIdx !== -1 ? lifetimeIdx : 5] || '-').trim(),
-                    merkterinstall: (cols[merkIdx !== -1 ? merkIdx : 6] || '-').trim()
+                    site: (cols[1] || '').trim(),               // Kolom B: SITE
+                    type: (cols[2] || '').trim(),               // Kolom C: TYPE
+                    modelUnit: (cols[3] || '').trim(),          // Kolom D: MODEL UNIT
+                    noUnit: (cols[4] || '').trim(),             // Kolom E: NO UNIT
+                    lifetime: (cols[9] || '-').trim(),          // Kolom J: LIFETIME
+                    statusPaketOnTrack: (cols[10] || '-').trim().toUpperCase(), // Kolom K: STATUS PAKET ON TRACK
+                    merkterinstall: (cols[11] || '-').trim()   // Kolom L: MERK TERINSTALL
                 };
             }).filter(item => item.site !== '' && !item.site.toLowerCase().includes('function'));
 
@@ -663,7 +652,7 @@
     function renderReviewLifetimeDashboard(data) {
         const totalUnit = data.length;
         const tercapaiUnit = data.filter(d => d.statusPaketOnTrack.includes('TERCAPAI') || d.statusPaketOnTrack.includes('ACHIEVED')).length;
-        const mendekatiUnit = data.filter(d => d.statusPaketOnTrack.includes('MENDEKATI') || d.statusPaketOnTrack.includes('WARNING')).length;
+        const mendekatiUnit = data.filter(d => d.statusPaketOnTrack.includes('MENDEKATI') || d.statusPaketOnTrack.includes('POLICY') || d.statusPaketOnTrack.includes('WARNING')).length;
         const amanUnit = data.filter(d => d.statusPaketOnTrack.includes('AMAN') || d.statusPaketOnTrack.includes('ON TRACK') || d.statusPaketOnTrack.includes('OK')).length;
 
         document.getElementById('reviewCardTotal').innerText = `${totalUnit} Unit`;
@@ -688,7 +677,7 @@
 
             if (st.includes('TERCAPAI') || st.includes('ACHIEVED')) {
                 statusBadge = `<span class="px-2.5 py-1 rounded text-xs font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">${item.statusPaketOnTrack}</span>`;
-            } else if (st.includes('MENDEKATI') || st.includes('WARNING')) {
+            } else if (st.includes('MENDEKATI') || st.includes('POLICY') || st.includes('WARNING')) {
                 statusBadge = `<span class="px-2.5 py-1 rounded text-xs font-bold bg-amber-500/10 text-amber-400 border border-amber-500/20">${item.statusPaketOnTrack}</span>`;
             } else {
                 statusBadge = `<span class="px-2.5 py-1 rounded text-xs font-bold bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">${item.statusPaketOnTrack}</span>`;
