@@ -811,24 +811,22 @@
     }
 
     // ==================== REVIEW LIFETIME LOGIC ====================
-     function loadReviewLifetimeData() {
+    function loadReviewLifetimeData() {
         const statusList = ['TERCAPAI', 'MENDEKATI POLICY', 'AMAN'];
         
         globalReviewData = globalPpuData.map((item, idx) => {
-            let statusPaket = statusList[idx % ];
+            let statusPaket = statusList[idx % 3];
             if (item.maxWear > 85) statusPaket = 'MENDEKATI POLICY';
             else if (item.maxWear > 95) statusPaket = 'TERCAPAI';
 
             return {
                 ...item,
                 statusPaketOnTrack: statusPaket,
-                lastUpdate: new Date().toLocaleDateString('id-ID')
             };
         });
 
         renderReviewLifetimeDashboard(globalReviewData);
     }
-
 
     function renderReviewLifetimeDashboard(data) {
         const totalUnit = data.length;
@@ -864,6 +862,7 @@
                 <td class="p-3 font-semibold text-white">${item.noUnit}</td>
                 <td class="p-3">${statusBadge}</td>
                 <td class="p-3 text-slate-300 text-[10px]">${item.lastUpdate}</td>
+                <td class="p-3 text-slate-300 text-[10px]">${item.merkterinstall}</td>
             `;
             tableBody.appendChild(tr);
         });
