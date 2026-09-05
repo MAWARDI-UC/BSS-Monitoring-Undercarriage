@@ -543,10 +543,10 @@
             globalReviewData = lines.slice(1).map((row) => {
                 const cols = parseCSVLine(row);
                 return {
-                    site: (cols[1] || '').trim(),               // Kolom B: SITE
-                    type: (cols[2] || '').trim(),               // Kolom C: TYPE
-                    modelUnit: (cols[3] || '').trim(),          // Kolom D: MODEL UNIT
-                    noUnit: (cols[4] || '').trim(),             // Kolom E: NO UNIT
+                    site: (cols[0] || '').trim(),               // Kolom A: SITE
+                    type: (cols[1] || '').trim(),               // Kolom B: TYPE
+                    modelUnit: (cols[2] || '').trim(),          // Kolom C: MODEL UNIT
+                    noUnit: (cols[3] || '').trim(),             // Kolom D: NO UNIT
                     lifetime: (cols[9] || '-').trim(),          // Kolom J: LIFETIME
                     statusPaketOnTrack: (cols[10] || '-').trim().toUpperCase(), // Kolom K: STATUS PAKET ON TRACK
                     merkterinstall: (cols[11] || '-').trim()   // Kolom L: MERK TERINSTALL
