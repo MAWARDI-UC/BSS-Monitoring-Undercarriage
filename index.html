@@ -811,23 +811,24 @@
     }
 
     // ==================== REVIEW LIFETIME LOGIC ====================
-    function loadReviewLifetimeData() {
+     function loadReviewLifetimeData() {
         const statusList = ['TERCAPAI', 'MENDEKATI POLICY', 'AMAN'];
         
-        globalReviewData = globalPpuData.map((item) => {
-            let statusPaket = statusList;
-            if (item) statusPaket = 'MENDEKATI POLICY';
-            else if (item) statusPaket = 'TERCAPAI';
+        globalReviewData = globalPpuData.map((item, idx) => {
+            let statusPaket = statusList[idx % ];
+            if (item.maxWear > 85) statusPaket = 'MENDEKATI POLICY';
+            else if (item.maxWear > 95) statusPaket = 'TERCAPAI';
 
             return {
                 ...item,
                 statusPaketOnTrack: statusPaket,
-                lastUpdate: row.toLocaleDateString('id-ID') // KOLOM J (Indeks 9)
+                lastUpdate: new Date().toLocaleDateString('id-ID')
             };
-        });filter(item => item.site !== '');
+        });
 
         renderReviewLifetimeDashboard(globalReviewData);
     }
+
 
     function renderReviewLifetimeDashboard(data) {
         const totalUnit = data.length;
