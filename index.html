@@ -626,18 +626,20 @@
             const dataText = await response.text();
             const rows = dataText.split('\n').filter(r => r.trim() !== '');
             
-            // Parse both PPU and Review Lifetime data from same sheet
             globalPpuData = [];
             globalReviewData = [];
 
             rows.slice(1).forEach((row) => {
                 const cols = parseCSVLine(row);
                 
-                const ppuItem = {
+                // Spreadsheet columns: A=0(Site), B=1(Type), C=2(Model), D=3(?), E=4(Brand), F=5(MaxWear), G=6(LastUpdate), 
+                // H=7(Paket), I=8(HM), J=9(Lifetime), K=10(Status), L=11(Merk)
+                
+                const item = {
                     site: (cols[0] || '').trim(),
                     type: (cols[1] || '').trim(),
-                    noUnit: (cols[2] || '').trim(),
-                    modelUnit: (cols[3] || '').trim(),
+                    modelUnit: (cols[2] || '').trim(),
+                    noUnit: (cols[3] || '').trim(),
                     brand: (cols[4] || '').trim(),
                     maxWear: parseFloat(cols[5]) || 0,
                     lastUpdate: (cols[6] || '').trim(),
@@ -646,19 +648,19 @@
                     lifetime: parseFloat(cols[9]) || 0,
                     statusPaketOnTrack: (cols[10] || '').trim().toUpperCase(),
                     merkInstall: (cols[11] || '').trim(),
-                    alarmStatus: '', // untuk PPU dashboard, status Over/Mendekati ditentukan dari Review data
                 };
 
                 // Only add if has valid site
-                if (ppuItem.site !== '') {
-                    globalReviewData.push(ppuItem);
-                    // Determine PPU status based on Review data if needed
-                    globalPpuData.push(ppuItem);
+                if (item.site !== '') {
+                    globalReviewData.push(item);
+                    globalPpuData.push(item);
                 }
             });
 
+            console.log('📊 Data loaded:', globalReviewData.length, 'rows');
             populateDropdowns();
             renderReviewLifetimeDashboard(globalReviewData);
+            renderPpuDashboard(globalPpuData);
             
         } catch (error) {
             console.error('❌ Gagal mengambil data:', error);
@@ -737,7 +739,7 @@
             tr.className = 'hover:bg-slate-800/40 border-b border-slate-800';
             
             let statusBadge = '';
-            const status = item.statusPaketOnTrack.toUpperCase();
+            const status = item.statusPaketOnTrack.trim().toUpperCase();
             
             if (status === 'TERCAPAI') {
                 statusBadge = `<span class="px-2.5 py-1 rounded text-xs font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">TERCAPAI</span>`;
@@ -794,7 +796,7 @@
             const matchSite = (siteVal === 'ALL' || item.site === siteVal);
             const matchType = (typeVal === 'ALL' || item.type === typeVal);
             const matchModel = (modelVal === 'ALL' || item.modelUnit === modelVal);
-            const matchStatus = (statusVal === 'ALL' || item.statusPaketOnTrack === statusVal);
+            const matchStatus = (statusVal === 'ALL' || item.statusPaketOnTrack.trim().toUpperCase() === statusVal.toUpperCase());
             
             return matchSite && matchType && matchModel && matchStatus;
         });
@@ -804,7 +806,6 @@
 
     // ==================== PPU DASHBOARD LOGIC ====================
     function renderPpuDashboard(data) {
-        // Placeholder untuk PPU dashboard - akan diimplementasikan kemudian
         const totalUnit = data.length;
         document.getElementById('cardTotalUnit').innerText = `${totalUnit} Unit`;
         document.getElementById('cardOverUnit').innerText = `0 Unit`;
