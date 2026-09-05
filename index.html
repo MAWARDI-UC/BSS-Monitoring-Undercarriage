@@ -355,9 +355,7 @@
 
     // ==================== URL SOURCES ====================
     const sheetPpuUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSMyvNRqkn65gL_4tIjZKJeKRIQG9ODScl-6uIst7HobQXwRsP4J2BdI1NsA81_pHqxrH2t_sF75_Ch/pub?output=csv';
-    
-    // Ganti URL di bawah dengan URL CSV dari Publish to Web Spreadsheet Review Lifetime Anda
-    const sheetReviewUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vT5N8qY8wKsnzWvX0KxS9-cM9x1V5zJ9-S_vG1K_S9L2g8x8aL8k-9_S9l8g/pub?output=csv';
+    const sheetReviewUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTQwT7qtjPmwP3JqE22qhGYBjACLqqb6Af-ZZuVTsaqeY4Qlc51HUBchQoiIU09DFlhPxrUlfiN_mo9/pub?output=csv';
 
     let globalPpuData = [];
     let globalReviewData = [];
@@ -467,7 +465,7 @@
         reviewChart.render();
     }
 
-    // ==================== CSV PARSER ====================
+    // ==================== PARSER CSV PRESET ====================
     function parseCSVLine(line) {
         const result = [];
         let current = '';
@@ -506,7 +504,7 @@
                 return;
             }
 
-            const rows = dataText.split('\n').filter(r => r.trim() !== '');
+            const rows = dataText.split(/\r?\n/).filter(r => r.trim() !== '');
             
             globalPpuData = rows.slice(1).map((row) => {
                 const cols = parseCSVLine(row);
@@ -534,29 +532,41 @@
             const response = await fetch(sheetReviewUrl);
             const dataText = await response.text();
 
-            // Proteksi jika Sheet belum di-publish sebagai CSV sehingga yang didapat halaman login/script
-            if (dataText.trim().startsWith('<!DOCTYPE') || dataText.includes('google-site-verification') || dataText.includes('function(')) {
-                console.error('❌ Link Review Lifetime mengembalikan HTML/JS. Pastikan Sheet sudah di Publish to Web dalam format CSV.');
+            if (dataText.trim().startsWith('<!DOCTYPE') || dataText.includes('google-site-verification')) {
+                console.error('❌ Google Sheets Review Lifetime belum dipublikasikan sebagai CSV publik.');
                 return;
             }
 
-            const rows = dataText.split('\n').filter(r => r.trim() !== '');
-            
-            globalReviewData = rows.slice(1).map((row) => {
+            const lines = dataText.split(/\r?\n/).filter(r => r.trim() !== '');
+            if (lines.length < 2) return;
+
+            // Membaca header secara cerdas
+            const headers = parseCSVLine(lines[0]).map(h => h.trim().toLowerCase().replace(/[^a-z0-9]/g, ''));
+
+            const siteIdx = headers.findIndex(h => h.includes('site'));
+            const typeIdx = headers.findIndex(h => h.includes('type'));
+            const modelIdx = headers.findIndex(h => h.includes('model'));
+            const noUnitIdx = headers.findIndex(h => h.includes('nounit') || h.includes('unit'));
+            const statusIdx = headers.findIndex(h => h.includes('status') || h.includes('ontrack') || h.includes('paket'));
+            const lifetimeIdx = headers.findIndex(h => h.includes('lifetime'));
+            const merkIdx = headers.findIndex(h => h.includes('merk'));
+
+            globalReviewData = lines.slice(1).map((row) => {
                 const cols = parseCSVLine(row);
                 return {
-                    site: (cols[0] || '').trim(),
-                    type: (cols[1] || '').trim(),
-                    modelUnit: (cols[2] || '').trim(),
-                    noUnit: (cols[3] || '').trim(),
-                    statusPaketOnTrack: (cols[4] || '-').trim().toUpperCase(),
-                    lifetime: (cols[5] || '-').trim(),
-                    merkterinstall: (cols[6] || '-').trim()
+                    site: (cols[siteIdx !== -1 ? siteIdx : 0] || '').trim(),
+                    type: (cols[typeIdx !== -1 ? typeIdx : 1] || '').trim(),
+                    modelUnit: (cols[modelIdx !== -1 ? modelIdx : 2] || '').trim(),
+                    noUnit: (cols[noUnitIdx !== -1 ? noUnitIdx : 3] || '').trim(),
+                    statusPaketOnTrack: (cols[statusIdx !== -1 ? statusIdx : 4] || '-').trim().toUpperCase(),
+                    lifetime: (cols[lifetimeIdx !== -1 ? lifetimeIdx : 5] || '-').trim(),
+                    merkterinstall: (cols[merkIdx !== -1 ? merkIdx : 6] || '-').trim()
                 };
-            }).filter(item => item.site !== '' && !item.site.includes('function') && !item.site.includes('{'));
+            }).filter(item => item.site !== '' && !item.site.toLowerCase().includes('function'));
 
             populateReviewDropdowns(globalReviewData);
             renderReviewLifetimeDashboard(globalReviewData);
+
         } catch (error) {
             console.error('❌ Gagal mengambil data Review Lifetime:', error);
         }
@@ -652,9 +662,9 @@
     // ==================== RENDER REVIEW LIFETIME DASHBOARD ====================
     function renderReviewLifetimeDashboard(data) {
         const totalUnit = data.length;
-        const tercapaiUnit = data.filter(d => d.statusPaketOnTrack.includes('TERCAPAI')).length;
-        const mendekatiUnit = data.filter(d => d.statusPaketOnTrack.includes('MENDEKATI')).length;
-        const amanUnit = data.filter(d => d.statusPaketOnTrack.includes('AMAN')).length;
+        const tercapaiUnit = data.filter(d => d.statusPaketOnTrack.includes('TERCAPAI') || d.statusPaketOnTrack.includes('ACHIEVED')).length;
+        const mendekatiUnit = data.filter(d => d.statusPaketOnTrack.includes('MENDEKATI') || d.statusPaketOnTrack.includes('WARNING')).length;
+        const amanUnit = data.filter(d => d.statusPaketOnTrack.includes('AMAN') || d.statusPaketOnTrack.includes('ON TRACK') || d.statusPaketOnTrack.includes('OK')).length;
 
         document.getElementById('reviewCardTotal').innerText = `${totalUnit} Unit`;
         document.getElementById('reviewCardTercapai').innerText = `${tercapaiUnit} Unit`;
@@ -664,17 +674,24 @@
         const tableBody = document.getElementById('reviewTableBody');
         tableBody.innerHTML = '';
 
+        if (data.length === 0) {
+            tableBody.innerHTML = `<tr><td colspan="7" class="p-4 text-center text-slate-500">Tidak ada data ditemukan</td></tr>`;
+            return;
+        }
+
         data.forEach(item => {
             const tr = document.createElement('tr');
             tr.className = 'hover:bg-slate-800/40 border-b border-slate-800';
             
             let statusBadge = '';
-            if (item.statusPaketOnTrack.includes('TERCAPAI')) {
-                statusBadge = `<span class="px-2.5 py-1 rounded text-xs font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">TERCAPAI</span>`;
-            } else if (item.statusPaketOnTrack.includes('MENDEKATI')) {
-                statusBadge = `<span class="px-2.5 py-1 rounded text-xs font-bold bg-amber-500/10 text-amber-400 border border-amber-500/20">MENDEKATI POLICY</span>`;
+            const st = item.statusPaketOnTrack;
+
+            if (st.includes('TERCAPAI') || st.includes('ACHIEVED')) {
+                statusBadge = `<span class="px-2.5 py-1 rounded text-xs font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">${item.statusPaketOnTrack}</span>`;
+            } else if (st.includes('MENDEKATI') || st.includes('WARNING')) {
+                statusBadge = `<span class="px-2.5 py-1 rounded text-xs font-bold bg-amber-500/10 text-amber-400 border border-amber-500/20">${item.statusPaketOnTrack}</span>`;
             } else {
-                statusBadge = `<span class="px-2.5 py-1 rounded text-xs font-bold bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">AMAN</span>`;
+                statusBadge = `<span class="px-2.5 py-1 rounded text-xs font-bold bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">${item.statusPaketOnTrack}</span>`;
             }
 
             tr.innerHTML = `
