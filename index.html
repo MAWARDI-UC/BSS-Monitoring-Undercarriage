@@ -907,7 +907,7 @@
                     totalWorn80Up: (cols[3] || '0').trim(),
                     totalKomponenPerUnit: (cols[4] || '0').trim(),
                     tingkatReferensi: (cols[5] || '-').trim(),
-                    Description: (cols[6] || '-').trim(),
+                    description: (cols[6] || '-').trim(), // Fixed: huruf kecil
                     lifetime: (cols[7] || '-').trim(),
                     policy: (cols[8] || '-').trim()
                 };
@@ -960,16 +960,13 @@
         updateReviewDependentDropdowns(data);
     }
 
-    // Fungsi Pembantu Filter Dinamis Cascading Dropdown Review Lifetime (Site -> Type -> Model)
     function updateReviewDependentDropdowns(data) {
         const selectedSite = document.getElementById('reviewSiteFilter').value;
         const selectedType = document.getElementById('reviewTypeFilter').value;
         const selectedModel = document.getElementById('reviewModelFilter').value;
 
-        // 1. Filter data berdasarkan Site yang dipilih
         let siteFiltered = selectedSite === 'ALL' ? data : data.filter(d => d.site === selectedSite);
 
-        // 2. Update pilihan Type sesuai Site
         const availableTypes = [...new Set(siteFiltered.map(d => d.type).filter(Boolean))].sort();
         fillSelectOptions('reviewTypeFilter', availableTypes, 'Semua TYPE');
         if (availableTypes.includes(selectedType)) {
@@ -978,11 +975,9 @@
             document.getElementById('reviewTypeFilter').value = 'ALL';
         }
 
-        // 3. Filter data berdasarkan Type yang aktif
         const currentType = document.getElementById('reviewTypeFilter').value;
         let typeFiltered = currentType === 'ALL' ? siteFiltered : siteFiltered.filter(d => d.type === currentType);
 
-        // 4. Update pilihan Model sesuai gabungan Site & Type yang terpilih
         const availableModels = [...new Set(typeFiltered.map(d => d.modelUnit).filter(Boolean))].sort();
         fillSelectOptions('reviewModelFilter', availableModels, 'Semua Model');
         if (availableModels.includes(selectedModel)) {
@@ -1033,10 +1028,29 @@
         fillSelectOptions('alarmStatusFilter', [...new Set(modelFilteredData.map(d => d.statusLifetime).filter(Boolean))].sort(), 'Semua Status');
     }
 
+    // Dropdown & Cascading Filter Rekomendasi Replace
     function populateRekomendasiDropdowns(data) {
         fillSelectOptions('rekomendasiSiteFilter', [...new Set(data.map(d => d.site).filter(Boolean))].sort(), 'Semua Site');
-        fillSelectOptions('rekomendasiModelFilter', [...new Set(data.map(d => d.model).filter(Boolean))].sort(), 'Semua Model');
-        fillSelectOptions('rekomendasiTingkatFilter', [...new Set(data.map(d => d.tingkatReferensi).filter(Boolean))].sort(), 'Semua Tingkat');
+        updateRekomendasiDependentDropdowns(data);
+    }
+
+    function updateRekomendasiDependentDropdowns(data) {
+        const selectedSite = document.getElementById('rekomendasiSiteFilter').value;
+        const selectedModel = document.getElementById('rekomendasiModelFilter').value;
+        const selectedDesc = document.getElementById('rekomendasiDescriptiontFilter').value;
+
+        let siteFiltered = selectedSite === 'ALL' ? data : data.filter(d => d.site === selectedSite);
+
+        const availableModels = [...new Set(siteFiltered.map(d => d.model).filter(Boolean))].sort();
+        fillSelectOptions('rekomendasiModelFilter', availableModels, 'Semua Model');
+        document.getElementById('rekomendasiModelFilter').value = availableModels.includes(selectedModel) ? selectedModel : 'ALL';
+
+        const currentModel = document.getElementById('rekomendasiModelFilter').value;
+        let modelFiltered = currentModel === 'ALL' ? siteFiltered : siteFiltered.filter(d => d.model === currentModel);
+
+        const availableDescs = [...new Set(modelFiltered.map(d => d.description).filter(Boolean))].sort();
+        fillSelectOptions('rekomendasiDescriptiontFilter', availableDescs, 'Semua Description');
+        document.getElementById('rekomendasiDescriptiontFilter').value = availableDescs.includes(selectedDesc) ? selectedDesc : 'ALL';
     }
 
     function fillSelectOptions(elementId, items, defaultText) {
@@ -1370,12 +1384,12 @@
     function applyRekomendasiFilters() {
         const siteVal = document.getElementById('rekomendasiSiteFilter').value;
         const modelVal = document.getElementById('rekomendasiModelFilter').value;
-        const tingkatVal = document.getElementById('rekomendasiTingkatFilter').value;
+        const descVal = document.getElementById('rekomendasiDescriptiontFilter').value;
 
         const filtered = globalRekomendasiData.filter(item => {
             return (siteVal === 'ALL' || item.site === siteVal) &&
                    (modelVal === 'ALL' || item.model === modelVal) &&
-                   (tingkatVal === 'ALL' || item.tingkatReferensi === tingkatVal);
+                   (descVal === 'ALL' || item.description === descVal);
         });
         renderRekomendasiDashboard(filtered);
     }
@@ -1447,14 +1461,22 @@
             renderAlarmWornDashboard(globalAlarmWornData);
         });
 
-        // Rekomendasi Replace Filters
-        ['rekomendasiSiteFilter', 'rekomendasiModelFilter', 'rekomendasiTingkatFilter'].forEach(id => {
-            document.getElementById(id)?.addEventListener('change', applyRekomendasiFilters);
+        // Rekomendasi Replace Filters (Cascading Filter Enabled)
+        document.getElementById('rekomendasiSiteFilter')?.addEventListener('change', () => {
+            updateRekomendasiDependentDropdowns(globalRekomendasiData);
+            applyRekomendasiFilters();
         });
+        document.getElementById('rekomendasiModelFilter')?.addEventListener('change', () => {
+            updateRekomendasiDependentDropdowns(globalRekomendasiData);
+            applyRekomendasiFilters();
+        });
+        document.getElementById('rekomendasiDescriptiontFilter')?.addEventListener('change', applyRekomendasiFilters);
+
         document.getElementById('resetFilterBtnRekomendasi')?.addEventListener('click', () => {
             document.getElementById('rekomendasiSiteFilter').value = 'ALL';
+            updateRekomendasiDependentDropdowns(globalRekomendasiData);
             document.getElementById('rekomendasiModelFilter').value = 'ALL';
-            document.getElementById('rekomendasiTingkatFilter').value = 'ALL';
+            document.getElementById('rekomendasiDescriptiontFilter').value = 'ALL';
             renderRekomendasiDashboard(globalRekomendasiData);
         });
     }
