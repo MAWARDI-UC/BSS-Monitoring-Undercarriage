@@ -625,13 +625,9 @@
             }
         });
 
+        // Trigger window resize event agar ApexCharts otomatis menyesuaikan ukuran
         setTimeout(() => {
-            if (achievementChart) achievementChart.reflow();
-            if (overChart) overChart.reflow();
-            if (reviewChart) reviewChart.reflow();
-            if (alarmSiteChart) alarmSiteChart.reflow();
-            if (alarmKomponenChart) alarmKomponenChart.reflow();
-            if (rekomendasiSiteChart) rekomendasiSiteChart.reflow();
+            window.dispatchEvent(new Event('resize'));
         }, 100);
     }
 
