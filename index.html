@@ -938,25 +938,45 @@
         updateAlarmDependentDropdowns(data);
     }
 
-    // Fungsi Pembantu Filter Dinamis Dropdown Alarm Worn
+    // Fungsi Pembantu Filter Dinamis Cascading Dropdown Alarm Worn (Site -> Model -> No Unit)
     function updateAlarmDependentDropdowns(data) {
         const selectedSite = document.getElementById('alarmSiteFilter').value;
-        const filteredData = selectedSite === 'ALL' ? data : data.filter(d => d.site === selectedSite);
+        const selectedModel = document.getElementById('alarmModelFilter').value;
 
+        // Filter data berdasarkan Site yang sedang dipilih
+        let siteFilteredData = selectedSite === 'ALL' ? data : data.filter(d => d.site === selectedSite);
+
+        // Update Opsi Model berdasarkan Site yang terpilih
+        const availableModels = [...new Set(siteFilteredData.map(d => d.model).filter(Boolean))].sort();
+        fillSelectOptions('alarmModelFilter', availableModels, 'Semua Model');
+
+        // Pertahankan nilai Model jika pilihan sebelumnya masih valid di site baru
+        if (availableModels.includes(selectedModel)) {
+            document.getElementById('alarmModelFilter').value = selectedModel;
+        } else {
+            document.getElementById('alarmModelFilter').value = 'ALL';
+        }
+
+        // Update Opsi No Unit berdasarkan gabungan filter Site & Model
+        updateAlarmNoUnitDropdown(siteFilteredData);
+    }
+
+    function updateAlarmNoUnitDropdown(siteFilteredData) {
         const currentModel = document.getElementById('alarmModelFilter').value;
         const currentNoUnit = document.getElementById('alarmNoUnitFilter').value;
 
-        fillSelectOptions('alarmModelFilter', [...new Set(filteredData.map(d => d.model).filter(Boolean))].sort(), 'Semua Model');
-        fillSelectOptions('alarmNoUnitFilter', [...new Set(filteredData.map(d => d.noUnit).filter(Boolean))].sort(), 'Semua No Unit');
-        fillSelectOptions('alarmStatusFilter', [...new Set(filteredData.map(d => d.statusLifetime).filter(Boolean))].sort(), 'Semua Status');
+        let modelFilteredData = currentModel === 'ALL' ? siteFilteredData : siteFilteredData.filter(d => d.model === currentModel);
 
-        // Restore nilai jika opsi tersebut masih tersedia di data ter-filter
-        if ([...document.getElementById('alarmModelFilter').options].some(o => o.value === currentModel)) {
-            document.getElementById('alarmModelFilter').value = currentModel;
-        }
-        if ([...document.getElementById('alarmNoUnitFilter').options].some(o => o.value === currentNoUnit)) {
+        const availableNoUnits = [...new Set(modelFilteredData.map(d => d.noUnit).filter(Boolean))].sort();
+        fillSelectOptions('alarmNoUnitFilter', availableNoUnits, 'Semua No Unit');
+
+        if (availableNoUnits.includes(currentNoUnit)) {
             document.getElementById('alarmNoUnitFilter').value = currentNoUnit;
+        } else {
+            document.getElementById('alarmNoUnitFilter').value = 'ALL';
         }
+
+        fillSelectOptions('alarmStatusFilter', [...new Set(modelFilteredData.map(d => d.statusLifetime).filter(Boolean))].sort(), 'Semua Status');
     }
 
     function populateRekomendasiDropdowns(data) {
@@ -1336,7 +1356,13 @@
             updateAlarmDependentDropdowns(globalAlarmWornData);
             applyAlarmWornFilters();
         });
-        ['alarmModelFilter', 'alarmNoUnitFilter', 'alarmStatusFilter'].forEach(id => {
+        document.getElementById('alarmModelFilter')?.addEventListener('change', () => {
+            const selectedSite = document.getElementById('alarmSiteFilter').value;
+            const siteFilteredData = selectedSite === 'ALL' ? globalAlarmWornData : globalAlarmWornData.filter(d => d.site === selectedSite);
+            updateAlarmNoUnitDropdown(siteFilteredData);
+            applyAlarmWornFilters();
+        });
+        ['alarmNoUnitFilter', 'alarmStatusFilter'].forEach(id => {
             document.getElementById(id)?.addEventListener('change', applyAlarmWornFilters);
         });
         document.getElementById('resetFilterBtnAlarm')?.addEventListener('click', () => {
