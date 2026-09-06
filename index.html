@@ -514,9 +514,9 @@
                         </select>
                     </div>
                     <div>
-                        <label class="block text-[11px] font-medium text-slate-400 mb-1">TINGKAT REFERENSI</label>
-                        <select id="rekomendasiTingkatFilter" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-indigo-500">
-                            <option value="ALL">Semua Tingkat</option>
+                        <label class="block text-[11px] font-medium text-slate-400 mb-1">DESCRIPTION</label>
+                        <select id="rekomendasiDescriptiontFilter" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-indigo-500">
+                            <option value="ALL">Semua Description</option>
                         </select>
                     </div>
                 </div>
@@ -572,7 +572,7 @@
                                 <th class="p-3">Total Komponen Worn 80% Up</th>
                                 <th class="p-3">Total Komponen Per Unit</th>
                                 <th class="p-3">Tingkat Referensi</th>
-                                <th class="p-3">Remark</th>
+                                <th class="p-3">Description</th>
                                 <th class="p-3">Lifetime</th>
                                 <th class="p-3">Policy</th>
                             </tr>
@@ -907,7 +907,7 @@
                     totalWorn80Up: (cols[3] || '0').trim(),
                     totalKomponenPerUnit: (cols[4] || '0').trim(),
                     tingkatReferensi: (cols[5] || '-').trim(),
-                    remark: (cols[6] || '-').trim(),
+                    Descripion: (cols[6] || '-').trim(),
                     lifetime: (cols[7] || '-').trim(),
                     policy: (cols[8] || '-').trim()
                 };
