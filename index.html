@@ -324,6 +324,7 @@
                                 <th class="p-3">Model Unit</th>
                                 <th class="p-3">No Unit</th>
                                 <th class="p-3">Status Paket On Track</th>
+                                <th class="p-3">Policy</th>
                                 <th class="p-3">Lifetime</th>
                                 <th class="p-3">Merk Terinstall</th>
                             </tr>
@@ -838,6 +839,7 @@
                     type: (cols[1] || '').trim(),
                     modelUnit: (cols[2] || '').trim(),
                     noUnit: (cols[3] || '').trim(),
+                    Policy: (cols[8] || '-').trim(),
                     lifetime: (cols[9] || '-').trim(),
                     statusPaketOnTrack: (cols[10] || '-').trim().toUpperCase(),
                     merkterinstall: (cols[11] || '-').trim()
