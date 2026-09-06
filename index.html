@@ -924,15 +924,72 @@
     // ==================== DROPDOWNS ====================
     function populatePpuDropdowns(data) {
         fillSelectOptions('siteFilter', [...new Set(data.map(d => d.site).filter(Boolean))].sort(), 'Semua Site');
-        fillSelectOptions('typeFilter', [...new Set(data.map(d => d.type).filter(Boolean))].sort(), 'Semua TYPE');
-        fillSelectOptions('modelFilter', [...new Set(data.map(d => d.modelUnit).filter(Boolean))].sort(), 'Semua Model');
+        updatePpuDependentDropdowns(data);
+    }
+
+    function updatePpuDependentDropdowns(data) {
+        const selectedSite = document.getElementById('siteFilter').value;
+        const selectedType = document.getElementById('typeFilter').value;
+        const selectedModel = document.getElementById('modelFilter').value;
+
+        let siteFiltered = selectedSite === 'ALL' ? data : data.filter(d => d.site === selectedSite);
+
+        const availableTypes = [...new Set(siteFiltered.map(d => d.type).filter(Boolean))].sort();
+        fillSelectOptions('typeFilter', availableTypes, 'Semua TYPE');
+        if (availableTypes.includes(selectedType)) {
+            document.getElementById('typeFilter').value = selectedType;
+        } else {
+            document.getElementById('typeFilter').value = 'ALL';
+        }
+
+        const currentType = document.getElementById('typeFilter').value;
+        let typeFiltered = currentType === 'ALL' ? siteFiltered : siteFiltered.filter(d => d.type === currentType);
+
+        const availableModels = [...new Set(typeFiltered.map(d => d.modelUnit).filter(Boolean))].sort();
+        fillSelectOptions('modelFilter', availableModels, 'Semua Model');
+        if (availableModels.includes(selectedModel)) {
+            document.getElementById('modelFilter').value = selectedModel;
+        } else {
+            document.getElementById('modelFilter').value = 'ALL';
+        }
     }
 
     function populateReviewDropdowns(data) {
         fillSelectOptions('reviewSiteFilter', [...new Set(data.map(d => d.site).filter(Boolean))].sort(), 'Semua Site');
-        fillSelectOptions('reviewTypeFilter', [...new Set(data.map(d => d.type).filter(Boolean))].sort(), 'Semua TYPE');
-        fillSelectOptions('reviewModelFilter', [...new Set(data.map(d => d.modelUnit).filter(Boolean))].sort(), 'Semua Model');
         fillSelectOptions('reviewStatusFilter', [...new Set(data.map(d => d.statusPaketOnTrack).filter(Boolean))].sort(), 'Semua Status');
+        updateReviewDependentDropdowns(data);
+    }
+
+    // Fungsi Pembantu Filter Dinamis Cascading Dropdown Review Lifetime (Site -> Type -> Model)
+    function updateReviewDependentDropdowns(data) {
+        const selectedSite = document.getElementById('reviewSiteFilter').value;
+        const selectedType = document.getElementById('reviewTypeFilter').value;
+        const selectedModel = document.getElementById('reviewModelFilter').value;
+
+        // 1. Filter data berdasarkan Site yang dipilih
+        let siteFiltered = selectedSite === 'ALL' ? data : data.filter(d => d.site === selectedSite);
+
+        // 2. Update pilihan Type sesuai Site
+        const availableTypes = [...new Set(siteFiltered.map(d => d.type).filter(Boolean))].sort();
+        fillSelectOptions('reviewTypeFilter', availableTypes, 'Semua TYPE');
+        if (availableTypes.includes(selectedType)) {
+            document.getElementById('reviewTypeFilter').value = selectedType;
+        } else {
+            document.getElementById('reviewTypeFilter').value = 'ALL';
+        }
+
+        // 3. Filter data berdasarkan Type yang aktif
+        const currentType = document.getElementById('reviewTypeFilter').value;
+        let typeFiltered = currentType === 'ALL' ? siteFiltered : siteFiltered.filter(d => d.type === currentType);
+
+        // 4. Update pilihan Model sesuai gabungan Site & Type yang terpilih
+        const availableModels = [...new Set(typeFiltered.map(d => d.modelUnit).filter(Boolean))].sort();
+        fillSelectOptions('reviewModelFilter', availableModels, 'Semua Model');
+        if (availableModels.includes(selectedModel)) {
+            document.getElementById('reviewModelFilter').value = selectedModel;
+        } else {
+            document.getElementById('reviewModelFilter').value = 'ALL';
+        }
     }
 
     function populateAlarmWornDropdowns(data) {
@@ -940,26 +997,21 @@
         updateAlarmDependentDropdowns(data);
     }
 
-    // Fungsi Pembantu Filter Dinamis Cascading Dropdown Alarm Worn (Site -> Model -> No Unit)
     function updateAlarmDependentDropdowns(data) {
         const selectedSite = document.getElementById('alarmSiteFilter').value;
         const selectedModel = document.getElementById('alarmModelFilter').value;
 
-        // Filter data berdasarkan Site yang sedang dipilih
         let siteFilteredData = selectedSite === 'ALL' ? data : data.filter(d => d.site === selectedSite);
 
-        // Update Opsi Model berdasarkan Site yang terpilih
         const availableModels = [...new Set(siteFilteredData.map(d => d.model).filter(Boolean))].sort();
         fillSelectOptions('alarmModelFilter', availableModels, 'Semua Model');
 
-        // Pertahankan nilai Model jika pilihan sebelumnya masih valid di site baru
         if (availableModels.includes(selectedModel)) {
             document.getElementById('alarmModelFilter').value = selectedModel;
         } else {
             document.getElementById('alarmModelFilter').value = 'ALL';
         }
 
-        // Update Opsi No Unit berdasarkan gabungan filter Site & Model
         updateAlarmNoUnitDropdown(siteFilteredData);
     }
 
@@ -1076,7 +1128,7 @@
         tableBody.innerHTML = '';
 
         if (data.length === 0) {
-            tableBody.innerHTML = `<tr><td colspan="7" class="p-4 text-center text-slate-500">Tidak ada data ditemukan</td></tr>`;
+            tableBody.innerHTML = `<tr><td colspan="8" class="p-4 text-center text-slate-500">Tidak ada data ditemukan</td></tr>`;
             return;
         }
 
@@ -1330,24 +1382,42 @@
 
     // ==================== INITIALIZATION ====================
     function initEventListeners() {
-        // PPU Filters
-        ['siteFilter', 'typeFilter', 'modelFilter', 'alarmFilter'].forEach(id => {
+        // PPU Filters (Cascading Filter Enabled)
+        document.getElementById('siteFilter')?.addEventListener('change', () => {
+            updatePpuDependentDropdowns(globalPpuData);
+            applyPpuFilters();
+        });
+        document.getElementById('typeFilter')?.addEventListener('change', () => {
+            updatePpuDependentDropdowns(globalPpuData);
+            applyPpuFilters();
+        });
+        ['modelFilter', 'alarmFilter'].forEach(id => {
             document.getElementById(id)?.addEventListener('change', applyPpuFilters);
         });
         document.getElementById('resetFilterBtn')?.addEventListener('click', () => {
             document.getElementById('siteFilter').value = 'ALL';
+            updatePpuDependentDropdowns(globalPpuData);
             document.getElementById('typeFilter').value = 'ALL';
             document.getElementById('modelFilter').value = 'ALL';
             document.getElementById('alarmFilter').value = 'ALL';
             renderPpuDashboard(globalPpuData);
         });
 
-        // Review Lifetime Filters
-        ['reviewSiteFilter', 'reviewTypeFilter', 'reviewModelFilter', 'reviewStatusFilter'].forEach(id => {
+        // Review Lifetime Filters (Cascading Filter Enabled)
+        document.getElementById('reviewSiteFilter')?.addEventListener('change', () => {
+            updateReviewDependentDropdowns(globalReviewData);
+            applyReviewFilters();
+        });
+        document.getElementById('reviewTypeFilter')?.addEventListener('change', () => {
+            updateReviewDependentDropdowns(globalReviewData);
+            applyReviewFilters();
+        });
+        ['reviewModelFilter', 'reviewStatusFilter'].forEach(id => {
             document.getElementById(id)?.addEventListener('change', applyReviewFilters);
         });
         document.getElementById('resetFilterBtnReview')?.addEventListener('click', () => {
             document.getElementById('reviewSiteFilter').value = 'ALL';
+            updateReviewDependentDropdowns(globalReviewData);
             document.getElementById('reviewTypeFilter').value = 'ALL';
             document.getElementById('reviewModelFilter').value = 'ALL';
             document.getElementById('reviewStatusFilter').value = 'ALL';
