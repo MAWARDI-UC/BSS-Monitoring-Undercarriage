@@ -62,9 +62,9 @@
                     <i data-lucide="alert-circle" class="w-4 h-4"></i>
                     <span>Alarm Worn Up 80%</span>
                 </button>
-                <button data-tab="plan-replacement" class="tab-btn px-3 py-1.5 rounded-md text-xs font-medium text-slate-400 hover:text-slate-200 hover:bg-slate-800 flex items-center space-x-1.5 whitespace-nowrap transition">
+                <button data-tab="rekomendasi-replace" class="tab-btn px-3 py-1.5 rounded-md text-xs font-medium text-slate-400 hover:text-slate-200 hover:bg-slate-800 flex items-center space-x-1.5 whitespace-nowrap transition">
                     <i data-lucide="wrench" class="w-4 h-4"></i>
-                    <span>Plan Replacement</span>
+                    <span>Rekomendasi Replace</span>
                 </button>
             </nav>
         </div>
@@ -379,9 +379,9 @@
                         </select>
                     </div>
                     <div>
-                        <label class="block text-[11px] font-medium text-slate-400 mb-1">NO UNIT</label>
+                        <label class="block text-[11px] font-medium text-slate-400 mb-1">KOMPONEN</label>
                         <select id="alarmKomponenFilter" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-rose-500">
-                            <option value="ALL">Semua No Unit</option>
+                            <option value="ALL">Semua Komponen</option>
                         </select>
                     </div>
                     <div>
@@ -468,11 +468,117 @@
             </div>
         </div>
 
-        <!-- ==================== PLAN REPLACEMENT DASHBOARD ==================== -->
-        <div id="plan-replacement-content" class="dashboard-content space-y-6 hidden">
-            <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-8 text-center text-slate-400">
-                <i data-lucide="construction" class="w-12 h-12 mx-auto mb-4 opacity-50"></i>
-                <p>Konten Plan Replacement sedang dalam tahap pengembangan...</p>
+        <!-- ==================== REKOMENDASI REPLACE DASHBOARD ==================== -->
+        <div id="rekomendasi-replace-content" class="dashboard-content space-y-6 hidden">
+            <div class="relative overflow-hidden rounded-2xl bg-gradient-to-r from-slate-900 via-slate-800 to-indigo-950/40 p-6 border border-slate-800 shadow-xl">
+                <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div>
+                        <div class="flex items-center space-x-2 mb-2">
+                            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold tracking-wide uppercase bg-indigo-500 text-white">REPLACEMENT</span>
+                            <span class="text-xs text-emerald-400 font-medium flex items-center space-x-1">
+                                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                                <span>Monitoring Plan Replacement Active</span>
+                            </span>
+                        </div>
+                        <h2 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">Rekomendasi Replace</h2>
+                        <p class="text-xs text-indigo-400 font-semibold tracking-wider uppercase mt-1">REKOMENDASI PERGANTIAN KOMPONEN PER UNIT</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filter Bar Rekomendasi Replace -->
+            <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-5 shadow-lg space-y-4">
+                <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                    <div class="flex items-center space-x-2 text-indigo-400 font-bold text-sm">
+                        <i data-lucide="filter" class="w-4 h-4"></i>
+                        <span class="text-slate-100">Filter Rekomendasi Replace</span>
+                    </div>
+                    <button id="resetFilterBtnRekomendasi" class="text-xs text-slate-400 hover:text-indigo-400 flex items-center space-x-1 transition">
+                        <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
+                        <span>Reset Filter</span>
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                    <div>
+                        <label class="block text-[11px] font-medium text-slate-400 mb-1">SITE</label>
+                        <select id="rekomendasiSiteFilter" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-indigo-500">
+                            <option value="ALL">Semua Site</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-medium text-slate-400 mb-1">MODEL</label>
+                        <select id="rekomendasiModelFilter" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-indigo-500">
+                            <option value="ALL">Semua Model</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-medium text-slate-400 mb-1">TINGKAT REFERENSI</label>
+                        <select id="rekomendasiTingkatFilter" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-indigo-500">
+                            <option value="ALL">Semua Tingkat</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- KPI Cards Rekomendasi Replace -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div class="bg-slate-900/90 border border-slate-800 p-5 rounded-2xl flex items-center justify-between shadow-md">
+                    <div>
+                        <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Total Unit Rekomendasi</p>
+                        <h3 id="rekomendasiCardTotalUnit" class="text-2xl font-black text-white mt-1">0 Unit</h3>
+                    </div>
+                    <div class="w-12 h-12 rounded-2xl bg-indigo-500/10 border border-indigo-500/30 flex items-center justify-center text-indigo-400">
+                        <i data-lucide="truck" class="w-6 h-6"></i>
+                    </div>
+                </div>
+                <div class="bg-slate-900/90 border border-slate-800 p-5 rounded-2xl flex items-center justify-between shadow-md">
+                    <div>
+                        <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Total Item Worn ≥80%</p>
+                        <h3 id="rekomendasiCardTotalWorn" class="text-2xl font-black text-rose-400 mt-1">0 Item</h3>
+                    </div>
+                    <div class="w-12 h-12 rounded-2xl bg-rose-500/10 border border-rose-500/30 flex items-center justify-center text-rose-400">
+                        <i data-lucide="alert-triangle" class="w-6 h-6"></i>
+                    </div>
+                </div>
+                <div class="bg-slate-900/90 border border-slate-800 p-5 rounded-2xl flex items-center justify-between shadow-md">
+                    <div>
+                        <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Total Komponen Terdaftar</p>
+                        <h3 id="rekomendasiCardTotalKomponen" class="text-2xl font-black text-amber-400 mt-1">0 Item</h3>
+                    </div>
+                    <div class="w-12 h-12 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400">
+                        <i data-lucide="layers" class="w-6 h-6"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chart Rekomendasi Replace -->
+            <div class="bg-slate-900/90 border border-slate-800 p-5 rounded-2xl shadow-lg space-y-4">
+                <h3 class="font-bold text-sm text-slate-100 border-b border-slate-800 pb-3">Jumlah Unit Rekomendasi Per Site</h3>
+                <div id="rekomendasiSiteChart" class="w-full"></div>
+            </div>
+
+            <!-- Table Rekomendasi Replace -->
+            <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-5 shadow-lg space-y-4">
+                <h3 class="font-bold text-sm text-slate-100 border-b border-slate-800 pb-3">Daftar Rekomendasi Replace</h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs text-slate-300">
+                        <thead class="bg-slate-800/80 uppercase text-[10px] text-slate-400 border-b border-slate-700">
+                            <tr>
+                                <th class="p-3">Site</th>
+                                <th class="p-3">No Unit</th>
+                                <th class="p-3">Model</th>
+                                <th class="p-3">Total Komponen Worn 80% Up</th>
+                                <th class="p-3">Total Komponen Per Unit</th>
+                                <th class="p-3">Tingkat Referensi</th>
+                                <th class="p-3">Remark</th>
+                                <th class="p-3">Lifetime</th>
+                                <th class="p-3">Policy</th>
+                            </tr>
+                        </thead>
+                        <tbody id="rekomendasiTableBody" class="divide-y divide-slate-800"></tbody>
+                    </table>
+                </div>
             </div>
         </div>
 
@@ -485,12 +591,14 @@
     const sheetPpuUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSMyvNRqkn65gL_4tIjZKJeKRIQG9ODScl-6uIst7HobQXwRsP4J2BdI1NsA81_pHqxrH2t_sF75_Ch/pub?output=csv';
     const sheetReviewUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTQwT7qtjPmwP3JqE22qhGYBjACLqqb6Af-ZZuVTsaqeY4Qlc51HUBchQoiIU09DFlhPxrUlfiN_mo9/pub?output=csv';
     const sheetAlarmWornUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTWK0pCKlqI_4M982uj2mA_g_TJ3kq6NtKaGdSQnKiwYSi6kx3J-w2B42VG7ctuvwza6oG8g4GEiat7/pub?output=csv';
+    const sheetRekomendasiUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRFWWq3zKypFr6k5qcEkRntKgOudFNtW3GlH0e5LMlpL5ogg0sE8CrYkdpLlC-yT7786qLboE3tNeUr/pub?output=csv';
 
     let globalPpuData = [];
     let globalReviewData = [];
     let globalAlarmWornData = [];
+    let globalRekomendasiData = [];
 
-    let achievementChart, overChart, reviewChart, alarmSiteChart, alarmKomponenChart;
+    let achievementChart, overChart, reviewChart, alarmSiteChart, alarmKomponenChart, rekomendasiSiteChart;
 
     // ==================== TAB SWITCHING ====================
     function initTabSwitching() {
@@ -523,6 +631,7 @@
             if (reviewChart) reviewChart.reflow();
             if (alarmSiteChart) alarmSiteChart.reflow();
             if (alarmKomponenChart) alarmKomponenChart.reflow();
+            if (rekomendasiSiteChart) rekomendasiSiteChart.reflow();
         }, 100);
     }
 
@@ -612,7 +721,6 @@
         });
         alarmSiteChart.render();
 
-        // INSISIALISASI HORIZONTAL BAR CHART UNTUK DISTRIBUSI KOMPONEN
         alarmKomponenChart = new ApexCharts(document.querySelector("#alarmKomponenChart"), {
             series: [{ name: 'Jumlah Item', data: [] }],
             chart: { type: 'bar', height: 380, toolbar: { show: false }, background: 'transparent' },
@@ -641,6 +749,22 @@
             grid: { borderColor: '#1e293b', strokeDashArray: 3 }
         });
         alarmKomponenChart.render();
+    }
+
+    function initRekomendasiChart() {
+        rekomendasiSiteChart = new ApexCharts(document.querySelector("#rekomendasiSiteChart"), {
+            series: [{ name: 'Jumlah Unit', data: [] }],
+            chart: { type: 'bar', height: 320, toolbar: { show: false }, background: 'transparent' },
+            plotOptions: { bar: { borderRadius: 6, columnWidth: '45%', distributed: true, dataLabels: { position: 'top' } } },
+            dataLabels: { enabled: true, offsetY: -20, style: { colors: ['#f8fafc'], fontSize: '11px', fontWeight: 'bold' } },
+            theme: { mode: 'dark' },
+            colors: ['#6366f1', '#818cf8', '#a5b4fc', '#c7d2fe', '#4f46e5'],
+            legend: { show: false },
+            xaxis: { categories: [], labels: { style: { colors: '#94a3b8', fontSize: '11px', fontWeight: 'bold' } } },
+            yaxis: { labels: { style: { colors: '#94a3b8', fontSize: '10px' } } },
+            grid: { borderColor: '#1e293b', strokeDashArray: 3 }
+        });
+        rekomendasiSiteChart.render();
     }
 
     // ==================== PARSER CSV PRESET ====================
@@ -677,10 +801,7 @@
             const response = await fetch(sheetPpuUrl);
             const dataText = await response.text();
             
-            if (dataText.trim().startsWith('<!DOCTYPE') || dataText.includes('google-site-verification')) {
-                console.error('❌ Google Sheets PPU belum dipublikasikan sebagai CSV publik.');
-                return;
-            }
+            if (dataText.trim().startsWith('<!DOCTYPE') || dataText.includes('google-site-verification')) return;
 
             const rows = dataText.split(/\r?\n/).filter(r => r.trim() !== '');
             
@@ -710,10 +831,7 @@
             const response = await fetch(sheetReviewUrl);
             const dataText = await response.text();
 
-            if (dataText.trim().startsWith('<!DOCTYPE') || dataText.includes('google-site-verification')) {
-                console.error('❌ Google Sheets Review Lifetime belum dipublikasikan sebagai CSV publik.');
-                return;
-            }
+            if (dataText.trim().startsWith('<!DOCTYPE') || dataText.includes('google-site-verification')) return;
 
             const lines = dataText.split(/\r?\n/).filter(r => r.trim() !== '');
             if (lines.length < 2) return;
@@ -745,10 +863,7 @@
             const response = await fetch(sheetAlarmWornUrl);
             const dataText = await response.text();
 
-            if (dataText.trim().startsWith('<!DOCTYPE') || dataText.includes('google-site-verification')) {
-                console.error('❌ Google Sheets Alarm Worn belum dipublikasikan sebagai CSV publik.');
-                return;
-            }
+            if (dataText.trim().startsWith('<!DOCTYPE') || dataText.includes('google-site-verification')) return;
 
             const lines = dataText.split(/\r?\n/).filter(r => r.trim() !== '');
             if (lines.length < 2) return;
@@ -761,9 +876,9 @@
                     noUnit: (cols[2] || '').trim(),
                     komponen: (cols[3] || '').trim(),
                     worn: (cols[4] || '-').trim(),
-                    lifetime: (cols[6] || '-').trim(),
-                    policy: (cols[7] || '-').trim(),
-                    statusLifetime: (cols[8] || '-').trim()
+                    lifetime: (cols[5] || '-').trim(),
+                    policy: (cols[6] || '-').trim(),
+                    statusLifetime: (cols[7] || '-').trim()
                 };
             }).filter(item => item.site !== '' && !item.site.toLowerCase().includes('function'));
 
@@ -772,6 +887,40 @@
 
         } catch (error) {
             console.error('❌ Gagal mengambil data Alarm Worn Up 80%:', error);
+        }
+    }
+
+    // ==================== LOAD DATA REKOMENDASI REPLACE ====================
+    async function loadRekomendasiData() {
+        try {
+            const response = await fetch(sheetRekomendasiUrl);
+            const dataText = await response.text();
+
+            if (dataText.trim().startsWith('<!DOCTYPE') || dataText.includes('google-site-verification')) return;
+
+            const lines = dataText.split(/\r?\n/).filter(r => r.trim() !== '');
+            if (lines.length < 2) return;
+
+            globalRekomendasiData = lines.slice(1).map((row) => {
+                const cols = parseCSVLine(row);
+                return {
+                    site: (cols[0] || '').trim(),
+                    noUnit: (cols[1] || '').trim(),
+                    model: (cols[2] || '').trim(),
+                    totalWorn80Up: (cols[3] || '0').trim(),
+                    totalKomponenPerUnit: (cols[4] || '0').trim(),
+                    tingkatReferensi: (cols[5] || '-').trim(),
+                    remark: (cols[6] || '-').trim(),
+                    lifetime: (cols[7] || '-').trim(),
+                    policy: (cols[8] || '-').trim()
+                };
+            }).filter(item => item.site !== '' && !item.site.toLowerCase().includes('function'));
+
+            populateRekomendasiDropdowns(globalRekomendasiData);
+            renderRekomendasiDashboard(globalRekomendasiData);
+
+        } catch (error) {
+            console.error('❌ Gagal mengambil data Rekomendasi Replace:', error);
         }
     }
 
@@ -794,6 +943,12 @@
         fillSelectOptions('alarmModelFilter', [...new Set(data.map(d => d.model).filter(Boolean))].sort(), 'Semua Model');
         fillSelectOptions('alarmKomponenFilter', [...new Set(data.map(d => d.komponen).filter(Boolean))].sort(), 'Semua Komponen');
         fillSelectOptions('alarmStatusFilter', [...new Set(data.map(d => d.statusLifetime).filter(Boolean))].sort(), 'Semua Status');
+    }
+
+    function populateRekomendasiDropdowns(data) {
+        fillSelectOptions('rekomendasiSiteFilter', [...new Set(data.map(d => d.site).filter(Boolean))].sort(), 'Semua Site');
+        fillSelectOptions('rekomendasiModelFilter', [...new Set(data.map(d => d.model).filter(Boolean))].sort(), 'Semua Model');
+        fillSelectOptions('rekomendasiTingkatFilter', [...new Set(data.map(d => d.tingkatReferensi).filter(Boolean))].sort(), 'Semua Tingkat');
     }
 
     function fillSelectOptions(elementId, items, defaultText) {
@@ -1001,7 +1156,6 @@
             tableBody.appendChild(tr);
         });
 
-        // Update Charts Alarm Worn
         const sites = [...new Set(data.map(d => d.site).filter(Boolean))].sort();
         const siteCounts = sites.map(s => data.filter(d => d.site === s).length);
 
@@ -1014,10 +1168,66 @@
                 series: [{ name: 'Jumlah Item', data: siteCounts }]
             });
             
-            // UPDATE SINKRON UNTUK HORIZONTAL BAR CHART
             alarmKomponenChart.updateOptions({
                 xaxis: { categories: komponenList },
                 series: [{ name: 'Jumlah Item', data: komponenCounts }]
+            });
+        }
+    }
+
+    // ==================== RENDER REKOMENDASI REPLACE DASHBOARD ====================
+    function renderRekomendasiDashboard(data) {
+        const totalUnit = data.length;
+        const totalWorn = data.reduce((acc, curr) => acc + (parseInt(curr.totalWorn80Up) || 0), 0);
+        const totalKomponen = data.reduce((acc, curr) => acc + (parseInt(curr.totalKomponenPerUnit) || 0), 0);
+
+        document.getElementById('rekomendasiCardTotalUnit').innerText = `${totalUnit} Unit`;
+        document.getElementById('rekomendasiCardTotalWorn').innerText = `${totalWorn} Item`;
+        document.getElementById('rekomendasiCardTotalKomponen').innerText = `${totalKomponen} Item`;
+
+        const tableBody = document.getElementById('rekomendasiTableBody');
+        tableBody.innerHTML = '';
+
+        if (data.length === 0) {
+            tableBody.innerHTML = `<tr><td colspan="9" class="p-4 text-center text-slate-500">Tidak ada data ditemukan</td></tr>`;
+            return;
+        }
+
+        data.forEach(item => {
+            const tr = document.createElement('tr');
+            tr.className = 'hover:bg-slate-800/40 border-b border-slate-800';
+
+            let tingkatBadge = `<span class="px-2.5 py-1 rounded text-xs font-bold bg-slate-800 text-slate-300 border border-slate-700">${item.tingkatReferensi || '-'}</span>`;
+            const ref = (item.tingkatReferensi || '').toUpperCase();
+            if (ref.includes('HIGH') || ref.includes('PRIORITAS') || ref.includes('UTAMA')) {
+                tingkatBadge = `<span class="px-2.5 py-1 rounded text-xs font-bold bg-rose-500/10 text-rose-400 border border-rose-500/20">${item.tingkatReferensi}</span>`;
+            } else if (ref.includes('MEDIUM') || ref.includes('SEDANG')) {
+                tingkatBadge = `<span class="px-2.5 py-1 rounded text-xs font-bold bg-amber-500/10 text-amber-400 border border-amber-500/20">${item.tingkatReferensi}</span>`;
+            } else if (ref.includes('LOW') || ref.includes('RENDAH')) {
+                tingkatBadge = `<span class="px-2.5 py-1 rounded text-xs font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">${item.tingkatReferensi}</span>`;
+            }
+
+            tr.innerHTML = `
+                <td class="p-3 font-bold text-white">${item.site || '-'}</td>
+                <td class="p-3 font-semibold text-white">${item.noUnit || '-'}</td>
+                <td class="p-3 text-slate-300">${item.model || '-'}</td>
+                <td class="p-3 text-rose-400 font-bold">${item.totalWorn80Up}</td>
+                <td class="p-3 text-slate-300 font-semibold">${item.totalKomponenPerUnit}</td>
+                <td class="p-3">${tingkatBadge}</td>
+                <td class="p-3 text-slate-300">${item.remark}</td>
+                <td class="p-3 text-slate-300 font-semibold">${item.lifetime}</td>
+                <td class="p-3 text-slate-300">${item.policy}</td>
+            `;
+            tableBody.appendChild(tr);
+        });
+
+        const sites = [...new Set(data.map(d => d.site).filter(Boolean))].sort();
+        const siteUnitCounts = sites.map(s => data.filter(d => d.site === s).length);
+
+        if (rekomendasiSiteChart) {
+            rekomendasiSiteChart.updateOptions({
+                xaxis: { categories: sites },
+                series: [{ name: 'Jumlah Unit', data: siteUnitCounts }]
             });
         }
     }
@@ -1068,6 +1278,19 @@
         renderAlarmWornDashboard(filtered);
     }
 
+    function applyRekomendasiFilters() {
+        const siteVal = document.getElementById('rekomendasiSiteFilter').value;
+        const modelVal = document.getElementById('rekomendasiModelFilter').value;
+        const tingkatVal = document.getElementById('rekomendasiTingkatFilter').value;
+
+        const filtered = globalRekomendasiData.filter(item => {
+            return (siteVal === 'ALL' || item.site === siteVal) &&
+                   (modelVal === 'ALL' || item.model === modelVal) &&
+                   (tingkatVal === 'ALL' || item.tingkatReferensi === tingkatVal);
+        });
+        renderRekomendasiDashboard(filtered);
+    }
+
     // ==================== INITIALIZATION ====================
     function initEventListeners() {
         ['siteFilter', 'typeFilter', 'modelFilter', 'alarmFilter'].forEach(id => {
@@ -1102,19 +1325,31 @@
             document.getElementById('alarmStatusFilter').value = 'ALL';
             renderAlarmWornDashboard(globalAlarmWornData);
         });
+
+        ['rekomendasiSiteFilter', 'rekomendasiModelFilter', 'rekomendasiTingkatFilter'].forEach(id => {
+            document.getElementById(id)?.addEventListener('change', applyRekomendasiFilters);
+        });
+        document.getElementById('resetFilterBtnRekomendasi')?.addEventListener('click', () => {
+            document.getElementById('rekomendasiSiteFilter').value = 'ALL';
+            document.getElementById('rekomendasiModelFilter').value = 'ALL';
+            document.getElementById('rekomendasiTingkatFilter').value = 'ALL';
+            renderRekomendasiDashboard(globalRekomendasiData);
+        });
     }
 
     async function init() {
         initPpuCharts();
         initReviewChart();
         initAlarmWornCharts();
+        initRekomendasiChart();
         initTabSwitching();
         initEventListeners();
         
         await Promise.all([
             loadPpuData(),
             loadReviewLifetimeData(),
-            loadAlarmWornData()
+            loadAlarmWornData(),
+            loadRekomendasiData()
         ]);
     }
 
