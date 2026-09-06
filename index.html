@@ -941,7 +941,7 @@
     function populateAlarmWornDropdowns(data) {
         fillSelectOptions('alarmSiteFilter', [...new Set(data.map(d => d.site).filter(Boolean))].sort(), 'Semua Site');
         fillSelectOptions('alarmModelFilter', [...new Set(data.map(d => d.model).filter(Boolean))].sort(), 'Semua Model');
-        fillSelectOptions('alarmKomponenFilter', [...new Set(data.map(d => d.komponen).filter(Boolean))].sort(), 'Semua Komponen');
+        fillSelectOptions('alarmNoUnitFilter', [...new Set(data.map(d => d.noUnit).filter(Boolean))].sort(), 'Semua No Unit');
         fillSelectOptions('alarmStatusFilter', [...new Set(data.map(d => d.statusLifetime).filter(Boolean))].sort(), 'Semua Status');
     }
 
@@ -1266,13 +1266,13 @@
     function applyAlarmWornFilters() {
         const siteVal = document.getElementById('alarmSiteFilter').value;
         const modelVal = document.getElementById('alarmModelFilter').value;
-        const komponenVal = document.getElementById('alarmKomponenFilter').value;
+        const noUnitVal = document.getElementById('alarmNoUnitFilter').value;
         const statusVal = document.getElementById('alarmStatusFilter').value;
 
         const filtered = globalAlarmWornData.filter(item => {
             return (siteVal === 'ALL' || item.site === siteVal) &&
                    (modelVal === 'ALL' || item.model === modelVal) &&
-                   (komponenVal === 'ALL' || item.komponen === komponenVal) &&
+                   (noUnitVal === 'ALL' || item.noUnit === noUnitVal) &&
                    (statusVal === 'ALL' || item.statusLifetime === statusVal);
         });
         renderAlarmWornDashboard(filtered);
@@ -1315,13 +1315,13 @@
             renderReviewLifetimeDashboard(globalReviewData);
         });
 
-        ['alarmSiteFilter', 'alarmModelFilter', 'alarmKomponenFilter', 'alarmStatusFilter'].forEach(id => {
+        ['alarmSiteFilter', 'alarmModelFilter', 'alarmNoUnitFilter', 'alarmStatusFilter'].forEach(id => {
             document.getElementById(id)?.addEventListener('change', applyAlarmWornFilters);
         });
         document.getElementById('resetFilterBtnAlarm')?.addEventListener('click', () => {
             document.getElementById('alarmSiteFilter').value = 'ALL';
             document.getElementById('alarmModelFilter').value = 'ALL';
-            document.getElementById('alarmKomponenFilter').value = 'ALL';
+            document.getElementById('alarmNoUnitFilter').value = 'ALL';
             document.getElementById('alarmStatusFilter').value = 'ALL';
             renderAlarmWornDashboard(globalAlarmWornData);
         });
